@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.Playing;
         Time.timeScale = 1f;
         SceneLoader.Instance.Load(SceneNames.GameScene);
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.EnablePlayerInput();
+        }
         Debug.Log("Game Started");
     }
 
@@ -37,6 +41,10 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.MainMenu;
         //Time.timeScale = 1f;
         SceneLoader.Instance.Load(SceneNames.MainMenu);
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.EnableUIInput();
+        }
         Debug.Log("Got to Main Menu");
     }
 
@@ -61,3 +69,4 @@ public class GameManager : MonoBehaviour
         EventBus.Instance.RaiseGameResumed();
     }
 }
+

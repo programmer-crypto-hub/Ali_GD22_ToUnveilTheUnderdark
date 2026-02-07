@@ -25,6 +25,6 @@ public class EventBus : MonoBehaviour
 
     public void RaiseGameResumed()
     {
-        OnGamePaused?.Invoke();
+        OnGameResumed?.Invoke();
     }
 }
