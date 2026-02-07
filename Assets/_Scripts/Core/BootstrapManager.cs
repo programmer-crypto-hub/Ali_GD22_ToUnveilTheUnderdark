@@ -76,7 +76,7 @@ public class BootstrapManager : MonoBehaviour
         inputManager.inputActions = Resources.Load<InputActionAsset>("InputSystem_Actions");
         if (inputManager.inputActions == null)
         {
-            Debug.LogError("Failed to load InputActionAsset from Resources/InputSystems_Actions. Please ensure the asset exists and is in the correct folder.");
+            Debug.LogError("Failed to load InputActionAsset from Resources/InputSystem_Actions. Please ensure the asset exists and is in the correct folder.");
         }
         DontDestroyOnLoad(go);
     }

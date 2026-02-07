@@ -74,12 +74,12 @@ public class InputManager : MonoBehaviour
             return;
         }
         moveAction = playerActionMap.FindAction("Move");
-        lookAction = playerActionMap.FindAction("Look");
+        //lookAction = playerActionMap.FindAction("Look");
         jumpAction = playerActionMap.FindAction("Jump");
         attackAction = playerActionMap.FindAction("Attack");
         interactAction = playerActionMap.FindAction("Interact");
-        sprintAction = playerActionMap.FindAction("Sprint");
-        crouchAction = playerActionMap.FindAction("Crouch");
+        //sprintAction = playerActionMap.FindAction("Sprint");
+        //crouchAction = playerActionMap.FindAction("Crouch");
         pauseAction = playerActionMap.FindAction("Pause");
         cancelAction = uiActionMap.FindAction("Cancel");
         if (jumpAction != null)
@@ -238,13 +238,13 @@ public class InputManager : MonoBehaviour
         return InteractPressed;
     }
 
-    public bool IsSprintHeld()
-    {
-        return SprintHeld;
-    }
+    //public bool IsSprintHeld()
+    //{
+    //    return SprintHeld;
+    //}
 
-    public bool IsCrouchHeld()
-    {
-        return CrouchHeld;
-    }
+    //public bool IsCrouchHeld()
+    //{
+    //    return CrouchHeld;
+    //}
 }

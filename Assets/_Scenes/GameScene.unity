@@ -284,7 +284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf4e0f4e89c59ad4b9324bba7439a806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pausePanel: {fileID: 690163852}
+  pausePanel: {fileID: 43123865}
   resumeButton: {fileID: 612246466}
   mainMenuButton: {fileID: 1196621527}
 --- !u!4 &171212070
