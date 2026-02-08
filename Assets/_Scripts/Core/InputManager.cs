@@ -18,15 +18,17 @@ public class InputManager : MonoBehaviour
     private InputAction jumpAction;
     private InputAction attackAction;
     private InputAction interactAction;
-    private InputAction sprintAction;
-    private InputAction crouchAction;
+    //private InputAction sprintAction;
+    //private InputAction crouchAction;
     private InputAction pauseAction;
+    private InputAction zoomAction;
 
     // UI Actions
     private InputAction cancelAction;
 
     public Vector2 MoveInput { get; private set; }
     public Vector2 LookInput { get; private set; }
+    public float ZoomInput { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool AttackPressed { get; private set; }
     public bool InteractPressed { get; private set; }
@@ -74,7 +76,7 @@ public class InputManager : MonoBehaviour
             return;
         }
         moveAction = playerActionMap.FindAction("Move");
-        //lookAction = playerActionMap.FindAction("Look");
+        lookAction = playerActionMap.FindAction("Look");
         jumpAction = playerActionMap.FindAction("Jump");
         attackAction = playerActionMap.FindAction("Attack");
         interactAction = playerActionMap.FindAction("Interact");
@@ -82,6 +84,7 @@ public class InputManager : MonoBehaviour
         //crouchAction = playerActionMap.FindAction("Crouch");
         pauseAction = playerActionMap.FindAction("Pause");
         cancelAction = uiActionMap.FindAction("Cancel");
+        zoomAction = playerActionMap.FindAction("Zoom");
         if (jumpAction != null)
             jumpAction.performed += OnJumpPerformed;
         if (attackAction != null)
@@ -142,8 +145,9 @@ public class InputManager : MonoBehaviour
     {
         MoveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         LookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
-        SprintHeld = sprintAction != null && sprintAction.IsPressed();
-        CrouchHeld = crouchAction != null && crouchAction.IsPressed();
+        //SprintHeld = sprintAction != null && sprintAction.IsPressed();
+        //CrouchHeld = crouchAction != null && crouchAction.IsPressed();
+        ZoomInput = zoomAction != null ? zoomAction.ReadValue<Vector2>().y : 0f;
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
@@ -221,6 +225,11 @@ public class InputManager : MonoBehaviour
     public Vector2 GetLookInput()
     {
         return LookInput;
+    }
+
+    public float GetZoomInput()
+    {
+        return ZoomInput;
     }
 
     public bool IsJumpPressed()
