@@ -222,6 +222,11 @@ public class InputManager : MonoBehaviour
         return MoveInput;
     }
 
+    public bool IsJumpPressed()
+    {
+        return JumpPressed;
+    }
+
     public Vector2 GetLookInput()
     {
         return LookInput;
@@ -230,11 +235,6 @@ public class InputManager : MonoBehaviour
     public float GetZoomInput()
     {
         return ZoomInput;
-    }
-
-    public bool IsJumpPressed()
-    {
-        return JumpPressed;
     }
 
     public bool IsAttackPressed()
@@ -246,14 +246,4 @@ public class InputManager : MonoBehaviour
     {
         return InteractPressed;
     }
-
-    //public bool IsSprintHeld()
-    //{
-    //    return SprintHeld;
-    //}
-
-    //public bool IsCrouchHeld()
-    //{
-    //    return CrouchHeld;
-    //}
 }
