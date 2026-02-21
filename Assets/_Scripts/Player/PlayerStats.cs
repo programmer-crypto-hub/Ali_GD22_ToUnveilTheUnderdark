@@ -78,31 +78,31 @@ public class PlayerStats : MonoBehaviour
 
     }
 
-    ///// <summary>
-    ///// Применяет бонусы за повышение уровня:
-    ///// меняет maxHealth / maxMana и обновляет текущие значения
-    ///// с подниманием событий OnHealthChanged / OnManaChanged.
-    ///// Вызывать этот метод предпочтительнее, чем напрямую
-    ///// менять currentHealth и ScriptableObject снаружи.
-    ///// </summary>
-    //public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
-    //{
-    //    if (playerData == null)
-    //    {
-    //        Debug.LogWarning("PlayerStats.ApplyLevelUpBonuses: PlayerData не назначен.", this);
-    //        return;
-    //    }
+    /// <summary>
+    /// Применяет бонусы за повышение уровня:
+    /// меняет maxHealth / maxMana и обновляет текущие значения
+    /// с подниманием событий OnHealthChanged / OnManaChanged.
+    /// Вызывать этот метод предпочтительнее, чем напрямую
+    /// менять currentHealth и ScriptableObject снаружи.
+    /// </summary>
+    public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
+    {
+        if (playerData == null)
+        {
+            Debug.LogWarning("PlayerStats.ApplyLevelUpBonuses: PlayerData не назначен.", this);
+            return;
+        }
 
-    //    // Увеличиваем максимальные значения
-    //    playerData.maxHealth += healthBonus;
-    //    playerData.maxCaveCoins += caveCoinsBonus;
+        // Увеличиваем максимальные значения
+        playerData.maxHealth += healthBonus;
+        playerData.maxCaveCoins += caveCoinsBonus;
 
-    //    // Синхронизируем текущее с новыми максимумами
-    //    currentHealth = playerData.maxHealth;
+        // Синхронизируем текущее с новыми максимумами
+        currentHealth = playerData.maxHealth;
 
-    //    // События вызываем здесь, внутри PlayerStats
-    //    OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-    //}
+        // События вызываем здесь, внутри PlayerStats
+        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
+    }
 
     /// <summary>
     /// Наносит урон игроку.
