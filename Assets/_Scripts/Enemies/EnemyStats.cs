@@ -1,350 +1,175 @@
-//using System;
-//using UnityEngine;
-//using UnityEngine.Rendering;
+using System;
+using UnityEngine;
 
-///// <summary>
-///// Отвечает за текущие характеристики игрока:
-///// здоровье, мана/энергия и связанные с ними события.
-///// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
-///// </summary>
-//public class PlayerStats : MonoBehaviour
-//{
-//    [Header("Данные игрока")]
-//    [Tooltip("ScriptableObject с базовыми параметрами игрока (PlayerData).")]
-//    public PlayerData playerData;
+/// <summary>
+/// Отвечает за текущие характеристики врага:
+/// здоровье, мана/энергия и связанные с ними события.
+/// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
+/// </summary>
+public class EnemyStats : MonoBehaviour
+{
+    [Header("Данные врага")]
+    [Tooltip("ScriptableObject с базовыми параметрами врага (enemyData).")]
+    public EnemyData enemyData;
 
-//    [Header("Текущее состояние")]
-//    [SerializeField]
-//    [Tooltip("Текущее здоровье игрока.")]
-//    private float currentHealth;
+    [Header("Текущее состояние")]
+    [SerializeField]
+    [Tooltip("Текущее здоровье врага.")]
+    private float currentEnemyHealth;
 
-//    [Header("Currencies")]
-//    [SerializeField]
-//    [Tooltip("Текущее количество монет (Cave Coins).")]
-//    private float caveCoins;
-//    /// <summary>
-//    /// Текущее здоровье игрока (только для чтения).
-//    /// Для изменения используйте методы TakeDamage() или Heal().
-//    /// </summary>
-//    public float CurrentHealth => currentHealth;
+    [Header("Урон врагов")]
+    [SerializeField]
+    [Tooltip("Текущий урон врага.")]
+    private float enemyDamage;
 
-//    /// <summary>
-//    /// Currency Values
-//    /// For Modifying use AddCaveCoins() or SpendCaveCoins() methods.
-//    /// </summary>
-//    public float CaveCoins => caveCoins;
+    /// <summary>
+    /// Текущее здоровье врага (только для чтения).
+    /// Для изменения используйте методы TakeDamage() или Heal().
+    /// </summary>
+    public float CurrentEnemyHealth => currentEnemyHealth;
 
-//    // События для связи с другими системами (UI, эффекты и т.п.)
-//    /// <summary>
-//    /// Вызывается при изменении здоровья.
-//    /// Параметры: текущее здоровье, максимальное здоровье.
-//    /// </summary>
-//    public event Action<float, float> OnHealthChanged;
-//    public event Action<float, float> OnCaveCoinsChanged;
+    /// <summary>
+    /// Damage Values
+    /// For Modifying use IncreaseDamage() method.
+    /// </summary>
+    public float EnemyDamage => enemyDamage;
 
-//    /// <summary>
-//    /// Вызывается один раз в момент "смерти" игрока (здоровье упало до 0).
-//    /// </summary>
-//    public event Action OnDeath;
+    // События для связи с другими системами (UI, эффекты и т.п.)
+    /// <summary>
+    /// Вызывается при изменении здоровья.
+    /// Параметры: текущее здоровье, максимальное здоровье.
+    /// </summary>
+    public event Action<float, float> OnEnemyHealthChanged;
+    //public event Action<float, float> OnEnemyDamageChanged;
 
-//    /// <summary>
-//    /// Точка входа компонента.
-//    /// При старте берёт стартовые значения из PlayerData.
-//    /// </summary>
-//    private void Awake()
-//    {
-//        InitializeFromData();
-//    }
+    /// <summary>
+    /// Вызывается один раз в момент "смерти" врага (здоровье упало до 0).
+    /// </summary>
+    public event Action OnEnemyDeath;
 
-//    /// <summary>
-//    /// Инициализирует текущие значения из PlayerData.
-//    /// Можно вызвать повторно, например, при респауне.
-//    /// </summary>
-//    public void InitializeFromData()
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogError("PlayerStats: PlayerData не назначен!", this);
-//            return;
-//        }
+    /// <summary>
+    /// Точка входа компонента.
+    /// При старте берёт стартовые значения из enemyData.
+    /// </summary>
+    private void Awake()
+    {
+        InitializeFromEnemyData();
+    }
 
-//        // Берём стартовые значения и ограничиваем их в разумных пределах.
-//        currentHealth = Mathf.Clamp(playerData.maxHealth, 1f, float.MaxValue);
-//        caveCoins = Mathf.Clamp(playerData.caveCoins, 0f, float.MaxValue);
+    /// <summary>
+    /// Инициализирует текущие значения из enemyData на основе тега врага.
+    /// Можно вызвать повторно, например, при респауне.
+    /// </summary>
+    public void InitializeFromEnemyData()
+    {
+        if (enemyData == null)
+        {
+            Debug.LogError("EnemyStats: enemyData не назначен!", this);
+            return;
+        }
 
-//        // Уведомляем подписчиков о начальных значениях.
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//        OnCaveCoinsChanged?.Invoke(CaveCoins, playerData.maxCaveCoins);
+        string enemyTag = gameObject.tag;
 
-//    }
+        if (enemyTag == enemyData.enemyType)
+        {
+            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.skeletonMaxHealth);
 
-//    /// <summary>
-//    /// Применяет бонусы за повышение уровня:
-//    /// меняет maxHealth / maxMana и обновляет текущие значения
-//    /// с подниманием событий OnHealthChanged / OnManaChanged.
-//    /// Вызывать этот метод предпочтительнее, чем напрямую
-//    /// менять currentHealth и ScriptableObject снаружи.
-//    /// </summary>
-//    public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.ApplyLevelUpBonuses: PlayerData не назначен.", this);
-//            return;
-//        }
+        }
+        else if (enemyTag == enemyData.enemyType2)
+        {
+            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.goblinMaxHealth);
+        }
+        else if (enemyTag == enemyData.enemyType3)
+        {
+            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.vampireMaxHealth);
+        }
+        else
+        {
+            Debug.LogWarning("EnemyStats.InitializeFromEnemyData: Неизвестный тип врага, используем дефолтные значения.", this);
+            return;
+        }
 
-//        // Увеличиваем максимальные значения
-//        playerData.maxHealth += healthBonus;
-//        playerData.maxCaveCoins += caveCoinsBonus;
+        // Берём стартовые значения и ограничиваем их в разумных пределах.
+        //enemyDamage = Mathf.Clamp(enemyDamage, 0f, float.MaxValue);
 
-//        // Синхронизируем текущее с новыми максимумами
-//        currentHealth = playerData.maxHealth;
+        // Уведомляем подписчиков о начальных значениях.
+        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
+        //OnEnemyDamageChanged?.Invoke(enemyDamage, enemyDamage);
+    }
 
-//        // События вызываем здесь, внутри PlayerStats
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//    }
+    /// <summary>
+    /// Применяет бонусы за повышение уровня:
+    /// меняет здоровье и урон с вызовом событий.
+    /// </summary>
+    public void ApplyEnemyBuffs(float healthBonus, float damageBonus)
+    {
+        if (enemyData == null)
+        {
+            Debug.LogWarning("EnemyStats.ApplyEnemyBuffs: enemyData не назначен.", this);
+            return;
+        }
 
-//    /// <summary>
-//    /// Наносит урон игроку.
-//    /// Не даёт опустить здоровье ниже 0 и при необходимости вызывает OnDeath.
-//    /// </summary>
-//    public void TakeDamage(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.TakeDamage: PlayerData не назначен.", this);
-//            return;
-//        }
+        // Увеличиваем текущие значения
+        currentEnemyHealth += healthBonus;
+        enemyDamage += damageBonus;
 
-//        // Не реагируем на некорректный урон или если игрок уже мёртв.
-//        if (amount <= 0f || currentHealth <= 0f)
-//            return;
+        // Ограничиваем значения
+        // TODO: Fix the lines below
+        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, float.MaxValue);
+        enemyDamage = Mathf.Clamp(enemyDamage, 0f, enemyDamage);
 
-//        currentHealth -= amount;
-//        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
+        // События вызываем здесь, внутри EnemyStats
+        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
+        //OnEnemyDamageChanged?.Invoke(enemyDamage, enemyDamage);
+    }
 
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
+    /// <summary>
+    /// Наносит урон врагу.
+    /// Не даёт опустить здоровье ниже 0 и при необходимости вызывает OnDeath.
+    /// </summary>
+    public void TakeDamage(float amount)
+    {
+        if (enemyData == null)
+        {
+            Debug.LogWarning("EnemyStats.TakeDamage: enemyData не назначен.", this);
+            return;
+        }
 
-//        if (currentHealth <= 0f)
-//        {
-//            // Игрок "умирает" — здесь можно запустить анимацию смерти, перезапуск уровня и т.п.
-//            OnDeath?.Invoke();
-//        }
-//    }
+        // Не реагируем на некорректный урон или если враг уже мёртв.
+        if (amount <= 0f || currentEnemyHealth <= 0f)
+            return;
 
-//    /// <summary>
-//    /// Лечит игрока на указанное значение.
-//    /// Не поднимает здоровье выше максимального и не лечит мёртвого игрока.
-//    /// </summary>
-//    public void Heal(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.Heal: PlayerData не назначен.", this);
-//            return;
-//        }
+        currentEnemyHealth -= amount;
+        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 0f, float.MaxValue);
 
-//        // Нет смысла лечить на неположительное значение или лечить мёртвого.
-//        if (amount <= 0f || currentHealth <= 0f)
-//            return;
+        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
 
-//        currentHealth += amount;
-//        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
+        if (currentEnemyHealth <= 0f)
+        {
+            // Враг "умирает" — здесь можно запустить анимацию смерти, эффекты и т.п.
+            OnEnemyDeath?.Invoke();
+        }
+    }
 
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//    }
+    /// <summary>
+    /// Лечит врага на указанное значение.
+    /// Не поднимает здоровье выше максимального и не лечит мёртвого врага.
+    /// </summary>
+    public void Heal(float amount)
+    {
+        if (enemyData == null)
+        {
+            Debug.LogWarning("EnemyStats.Heal: enemyData не назначен.", this);
+            return;
+        }
 
-//    /// <summary>
-//    /// Adds cave coins to the player's current amount.
-//    /// Doesnt add coins if the player already has the maximum amount.
-//    /// </summary>
+        // Нет смысла лечить на неположительное значение или лечить мёртвого.
+        if (amount <= 0f || currentEnemyHealth <= 0f)
+            return;
 
-//    public void AddCaveCoins(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.AddCaveCoins: PlayerData не назначен.", this);
-//            return;
-//        }
-//        if (amount <= 0f || caveCoins >= playerData.maxCaveCoins)
-//            return;
-//        caveCoins += amount;
-//        caveCoins = Mathf.Clamp(caveCoins, 0f, playerData.maxCaveCoins);
-//        OnCaveCoinsChanged?.Invoke(caveCoins, playerData.maxCaveCoins);
-//    }
-//}
-//using System;
-//using UnityEngine;
-//using UnityEngine.Rendering;
+        currentEnemyHealth += amount;
+        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 0f, float.MaxValue);
 
-///// <summary>
-///// Отвечает за текущие характеристики игрока:
-///// здоровье, мана/энергия и связанные с ними события.
-///// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
-///// </summary>
-//public class PlayerStats : MonoBehaviour
-//{
-//    [Header("Данные игрока")]
-//    [Tooltip("ScriptableObject с базовыми параметрами игрока (PlayerData).")]
-//    public PlayerData playerData;
-
-//    [Header("Текущее состояние")]
-//    [SerializeField]
-//    [Tooltip("Текущее здоровье игрока.")]
-//    private float currentHealth;
-
-//    [Header("Currencies")]
-//    [SerializeField]
-//    [Tooltip("Текущее количество монет (Cave Coins).")]
-//    private float caveCoins;
-//    /// <summary>
-//    /// Текущее здоровье игрока (только для чтения).
-//    /// Для изменения используйте методы TakeDamage() или Heal().
-//    /// </summary>
-//    public float CurrentHealth => currentHealth;
-
-//    /// <summary>
-//    /// Currency Values
-//    /// For Modifying use AddCaveCoins() or SpendCaveCoins() methods.
-//    /// </summary>
-//    public float CaveCoins => caveCoins;
-
-//    // События для связи с другими системами (UI, эффекты и т.п.)
-//    /// <summary>
-//    /// Вызывается при изменении здоровья.
-//    /// Параметры: текущее здоровье, максимальное здоровье.
-//    /// </summary>
-//    public event Action<float, float> OnHealthChanged;
-//    public event Action<float, float> OnCaveCoinsChanged;
-
-//    /// <summary>
-//    /// Вызывается один раз в момент "смерти" игрока (здоровье упало до 0).
-//    /// </summary>
-//    public event Action OnDeath;
-
-//    /// <summary>
-//    /// Точка входа компонента.
-//    /// При старте берёт стартовые значения из PlayerData.
-//    /// </summary>
-//    private void Awake()
-//    {
-//        InitializeFromData();
-//    }
-
-//    /// <summary>
-//    /// Инициализирует текущие значения из PlayerData.
-//    /// Можно вызвать повторно, например, при респауне.
-//    /// </summary>
-//    public void InitializeFromData()
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogError("PlayerStats: PlayerData не назначен!", this);
-//            return;
-//        }
-
-//        // Берём стартовые значения и ограничиваем их в разумных пределах.
-//        currentHealth = Mathf.Clamp(playerData.maxHealth, 1f, float.MaxValue);
-//        caveCoins = Mathf.Clamp(playerData.caveCoins, 0f, float.MaxValue);
-
-//        // Уведомляем подписчиков о начальных значениях.
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//        OnCaveCoinsChanged?.Invoke(CaveCoins, playerData.maxCaveCoins);
-
-//    }
-
-//    /// <summary>
-//    /// Применяет бонусы за повышение уровня:
-//    /// меняет maxHealth / maxMana и обновляет текущие значения
-//    /// с подниманием событий OnHealthChanged / OnManaChanged.
-//    /// Вызывать этот метод предпочтительнее, чем напрямую
-//    /// менять currentHealth и ScriptableObject снаружи.
-//    /// </summary>
-//    public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.ApplyLevelUpBonuses: PlayerData не назначен.", this);
-//            return;
-//        }
-
-//        // Увеличиваем максимальные значения
-//        playerData.maxHealth += healthBonus;
-//        playerData.maxCaveCoins += caveCoinsBonus;
-
-//        // Синхронизируем текущее с новыми максимумами
-//        currentHealth = playerData.maxHealth;
-
-//        // События вызываем здесь, внутри PlayerStats
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//    }
-
-//    /// <summary>
-//    /// Наносит урон игроку.
-//    /// Не даёт опустить здоровье ниже 0 и при необходимости вызывает OnDeath.
-//    /// </summary>
-//    public void TakeDamage(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.TakeDamage: PlayerData не назначен.", this);
-//            return;
-//        }
-
-//        // Не реагируем на некорректный урон или если игрок уже мёртв.
-//        if (amount <= 0f || currentHealth <= 0f)
-//            return;
-
-//        currentHealth -= amount;
-//        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
-
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-
-//        if (currentHealth <= 0f)
-//        {
-//            // Игрок "умирает" — здесь можно запустить анимацию смерти, перезапуск уровня и т.п.
-//            OnDeath?.Invoke();
-//        }
-//    }
-
-//    /// <summary>
-//    /// Лечит игрока на указанное значение.
-//    /// Не поднимает здоровье выше максимального и не лечит мёртвого игрока.
-//    /// </summary>
-//    public void Heal(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.Heal: PlayerData не назначен.", this);
-//            return;
-//        }
-
-//        // Нет смысла лечить на неположительное значение или лечить мёртвого.
-//        if (amount <= 0f || currentHealth <= 0f)
-//            return;
-
-//        currentHealth += amount;
-//        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
-
-//        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-//    }
-
-//    /// <summary>
-//    /// Adds cave coins to the player's current amount.
-//    /// Doesnt add coins if the player already has the maximum amount.
-//    /// </summary>
-
-//    public void AddCaveCoins(float amount)
-//    {
-//        if (playerData == null)
-//        {
-//            Debug.LogWarning("PlayerStats.AddCaveCoins: PlayerData не назначен.", this);
-//            return;
-//        }
-//        if (amount <= 0f || caveCoins >= playerData.maxCaveCoins)
-//            return;
-//        caveCoins += amount;
-//        caveCoins = Mathf.Clamp(caveCoins, 0f, playerData.maxCaveCoins);
-//        OnCaveCoinsChanged?.Invoke(caveCoins, playerData.maxCaveCoins);
-//    }
-//}
+        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
+    }
+}

@@ -19,6 +19,6 @@ MonoBehaviour:
   attackSpeed: 1
   range: 3
   knockbackForce: 5
-  attackAnimationName: 
+  attackAnimationName: StaffCast
   attackSound: {fileID: 0}
   projectilePrefab: {fileID: 0}

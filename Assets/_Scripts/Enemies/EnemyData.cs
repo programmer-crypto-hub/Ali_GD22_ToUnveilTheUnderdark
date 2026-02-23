@@ -35,9 +35,9 @@ public class EnemyData : ScriptableObject
     [Header("Enemies' Combat Stats")]
     [Min(1f)]
     [Tooltip("Default Health Values")]
-    public float skeletonHealth = 20f;
-    public float goblinHealth = 30f;
-    public float vampireHealth = 50f;
+    public float skeletonMaxHealth = 20f;
+    public float goblinMaxHealth = 30f;
+    public float vampireMaxHealth = 50f;
 
     [Min(0f)]
     [Tooltip("Default Damage Values")]

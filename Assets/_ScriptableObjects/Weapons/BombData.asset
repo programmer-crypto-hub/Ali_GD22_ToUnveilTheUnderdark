@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69225c04120fe2e41a217b7e683563ad, type: 3}
-  m_Name: SwordData
+  m_Name: BombData
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Sword
+  weaponName: Bomb
   weaponType: 0
   icon: {fileID: 0}
-  damage: 5
-  attackSpeed: 5
-  range: 3
-  knockbackForce: 2
-  attackAnimationName: SwordAttack
+  damage: 10
+  attackSpeed: 3
+  range: 10
+  knockbackForce: 5
+  attackAnimationName: BombThrow
   attackSound: {fileID: 0}
   projectilePrefab: {fileID: 0}
