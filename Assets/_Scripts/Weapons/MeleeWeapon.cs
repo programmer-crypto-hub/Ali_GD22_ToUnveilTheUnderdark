@@ -8,13 +8,16 @@ public class MeleeWeapon : WeaponBase
 {
     [Header("Параметры ближней атаки")]
     [Tooltip("Точка, откуда считается удар (обычно у меча/руки).")]
-    public Transform attackOrigin;
+    [SerializeField]
+    private Transform attackOrigin;
 
     [Tooltip("Радиус удара. Если 0, можно использовать Range из WeaponData.")]
-    public float hitRadius = 1.5f;
+    [SerializeField]
+    private float hitRadius = 1.5f;
 
     [Tooltip("Слои, по которым можно наносить урон (враги, разрушаемые объекты).")]
-    public LayerMask hitLayers;
+    [SerializeField]
+    private LayerMask hitLayers;
 
     public override void Attack()
     {
