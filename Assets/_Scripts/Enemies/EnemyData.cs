@@ -7,6 +7,13 @@ using UnityEngine;
 /// </summary>
 public class EnemyData : ScriptableObject
 {
+    public enum EnemyType
+    {
+        Skeleton = 0,
+        Goblin = 1,
+        Vampire = 2
+    }
+
     [Header("Enemy Types")]
     [Tooltip("All Enemies")]
     public string enemyType = "Skeleton";

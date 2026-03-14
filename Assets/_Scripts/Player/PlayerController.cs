@@ -1,41 +1,31 @@
 using UnityEngine;
 
 /// <summary>
-/// Player movement controller for 3D third-person.
+/// Player movement controller for 3D top-down.
 /// Reads input from InputManager, moves a CharacterController
-/// relative to the camera and rotates the visual model in a
-/// "strafing" style (character always looks where the camera looks).
+/// relative to the camera and rotates the visual model to face movement direction.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("Player stats component (health, move speed, jump force, etc.).")]
+    [Tooltip("Player stats component (health, move speed, etc.).")]
     [SerializeField] private PlayerStats playerStats;
 
     [Tooltip("Camera transform used as reference for movement (usually main camera or Cinemachine virtual camera).")]
     [SerializeField] private Transform cameraTransform;
 
-    [Tooltip("Root transform of the visual model (rotates to face camera).")]
+    [Tooltip("Root transform of the visual model (rotates to face movement direction).")]
     [SerializeField] private Transform visualRoot;
 
-    [Header("Movement & Physics")]
-    [Tooltip("Gravity value (negative).")]
-    [SerializeField] private float gravity = -9.81f;
-
-    [Tooltip("Small downward velocity to keep the character grounded.")]
-    [SerializeField] private float groundedGravity = -2f;
-
+    [Header("Movement")]
     [Tooltip("Speed multiplier when sprinting.")]
     [SerializeField] private float sprintMultiplier = 1.5f;
 
     private CharacterController characterController;
-    private Vector3 verticalVelocity;
-    private bool isGrounded;
 
     /// <summary>
     /// Инициализирует ссылки на CharacterController, PlayerStats и камеру.
-    /// Вызывается один раз при создании объекта.
     /// </summary>
     private void Awake()
     {
@@ -50,7 +40,6 @@ public class PlayerController : MonoBehaviour
 
     /// <summary>
     /// Главный игровой цикл контроллера.
-    /// Каждый кадр обрабатывает движение и прыжок, затем сбрасывает одноразовые флаги ввода в InputManager.
     /// </summary>
     private void Update()
     {
@@ -58,29 +47,22 @@ public class PlayerController : MonoBehaviour
             return;
 
         HandleMovement();
-        HandleJump();
 
-        // В КОНЦЕ кадра сбрасываем "одноразовые" флаги кнопок (нажат в этом кадре).
-        // Это важно для действий типа прыжка/атаки: они должны срабатывать один раз,
-        // пока игровой код не успел их прочитать, а затем флаг нужно обнулить.
         InputManager.Instance.ResetButtonFlags();
     }
 
     /// <summary>
-    /// Считает движение относительно камеры, применяет гравитацию
-    /// и двигает CharacterController. Также обновляет поворот визуальной
-    /// модели так, чтобы персонаж всегда смотрел туда же, куда и камера.
+    /// Считает движение относительно камеры и двигает CharacterController.
+    /// Вращает визуальную модель по направлению движения.
     /// </summary>
     private void HandleMovement()
     {
         Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
 
-        // Movement relative to camera:
-        // W/S — move forward/back along camera forward,
-        // A/D — move left/right along camera right (strafe).
         if (moveInput.sqrMagnitude > 0.001f && cameraTransform != null)
         {
+            // Для топ-даун: движение по XZ, игнорируем Y
             Vector3 forward = cameraTransform.forward;
             forward.y = 0f;
             forward.Normalize();
@@ -107,64 +89,19 @@ public class PlayerController : MonoBehaviour
             speed *= sprintMultiplier;
         }
 
-        Vector3 horizontalVelocity = moveDirection * speed;
-
-        // Ground check from CharacterController.
-        isGrounded = characterController.isGrounded;
-
-        if (isGrounded && verticalVelocity.y < 0f)
-        {
-            verticalVelocity.y = groundedGravity;
-        }
-
-        // Apply gravity over time.
-        verticalVelocity.y += gravity * Time.deltaTime;
-
-        // Final velocity combines horizontal movement and vertical velocity.
-        Vector3 velocity = horizontalVelocity + verticalVelocity;
+        Vector3 velocity = moveDirection * speed;
 
         characterController.Move(velocity * Time.deltaTime);
 
-        // Strafing-style rotation:
-        // visual model always faces camera forward on XZ plane,
-        // movement can be forward/back/strafe relative to camera.
-        if (cameraTransform != null && visualRoot != null)
+        // Вращаем модель по направлению движения (если есть движение)
+        if (visualRoot != null && moveDirection.sqrMagnitude > 0.001f)
         {
-            Vector3 cameraForward = cameraTransform.forward;
-            cameraForward.y = 0f;
-            cameraForward.Normalize();
-
-            if (cameraForward.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(cameraForward);
-                visualRoot.rotation = Quaternion.Slerp(
-                    visualRoot.rotation,
-                    targetRotation,
-                    rotationSpeed * Mathf.Deg2Rad * Time.deltaTime
-                );
-            }
-        }
-    }
-
-    /// <summary>
-    /// Обрабатывает прыжок: если игрок стоит на земле и кнопка прыжка
-    /// была нажата в этом кадре, задаёт вертикальную скорость вверх.
-    /// </summary>
-    private void HandleJump()
-    {
-        if (!isGrounded)
-            return;
-
-        if (InputManager.Instance.IsJumpPressed())
-        {
-            float jumpForce = 5f;
-
-            if (playerStats != null && playerStats.playerData != null)
-            {
-                jumpForce = playerStats.playerData.jumpForce;
-            }
-
-            verticalVelocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            visualRoot.rotation = Quaternion.Slerp(
+                visualRoot.rotation,
+                targetRotation,
+                rotationSpeed * Mathf.Deg2Rad * Time.deltaTime
+            );
         }
     }
 }

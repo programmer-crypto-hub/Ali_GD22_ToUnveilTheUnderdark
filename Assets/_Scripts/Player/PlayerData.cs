@@ -40,4 +40,13 @@ public class PlayerData : ScriptableObject
     [Min(1f)]
     [Tooltip("Maximum amount of in-game currency the player can hold.")]
     public float maxCaveCoins = 200f;
+
+    [Header("In-Game Stats (Visibile for other players")]
+    [Min(0f)]
+    [Tooltip("Current amount of in-game currency (e.g., coins).")]
+    public float currentPlayerCaveCoins = 0f;
+
+    [Min(0f)]
+    [Tooltip("Current Health Value.")]
+    public float currentPlayerHealth = 100f;
 }
