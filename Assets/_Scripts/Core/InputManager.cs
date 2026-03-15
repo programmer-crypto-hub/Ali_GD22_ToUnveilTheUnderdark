@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour
     private InputActionMap uiActionMap;
 
     private InputAction moveAction;
-    private InputAction turnStartAction;
+    private InputAction turnEndAction;
     private InputAction lookAction;
     private InputAction zoomAction;
     private InputAction jumpAction;
@@ -30,7 +30,7 @@ public class InputManager : MonoBehaviour
     public float ZoomInput { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool AttackPressed { get; private set; }
-    public bool TurnStartPressed { get; private set; }
+    public bool TurnEndPressed { get; private set; }
     public bool InteractPressed { get; private set; }
     public bool SprintHeld { get; private set; }
     public bool CrouchHeld { get; private set; }
@@ -40,7 +40,7 @@ public class InputManager : MonoBehaviour
     public Action OnInteractPressed;
     public Action OnPausePressed;
     public Action OnCancelPressed;
-    public Action OnTurnStartPressed;
+    public Action OnTurnEndPressed;
     public Action OnDiceRolled;
     public Action OnWeaponNextPressed;
     public Action OnWeaponPrevPressed;
@@ -55,32 +55,30 @@ public class InputManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        playerActionMap = null;
     }
 
     private void Start()
     {
-        InitializeInputSystem();
+        InitializeUIInputSystem();
     }
 
-    private void InitializeInputSystem()
+    public void InitializePlayerInputSystem()
     {
         if (inputActions == null)
         {
             Debug.LogError("InputManager: Input Actions Asset не назначен!");
             return;
         }
-
         playerActionMap = inputActions.FindActionMap("Player");
-        uiActionMap = inputActions.FindActionMap("UI");
-
         if (playerActionMap == null)
         {
             Debug.LogError("InputManager: Action Map 'Player' не найден!");
             return;
         }
-
         moveAction = playerActionMap.FindAction("Move");
-        turnStartAction = playerActionMap.FindAction("TurnStart");
+        turnEndAction = playerActionMap.FindAction("TurnEnd");
         lookAction = playerActionMap.FindAction("Look");
         zoomAction = playerActionMap.FindAction("Zoom");
         jumpAction = playerActionMap.FindAction("Jump");
@@ -89,15 +87,12 @@ public class InputManager : MonoBehaviour
         sprintAction = playerActionMap.FindAction("Sprint");
         crouchAction = playerActionMap.FindAction("Crouch");
         pauseAction = playerActionMap.FindAction("Pause");
-        if (uiActionMap != null)
-            cancelAction = uiActionMap.FindAction("Cancel");
         weaponNextAction = playerActionMap.FindAction("Next");
         weaponPrevAction = playerActionMap.FindAction("Previous");
-
         if (jumpAction != null)
             jumpAction.performed += _ => OnJumpPerformed();
-        if (turnStartAction != null)
-            turnStartAction.performed += _ => OnTurnStartPerformed();
+        if (turnEndAction != null)
+            turnEndAction.performed += _ => OnTurnEndPerformed();
         if (attackAction != null)
             attackAction.performed += _ => OnAttackPerformed();
         if (interactAction != null)
@@ -110,8 +105,18 @@ public class InputManager : MonoBehaviour
             weaponNextAction.performed += _ => OnWeaponNextPerformed();
         if (weaponPrevAction != null)
             weaponPrevAction.performed += _ => OnWeaponPrevPerformed();
-
         EnablePlayerInput();
+    }
+    public void InitializeUIInputSystem()
+    {
+        if (inputActions == null)
+        {
+            Debug.LogError("InputManager: Input Actions Asset не назначен!");
+            return;
+        }
+        uiActionMap = inputActions.FindActionMap("UI");
+        if (uiActionMap != null)
+            cancelAction = uiActionMap.FindAction("Cancel");
     }
 
     private void OnEnable()
@@ -138,12 +143,12 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    public void OnDestroy()
     {
         if (jumpAction != null)
             jumpAction.performed -= _ => OnJumpPerformed();
-        if (turnStartAction != null)
-            turnStartAction.performed -= _ => OnTurnStartPerformed();
+        if (turnEndAction != null)
+            turnEndAction.performed -= _ => OnTurnEndPerformed();
         if (attackAction != null)
             attackAction.performed -= _ => OnAttackPerformed();
         if (interactAction != null)
@@ -184,10 +189,10 @@ public class InputManager : MonoBehaviour
         OnAttackPressed?.Invoke();
     }
 
-    private void OnTurnStartPerformed()
+    private void OnTurnEndPerformed()
     {
-        TurnStartPressed = true;
-        OnTurnStartPressed?.Invoke();
+        TurnEndPressed = true;
+        OnTurnEndPressed?.Invoke();
     }
 
     private void OnInteractPerformed()
@@ -221,7 +226,7 @@ public class InputManager : MonoBehaviour
         JumpPressed = false;
         AttackPressed = false;
         InteractPressed = false;
-        TurnStartPressed = false;
+        TurnEndPressed = false;
     }
 
     public void EnablePlayerInput()
@@ -281,9 +286,9 @@ public class InputManager : MonoBehaviour
         return AttackPressed;
     }
 
-    public bool IsTurnStartPressed()
+    public bool IsTurnEndPressed()
     {
-        return TurnStartPressed;
+        return TurnEndPressed;
     }
 
     public bool IsInteractPressed()

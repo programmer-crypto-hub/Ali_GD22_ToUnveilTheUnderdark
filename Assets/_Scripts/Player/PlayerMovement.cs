@@ -19,6 +19,5 @@ public class PlayerMovement : MonoBehaviour
             playerStats = GetComponent<PlayerStats>();
         if (inputManager == null)
             inputManager = InputManager.Instance;
-        startBTN.onClick.AddListener(InputManager.Instance.IsTurnStartPressed());
     }
 }
