@@ -22,6 +22,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     [Tooltip("Текущее количество монет (Cave Coins).")]
     private float caveCoins;
+
+    [Header("Movement")]
+    [SerializeField]
+    [Tooltip("Rolled Die Amount")]
+    private float currentDiceValue;
     /// <summary>
     /// Текущее здоровье игрока (только для чтения).
     /// Для изменения используйте методы TakeDamage() или Heal().
@@ -41,6 +46,7 @@ public class PlayerStats : MonoBehaviour
     /// </summary>
     public event Action<float, float> OnHealthChanged;
     public event Action<float, float> OnCaveCoinsChanged;
+    public event Action<float, float> OnDiceRolled;
 
     /// <summary>
     /// Вызывается один раз в момент "смерти" игрока (здоровье упало до 0).
@@ -71,10 +77,12 @@ public class PlayerStats : MonoBehaviour
         // Берём стартовые значения и ограничиваем их в разумных пределах.
         currentHealth = Mathf.Clamp(playerData.maxHealth, 1f, float.MaxValue);
         caveCoins = Mathf.Clamp(playerData.caveCoins, 0f, float.MaxValue);
+        currentDiceValue = 0f;
 
         // Уведомляем подписчиков о начальных значениях.
         OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
         OnCaveCoinsChanged?.Invoke(CaveCoins, playerData.maxCaveCoins);
+        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
 
     }
 
@@ -171,5 +179,39 @@ public class PlayerStats : MonoBehaviour
         caveCoins += amount;
         caveCoins = Mathf.Clamp(caveCoins, 0f, playerData.maxCaveCoins);
         OnCaveCoinsChanged?.Invoke(caveCoins, playerData.maxCaveCoins);
+    }
+
+    /// <summary>
+    /// Control Dice Rolling for Player Stats 
+    /// </summary>
+    
+    public void RollDice()
+    {
+        if (playerData == null)
+        {
+            Debug.LogWarning("PlayerStats.RollDice: PlayerData не назначен.", this);
+            return;
+        }
+        currentDiceValue = UnityEngine.Random.Range(1f, playerData.maxDiceValue + 1f);
+        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
+    }
+
+    /// <summary>
+    /// Apply Multipliers to the current dice value, for example, from buffs or debuffs.
+    /// Will not change the current dice value if the multiplier is more than or equal to 10.
+    /// </summary>
+    
+    public void ApplyDiceMultiplier(float multiplier)
+    {
+        if (playerData == null)
+        {
+            Debug.LogWarning("PlayerStats.ApplyDiceMultiplier: PlayerData не назначен.", this);
+            return;
+        }
+        if (multiplier <= 0f || multiplier >= 10f)
+            return;
+        currentDiceValue *= multiplier;
+        currentDiceValue = Mathf.Clamp(currentDiceValue, 1f, playerData.maxDiceValue);
+        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
     }
 }

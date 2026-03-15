@@ -28,6 +28,10 @@ public class PlayerData : ScriptableObject
     [Tooltip("Ускорение при начале движения (может использоваться в более сложных контроллерах).")]
     public float acceleration = 10f;
 
+    [Min(1f)]
+    [Tooltip("Maximal Dice Value")]
+    public float maxDiceValue = 20f;
+
     [Min(0f)]
     [Tooltip("Скорость поворота персонажа (градусы в секунду).")]
     public float rotationSpeed = 720f;
