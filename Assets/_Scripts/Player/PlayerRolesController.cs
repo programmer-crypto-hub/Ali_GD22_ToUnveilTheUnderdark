@@ -11,6 +11,8 @@ public class PlayerRolesController : MonoBehaviour
 
     public Action OnRoleGiven;
 
+    public int RoleId { get; private set; }
+
     private void Awake()
     {
         if (playerRoles == null)
@@ -30,9 +32,9 @@ public class PlayerRolesController : MonoBehaviour
         Instance = this;
     }
 
-    private void ApplyRole(int role)
+    public void ApplyRole()
     {
-        role = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length - 1);
-        Debug.Log($"Applying role: {role}");
+        RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length - 1);
+        Debug.Log($"Applying role: {RoleId}");
     }
 }

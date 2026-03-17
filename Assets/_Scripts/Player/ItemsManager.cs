@@ -12,9 +12,8 @@ public class ItemsManager : MonoBehaviour
     [Header("Оружия на игроке")]
     [SerializeField]
     [Tooltip("All items which can be obtained")]
-    private WeaponBase[] itemInstances;
+    private List<WeaponBase>[] itemInstances;
 
-    private int currentAvailableIndex;
     private WeaponBase currentItem;
 
     

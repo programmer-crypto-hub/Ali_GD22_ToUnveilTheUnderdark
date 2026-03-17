@@ -34,6 +34,10 @@ public class GameManager : MonoBehaviour
             InputManager.Instance.EnablePlayerInput();
         }
         Debug.Log("Game Started");
+        if (PlayerRolesController.Instance != null)
+        {
+            PlayerRolesController.Instance.ApplyRole();
+        }
     }
 
     public void GoToMenu()

@@ -161,6 +161,7 @@ public class InputManager : MonoBehaviour
             weaponNextAction.performed -= _ => OnWeaponNextPerformed();
         if (weaponPrevAction != null)
             weaponPrevAction.performed -= _ => OnWeaponPrevPerformed();
+        DisablePlayerInput();
     }
 
     private void Update()
@@ -235,6 +236,12 @@ public class InputManager : MonoBehaviour
             playerActionMap.Enable();
         if (uiActionMap != null)
             uiActionMap.Disable();
+    }
+
+    public void DisablePlayerInput()
+    {
+        if (playerActionMap != null)
+            playerActionMap.Disable();
     }
 
     public void EnableUIInput()
