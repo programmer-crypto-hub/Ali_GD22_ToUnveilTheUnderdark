@@ -12,6 +12,7 @@ public class PlayerRolesController : MonoBehaviour
     public Action OnRoleGiven;
 
     public int RoleId { get; private set; }
+    public PlayerRoles.RoleType roleName { get; private set; }
 
     private void Awake()
     {
@@ -34,7 +35,8 @@ public class PlayerRolesController : MonoBehaviour
 
     public void ApplyRole()
     {
-        RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length - 1);
+        RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length);
         Debug.Log($"Applying role: {RoleId}");
+        roleName = (PlayerRoles.RoleType)RoleId;
     }
 }

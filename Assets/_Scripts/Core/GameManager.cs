@@ -5,7 +5,7 @@ public enum GameState
 {
     MainMenu = 0,
     Playing = 1,
-    Paused = 2,
+    Combat = 2,
 }
 public class GameManager : MonoBehaviour
 {
@@ -52,25 +52,17 @@ public class GameManager : MonoBehaviour
         Debug.Log("Got to Main Menu");
     }
 
-    public void Pause()
-    {
-        CurrentState = GameState.Paused;
-        Time.timeScale = 0f;
-        Debug.Log("Got to Main Menu");
-        EventBus.Instance.RaiseGamePaused();
-    }
-
-    public void Resume()
-    {
-        if (CurrentState != GameState.Paused)
-        {
-            Debug.LogWarning("Cannot resume the game because it is not paused.");
-            return;
-        }
-        CurrentState = GameState.Playing;
-        Time.timeScale = 1f;
-        Debug.Log("Game Resumed");
-        EventBus.Instance.RaiseGameResumed();
-    }
+//    public void Resume()
+//    {
+//        if (CurrentState != GameState.Paused)
+//        {
+//            Debug.LogWarning("Cannot resume the game because it is not paused.");
+//            return;
+//        }
+//        CurrentState = GameState.Playing;
+//        Time.timeScale = 1f;
+//        Debug.Log("Game Resumed");
+//        EventBus.Instance.RaiseGameResumed();
+//    }
 }
 

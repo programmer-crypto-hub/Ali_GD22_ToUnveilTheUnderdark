@@ -18,6 +18,9 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Текущее здоровье игрока.")]
     private float currentHealth;
 
+    private string currentRole;
+    private int currentRoleId;
+
     [Header("Currencies")]
     [SerializeField]
     [Tooltip("Текущее количество монет (Cave Coins).")]
@@ -27,6 +30,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     [Tooltip("Rolled Die Amount")]
     private float currentDiceValue;
+
+    [Header("Combat")]
+    [SerializeField]
+    [Tooltip("Current Combat Value, calculated from the current dice value and applied multipliers.")]
+    private float diceValue;
     /// <summary>
     /// Текущее здоровье игрока (только для чтения).
     /// Для изменения используйте методы TakeDamage() или Heal().
@@ -39,6 +47,9 @@ public class PlayerStats : MonoBehaviour
     /// </summary>
     public float CaveCoins => caveCoins;
 
+    public int CurrentRoleId => currentRoleId;
+    public string CurrentRole => currentRole;
+
     // События для связи с другими системами (UI, эффекты и т.п.)
     /// <summary>
     /// Вызывается при изменении здоровья.
@@ -47,6 +58,7 @@ public class PlayerStats : MonoBehaviour
     public event Action<float, float> OnHealthChanged;
     public event Action<float, float> OnCaveCoinsChanged;
     public event Action<float, float> OnDiceRolled;
+    public event Action<string, int> OnRoleApplied;
 
     /// <summary>
     /// Вызывается один раз в момент "смерти" игрока (здоровье упало до 0).
@@ -60,6 +72,14 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         InitializeFromData();
+        PlayerRolesController.Instance.OnRoleGiven += () =>
+        {
+            PlayerRolesController.Instance.ApplyRole();
+            currentRole = PlayerRolesController.Instance.roleName.ToString();
+            currentRoleId = PlayerRolesController.Instance.RoleId;
+            //currentRole = ((PlayerRolesController.Instance.RoleId >= 0) ? ((PlayerRoles.RoleType)currentRoleId).ToString() : "No Role");
+            OnRoleApplied?.Invoke(currentRole, currentRoleId);
+        };
     }
 
     /// <summary>

@@ -13,6 +13,7 @@ public class InputManager : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction turnEndAction;
+    private InputAction rollDiceAction;
     private InputAction lookAction;
     private InputAction zoomAction;
     private InputAction jumpAction;
@@ -20,7 +21,6 @@ public class InputManager : MonoBehaviour
     private InputAction interactAction;
     private InputAction sprintAction;
     private InputAction crouchAction;
-    private InputAction pauseAction;
     private InputAction cancelAction;
     private InputAction weaponNextAction;
     private InputAction weaponPrevAction;
@@ -31,17 +31,17 @@ public class InputManager : MonoBehaviour
     public bool JumpPressed { get; private set; }
     public bool AttackPressed { get; private set; }
     public bool TurnEndPressed { get; private set; }
+    public bool RollDicePressed { get; private set; }
     public bool InteractPressed { get; private set; }
     public bool SprintHeld { get; private set; }
     public bool CrouchHeld { get; private set; }
 
     public Action OnJumpPressed;
     public Action OnAttackPressed;
+    public Action OnDiceRolled;
     public Action OnInteractPressed;
-    public Action OnPausePressed;
     public Action OnCancelPressed;
     public Action OnTurnEndPressed;
-    public Action OnDiceRolled;
     public Action OnWeaponNextPressed;
     public Action OnWeaponPrevPressed;
 
@@ -79,6 +79,7 @@ public class InputManager : MonoBehaviour
         }
         moveAction = playerActionMap.FindAction("Move");
         turnEndAction = playerActionMap.FindAction("TurnEnd");
+        rollDiceAction = playerActionMap.FindAction("RollDice");
         lookAction = playerActionMap.FindAction("Look");
         zoomAction = playerActionMap.FindAction("Zoom");
         jumpAction = playerActionMap.FindAction("Jump");
@@ -86,7 +87,6 @@ public class InputManager : MonoBehaviour
         interactAction = playerActionMap.FindAction("Interact");
         sprintAction = playerActionMap.FindAction("Sprint");
         crouchAction = playerActionMap.FindAction("Crouch");
-        pauseAction = playerActionMap.FindAction("Pause");
         weaponNextAction = playerActionMap.FindAction("Next");
         weaponPrevAction = playerActionMap.FindAction("Previous");
         if (jumpAction != null)
@@ -95,10 +95,10 @@ public class InputManager : MonoBehaviour
             turnEndAction.performed += _ => OnTurnEndPerformed();
         if (attackAction != null)
             attackAction.performed += _ => OnAttackPerformed();
+        if (rollDiceAction != null)
+            rollDiceAction.performed += _ => OnDiceRollPerformed();
         if (interactAction != null)
             interactAction.performed += _ => OnInteractPerformed();
-        if (pauseAction != null)
-            pauseAction.performed += _ => OnPausePerformed();
         if (cancelAction != null)
             cancelAction.performed += _ => OnCancelPerformed();
         if (weaponNextAction != null)
@@ -151,10 +151,10 @@ public class InputManager : MonoBehaviour
             turnEndAction.performed -= _ => OnTurnEndPerformed();
         if (attackAction != null)
             attackAction.performed -= _ => OnAttackPerformed();
+        if (rollDiceAction != null)
+            rollDiceAction.performed -= _ => OnDiceRollPerformed();
         if (interactAction != null)
             interactAction.performed -= _ => OnInteractPerformed();
-        if (pauseAction != null)
-            pauseAction.performed -= _ => OnPausePerformed();
         if (cancelAction != null)
             cancelAction.performed -= _ => OnCancelPerformed();
         if (weaponNextAction != null)
@@ -196,15 +196,16 @@ public class InputManager : MonoBehaviour
         OnTurnEndPressed?.Invoke();
     }
 
+    private void OnDiceRollPerformed()
+    {
+        RollDicePressed = true;
+        OnDiceRolled?.Invoke();
+    }
+
     private void OnInteractPerformed()
     {
         InteractPressed = true;
         OnInteractPressed?.Invoke();
-    }
-
-    private void OnPausePerformed()
-    {
-        OnPausePressed?.Invoke();
     }
 
     private void OnCancelPerformed()
@@ -296,6 +297,11 @@ public class InputManager : MonoBehaviour
     public bool IsTurnEndPressed()
     {
         return TurnEndPressed;
+    }
+
+    public bool IsRollDicePressed()
+    {
+        return RollDicePressed;
     }
 
     public bool IsInteractPressed()

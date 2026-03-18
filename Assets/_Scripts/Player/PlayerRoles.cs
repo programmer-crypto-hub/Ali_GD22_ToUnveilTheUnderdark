@@ -19,8 +19,4 @@ public class PlayerRoles : ScriptableObject
         [Tooltip("Random - Player Given Random Abilities and Inventory")]
         Random = 5
     }
-
-    [Header("Общее")]
-    [Tooltip("Тип оружия (ближнее, дальнее, магическое).")]
-    public RoleType roleType = RoleType.Warrior;
 }
