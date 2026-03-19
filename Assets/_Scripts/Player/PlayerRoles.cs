@@ -1,5 +1,4 @@
 using UnityEngine;
-using static WeaponData;
 
 [CreateAssetMenu(fileName = "New Player Roles", menuName = "Game Data/Player Roles", order = 0)]
 public class PlayerRoles : ScriptableObject
@@ -19,4 +18,12 @@ public class PlayerRoles : ScriptableObject
         [Tooltip("Random - Player Given Random Abilities and Inventory")]
         Random = 5
     }
+
+    [Header("Role Settings")]
+    [SerializeField]
+    public RoleType roleType;
+
+    [Header("Role Sprites")]
+    [Tooltip("Sprites Array")]
+    public Sprite[] roleSprites;
 }

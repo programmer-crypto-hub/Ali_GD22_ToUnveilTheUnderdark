@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerRolesController : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class PlayerRolesController : MonoBehaviour
 
     public Action OnRoleGiven;
 
+    [Header("UI Elements")]
+    [Tooltip("—сылка на UI элемент дл€ отображени€ текущей роли игрока.")]
+    public GameObject rolePanel;
+    public Image roleImage;
+
     public int RoleId { get; private set; }
     public PlayerRoles.RoleType roleName { get; private set; }
 
@@ -20,6 +26,10 @@ public class PlayerRolesController : MonoBehaviour
         {
             Debug.LogError("PlayerRolesController: PlayerRoles не назначены в инспекторе.", this);
         }
+        
+        rolePanel.SetActive(false);
+
+        ApplyRole();
     }
 
     private void OnEnable()
@@ -38,5 +48,14 @@ public class PlayerRolesController : MonoBehaviour
         RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length);
         Debug.Log($"Applying role: {RoleId}");
         roleName = (PlayerRoles.RoleType)RoleId;
+        roleImage.sprite = playerRoles.roleSprites[RoleId];
+    }
+
+    public void DisplayRoleUI()
+    {
+        rolePanel.SetActive(true);
+        // «десь можно добавить логику дл€ отображени€ конкретного изображени€ или текста в зависимости от роли
+        // Ќапример:
+        // roleImage.sprite = GetRoleSprite(roleName);
     }
 }
