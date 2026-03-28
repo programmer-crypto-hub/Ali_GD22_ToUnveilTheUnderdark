@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 using UnityEngine;
 
 public enum GameState
@@ -36,7 +35,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Started");
         if (PlayerRolesController.Instance != null)
         {
-            PlayerRolesController.Instance.ApplyRole();
+            //PlayerRolesController.Instance.ApplyRole();
         }
     }
 

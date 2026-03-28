@@ -6,14 +6,15 @@ public class DiceManager : MonoBehaviour
     public static DiceManager Instance { get; private set; }
 
     [Header("Animation Settings")]
+    [SerializeField]
     public Animator playerAnim;
 
     [Header("UI Settings")]
     public Button rollDiceButton;
 
     [Header("Dice Settings")]
-    public GameObject dice;
-    int diceRollResult;
+    //public GameObject dice;
+    public int diceRollResult;
 
     public void Awake()
     {
@@ -23,9 +24,14 @@ public class DiceManager : MonoBehaviour
 
     public void RollDice()
     {
-        playerAnim.SetTrigger("roll_Trig");
+        GetDiceValue();
+        Debug.Log($"Результат броска: {diceRollResult}");
+        //playerAnim.SetTrigger("roll_Trig");
         new WaitForSeconds(5f); // Задержка для анимации броска кубика
-        playerAnim.SetTrigger("run_Trig");
+        if (GameManager.Instance.CurrentState == GameState.Playing)
+            playerAnim.SetTrigger("walk_trig");
+        if (GameManager.Instance.CurrentState == GameState.Combat)
+            playerAnim.SetTrigger("attack_trig");
     }
 
     public int GetDiceValue()
@@ -45,13 +51,15 @@ public class DiceManager : MonoBehaviour
 
     public void ConvertDiceToMovement()
     {
-        int movedSpaces = (diceRollResult /= 3);
+        int diceToMoveApprox = 3;
+        int movedSpaces = (diceRollResult /= diceToMoveApprox);
         Debug.Log($"Игрок может переместиться на {diceRollResult} шагов.");
     }
 
-    public void ConvertDiceToCombat(int damage)
+    public void ConvertDiceToCombat(float damage)
     {
-        damage *= (diceRollResult / 20); 
+        int diceToCombatApprox = 100 / 5;
+        damage = (diceRollResult / diceToCombatApprox);
         // Применение процента к урону и округление до целого числа
     }
 }

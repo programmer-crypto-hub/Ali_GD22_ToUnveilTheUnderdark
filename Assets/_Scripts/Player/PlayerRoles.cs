@@ -20,7 +20,6 @@ public class PlayerRoles : ScriptableObject
     }
 
     [Header("Role Settings")]
-    [SerializeField]
     public RoleType roleType;
 
     [Header("Role Sprites")]

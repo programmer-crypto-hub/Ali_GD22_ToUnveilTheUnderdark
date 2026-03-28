@@ -1,55 +1,57 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Enemy Data", menuName = "Game Data/Enemy Data", order = 1)]
 /// <summary>
-/// ScriptableObject с базовыми параметрами врагов.
-/// Хранит стартовые значения 
+/// Данные для врага (здоровье, скорость, урон и т.п.).
+/// Используется EnemyFactory для создания врагов и EnemyBase для чтения параметров.
 /// </summary>
+[CreateAssetMenu(
+    fileName = "EnemyData",
+    menuName = "Game Data/Enemy Data",
+    order = 1)]
 public class EnemyData : ScriptableObject
 {
     public enum EnemyType
     {
-        Skeleton = 0,
-        Goblin = 1,
-        Vampire = 2
+        Melee,   // Ближний бой (гоблины, орки)
+        Ranged,  // Дальний бой (лучники, маги)
+        Boss     // Боссы (особые враги)
     }
 
-    [Header("Enemy Types")]
-    [Tooltip("All Enemies")]
-    public string enemyType = "Skeleton";
-    public string enemyType2 = "Goblin";
-    public string enemyType3 = "Vampire";
+    [Header("Общее")]
+    [Tooltip("Читаемое название врага (для UI и логирования).")]
+    public string enemyName = "New Enemy";
 
-    [Header("Enemies' Velocity Values")]
-    [Min(0f)]
-    [Tooltip("Default Speed Value, used by EnemyController.")]
-    public float skeletonSpeed = 5f;
-    public float goblinSpeed = 7f;
-    public float vampireSpeed = 10f;
+    [Tooltip("Тип врага (ближний, дальний, босс).")]
+    public EnemyType enemyType = EnemyType.Melee;
 
-    [Min(0f)]
-    [Tooltip("Default Jump Force, affecting Vertical Axis.")]
-    public float skeletonJumpForce = 10f;
-    public float goblinJumpForce = 6f;
-    public float vampireJumpForce = 4f;
-
-    [Min(0f)]
-    [Tooltip("Enemies Acceleration by Movement Start")]
-    public float skeletonAccelSpeed = 10f;
-    public float goblinAccelSpeed = 15f;
-    public float vampireAccelSpeed = 20f;
-
-    [Header("Enemies' Combat Stats")]
+    [Header("Характеристики")]
     [Min(1f)]
-    [Tooltip("Default Health Values")]
-    public float skeletonMaxHealth = 20f;
-    public float goblinMaxHealth = 30f;
-    public float vampireMaxHealth = 50f;
+    [Tooltip("Максимальное здоровье врага.")]
+    public float maxHealth = 50f;
 
     [Min(0f)]
-    [Tooltip("Default Damage Values")]
-    public float skeletonDamage = 5f;
-    public float goblinDamage = 10f;
-    public float vampireDamage = 15f;
+    [Tooltip("Скорость движения врага (единиц в секунду).")]
+    public float moveSpeed = 3f;
 
+    [Min(0f)]
+    [Tooltip("Урон, который враг наносит за одну атаку.")]
+    public float damage = 10f;
+
+    [Header("Бой")]
+    [Min(0f)]
+    [Tooltip("Дальность атаки врага (радиус ближнего боя или дальность выстрела).")]
+    public float attackRange = 2f;
+
+    [Min(0f)]
+    [Tooltip("Дальность обнаружения игрока (на каком расстоянии враг начинает преследовать).")]
+    public float detectionRange = 10f;
+
+    [Header("Награды")]
+    [Min(0f)]
+    [Tooltip("Опыт, который получает игрок за убийство этого врага.")]
+    public float experienceReward = 10f;
+
+    [Header("Префаб")]
+    [Tooltip("Префаб врага, который будет использоваться для создания экземпляров.")]
+    public GameObject prefab;
 }

@@ -1,175 +1,113 @@
+/*
+ * EnemyStats
+ * Назначение: совместимый адаптер над EnemyBase для систем, ожидающих EnemyStats.
+ * Что делает: проксирует характеристики/урон/смерть и ретранслирует событие OnDied.
+ * Связи: используется EnemyDeathRewarder и другими подсистемами, где ожидается EnemyStats.
+ * Паттерны: Adapter, Facade.
+ */
+
 using System;
 using UnityEngine;
 
 /// <summary>
-/// Отвечает за текущие характеристики врага:
-/// здоровье, мана/энергия и связанные с ними события.
-/// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
+/// Адаптер к EnemyBase для совместимости с системами наград/подписок.
+/// Источник истины по здоровью/смерти находится в EnemyBase.
 /// </summary>
 public class EnemyStats : MonoBehaviour
 {
-    [Header("Данные врага")]
-    [Tooltip("ScriptableObject с базовыми параметрами врага (enemyData).")]
-    public EnemyData enemyData;
+    [Header("Ссылки")]
+    [Tooltip("Компонент EnemyBase, который хранит runtime-состояние врага.")]
+    [SerializeField] private EnemyBase enemyBase;
 
-    [Header("Текущее состояние")]
-    [SerializeField]
-    [Tooltip("Текущее здоровье врага.")]
-    private float currentEnemyHealth;
-
-    [Header("Урон врагов")]
-    [SerializeField]
-    [Tooltip("Текущий урон врага.")]
-    private float enemyDamage;
+    public EnemyData EnemyData => enemyBase != null ? enemyBase.Data : null;
+    public float MaxHealth => enemyBase != null ? enemyBase.MaxHealth : 0f;
+    public float MoveSpeed => enemyBase != null ? enemyBase.MoveSpeed : 0f;
+    public float Damage => enemyBase != null ? enemyBase.Damage : 0f;
+    public float AttackRange => enemyBase != null ? enemyBase.AttackRange : 0f;
+    public float DetectionRange => enemyBase != null ? enemyBase.DetectionRange : 0f;
+    public float ExperienceReward => EnemyData != null ? EnemyData.experienceReward : 0f;
 
     /// <summary>
-    /// Текущее здоровье врага (только для чтения).
-    /// Для изменения используйте методы TakeDamage() или Heal().
+    /// Событие смерти в формате EnemyStats для обратной совместимости.
     /// </summary>
-    public float CurrentEnemyHealth => currentEnemyHealth;
+    public event Action<EnemyStats> OnDied;
 
-    /// <summary>
-    /// Damage Values
-    /// For Modifying use IncreaseDamage() method.
-    /// </summary>
-    public float EnemyDamage => enemyDamage;
-
-    // События для связи с другими системами (UI, эффекты и т.п.)
-    /// <summary>
-    /// Вызывается при изменении здоровья.
-    /// Параметры: текущее здоровье, максимальное здоровье.
-    /// </summary>
-    public event Action<float, float> OnEnemyHealthChanged;
-    //public event Action<float, float> OnEnemyDamageChanged;
-
-    /// <summary>
-    /// Вызывается один раз в момент "смерти" врага (здоровье упало до 0).
-    /// </summary>
-    public event Action OnEnemyDeath;
-
-    /// <summary>
-    /// Точка входа компонента.
-    /// При старте берёт стартовые значения из enemyData.
-    /// </summary>
     private void Awake()
     {
-        InitializeFromEnemyData();
+        // EnemyStats — компонент “обвязки”.
+        // Чтобы префабы были устойчивыми, стараемся автоматически найти EnemyBase на том же объекте.
+        if (enemyBase == null)
+            enemyBase = GetComponent<EnemyBase>();
+
+        if (enemyBase == null)
+            Debug.LogError("EnemyStats: отсутствует EnemyBase на объекте.", this);
+    }
+
+    private void OnEnable()
+    {
+        // Важно: подписки на события делаем в OnEnable,
+        // чтобы при Disable/Enable компонента не оставались “висячие” подписки.
+        if (enemyBase != null)
+            enemyBase.OnDied += HandleEnemyBaseDied;
+    }
+
+    private void OnDisable()
+    {
+        // И симметрично отписываемся в OnDisable.
+        if (enemyBase != null)
+            enemyBase.OnDied -= HandleEnemyBaseDied;
     }
 
     /// <summary>
-    /// Инициализирует текущие значения из enemyData на основе тега врага.
-    /// Можно вызвать повторно, например, при респауне.
+    /// Совместимый метод инициализации из EnemyData.
     /// </summary>
-    public void InitializeFromEnemyData()
+    public void Setup(EnemyData data)
     {
-        if (enemyData == null)
+        // В большинстве случаев EnemyData назначается не в инспекторе, а “снаружи”:
+        // спавнер создаёт префаб и передаёт конфиг врага методом Setup(data).
+        if (enemyBase == null)
         {
-            Debug.LogError("EnemyStats: enemyData не назначен!", this);
+            Debug.LogWarning("EnemyStats.Setup: EnemyBase не назначен.", this);
             return;
         }
 
-        string enemyTag = gameObject.tag;
-
-        if (enemyTag == enemyData.enemyType)
-        {
-            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.skeletonMaxHealth);
-
-        }
-        else if (enemyTag == enemyData.enemyType2)
-        {
-            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.goblinMaxHealth);
-        }
-        else if (enemyTag == enemyData.enemyType3)
-        {
-            currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, enemyData.vampireMaxHealth);
-        }
-        else
-        {
-            Debug.LogWarning("EnemyStats.InitializeFromEnemyData: Неизвестный тип врага, используем дефолтные значения.", this);
-            return;
-        }
-
-        // Берём стартовые значения и ограничиваем их в разумных пределах.
-        //enemyDamage = Mathf.Clamp(enemyDamage, 0f, float.MaxValue);
-
-        // Уведомляем подписчиков о начальных значениях.
-        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
-        //OnEnemyDamageChanged?.Invoke(enemyDamage, enemyDamage);
+        enemyBase.Setup(data);
     }
 
     /// <summary>
-    /// Применяет бонусы за повышение уровня:
-    /// меняет здоровье и урон с вызовом событий.
+    /// Совместимый метод получения урона.
     /// </summary>
-    public void ApplyEnemyBuffs(float healthBonus, float damageBonus)
+    public void TakeDamage(float damage)
     {
-        if (enemyData == null)
+        // EnemyStats не хранит здоровье сам — он только прокидывает вызов в EnemyBase.
+        if (enemyBase == null)
         {
-            Debug.LogWarning("EnemyStats.ApplyEnemyBuffs: enemyData не назначен.", this);
+            Debug.LogWarning("EnemyStats.TakeDamage: EnemyBase не назначен.", this);
             return;
         }
 
-        // Увеличиваем текущие значения
-        currentEnemyHealth += healthBonus;
-        enemyDamage += damageBonus;
-
-        // Ограничиваем значения
-        // TODO: Fix the lines below
-        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 1f, float.MaxValue);
-        enemyDamage = Mathf.Clamp(enemyDamage, 0f, enemyDamage);
-
-        // События вызываем здесь, внутри EnemyStats
-        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
-        //OnEnemyDamageChanged?.Invoke(enemyDamage, enemyDamage);
+        enemyBase.TakeDamage(damage);
     }
 
     /// <summary>
-    /// Наносит урон врагу.
-    /// Не даёт опустить здоровье ниже 0 и при необходимости вызывает OnDeath.
+    /// Совместимый метод смерти.
     /// </summary>
-    public void TakeDamage(float amount)
+    public virtual void Die()
     {
-        if (enemyData == null)
+        // Аналогично: смерть хранится в EnemyBase, а EnemyStats оставлен для совместимости API.
+        if (enemyBase == null)
         {
-            Debug.LogWarning("EnemyStats.TakeDamage: enemyData не назначен.", this);
+            Debug.LogWarning("EnemyStats.Die: EnemyBase не назначен.", this);
             return;
         }
 
-        // Не реагируем на некорректный урон или если враг уже мёртв.
-        if (amount <= 0f || currentEnemyHealth <= 0f)
-            return;
-
-        currentEnemyHealth -= amount;
-        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 0f, float.MaxValue);
-
-        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
-
-        if (currentEnemyHealth <= 0f)
-        {
-            // Враг "умирает" — здесь можно запустить анимацию смерти, эффекты и т.п.
-            OnEnemyDeath?.Invoke();
-        }
+        enemyBase.Die();
     }
 
-    /// <summary>
-    /// Лечит врага на указанное значение.
-    /// Не поднимает здоровье выше максимального и не лечит мёртвого врага.
-    /// </summary>
-    public void Heal(float amount)
+    private void HandleEnemyBaseDied()
     {
-        if (enemyData == null)
-        {
-            Debug.LogWarning("EnemyStats.Heal: enemyData не назначен.", this);
-            return;
-        }
-
-        // Нет смысла лечить на неположительное значение или лечить мёртвого.
-        if (amount <= 0f || currentEnemyHealth <= 0f)
-            return;
-
-        currentEnemyHealth += amount;
-        currentEnemyHealth = Mathf.Clamp(currentEnemyHealth, 0f, float.MaxValue);
-
-        OnEnemyHealthChanged?.Invoke(currentEnemyHealth, currentEnemyHealth);
+        // Переводим событие “умер EnemyBase” в событие “умер EnemyStats”.
+        // Так системам наград/спавна/пула удобнее работать с одним типом события.
+        OnDied?.Invoke(this);
     }
 }

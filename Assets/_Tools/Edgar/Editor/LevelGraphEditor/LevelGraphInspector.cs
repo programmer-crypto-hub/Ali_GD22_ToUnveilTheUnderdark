@@ -57,7 +57,7 @@ namespace Edgar.Unity.Editor
         }
 
         [UnityEditor.Callbacks.OnOpenAsset(1)]
-        public static bool OnOpenAsset(int instanceID, int line)
+        public static bool OnOpenAsset(EntityId instanceID, int line)
         {
             var assetPath = AssetDatabase.GetAssetPath(instanceID);
             var levelGraph = AssetDatabase.LoadAssetAtPath<LevelGraph>(assetPath);

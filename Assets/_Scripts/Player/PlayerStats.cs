@@ -72,14 +72,14 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         InitializeFromData();
-        PlayerRolesController.Instance.OnRoleGiven += () =>
-        {
-            PlayerRolesController.Instance.ApplyRole();
-            currentRole = PlayerRolesController.Instance.roleName.ToString();
-            currentRoleId = PlayerRolesController.Instance.RoleId;
-            //currentRole = ((PlayerRolesController.Instance.RoleId >= 0) ? ((PlayerRoles.RoleType)currentRoleId).ToString() : "No Role");
-            OnRoleApplied?.Invoke(currentRole, currentRoleId);
-        };
+        //PlayerRolesController.Instance.OnRoleGiven += () =>
+        //{
+        //    //PlayerRolesController.Instance.ApplyRole();
+        //    //currentRole = PlayerRolesController.Instance.roleName.ToString();
+        //    currentRoleId = PlayerRolesController.Instance.RoleId;
+        //    //currentRole = ((PlayerRolesController.Instance.RoleId >= 0) ? ((PlayerRoles.RoleType)currentRoleId).ToString() : "No Role");
+        //    OnRoleApplied?.Invoke(currentRole, currentRoleId);
+        //};
     }
 
     /// <summary>

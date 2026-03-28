@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TestInput : MonoBehaviour
+public class InputTest : MonoBehaviour
 {
     private void Update()
     {
