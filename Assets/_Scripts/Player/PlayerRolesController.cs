@@ -48,12 +48,13 @@ public class PlayerRolesController : MonoBehaviour
         RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length + 1);
         Debug.Log($"Applying role: {RoleId}");
         roleName = (PlayerRoles.RoleType)RoleId;
-        roleImage.sprite = playerRoles.roleSprites[RoleId];
+        roleImage.sprite = playerRoles.roleSprite;
     }
 
     public void DisplayRoleUI()
     {
         rolePanel.SetActive(true);
+        new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
         roleImage.enabled = true;
         // Здесь можно добавить логику для отображения конкретного изображения или текста в зависимости от роли
         // Например:

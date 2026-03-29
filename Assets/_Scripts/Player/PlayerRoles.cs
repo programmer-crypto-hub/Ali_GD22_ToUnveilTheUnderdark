@@ -23,6 +23,6 @@ public class PlayerRoles : ScriptableObject
     public RoleType roleType;
 
     [Header("Role Sprites")]
-    [Tooltip("Sprites Array")]
-    public Sprite[] roleSprites;
+    [Tooltip("Sprites")]
+    public Sprite roleSprite;
 }
