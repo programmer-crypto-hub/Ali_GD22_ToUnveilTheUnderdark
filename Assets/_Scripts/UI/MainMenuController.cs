@@ -8,7 +8,7 @@ public class MainMenuController : MonoBehaviour
 
     private void Awake()
     {
-        buttonNewGame.onClick.AddListener(() => GameManager.Instance.StartGame());
+        //buttonNewGame.onClick.AddListener(() => GameManager.Instance.StartGame());
         buttonQuitGame.onClick.AddListener(() => Application.Quit());
     }
 }

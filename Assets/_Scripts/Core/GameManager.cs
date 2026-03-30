@@ -23,21 +23,21 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void StartGame()
-    {
-        CurrentState = GameState.Playing;
-        Time.timeScale = 1f;
-        SceneLoader.Instance.Load(SceneNames.GameScene);
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.EnablePlayerInput();
-        }
-        Debug.Log("Game Started");
-        if (PlayerRolesController.Instance != null)
-        {
-            //PlayerRolesController.Instance.ApplyRole();
-        }
-    }
+    //public void StartGame()
+    //{
+    //    CurrentState = GameState.Playing;
+    //    Time.timeScale = 1f;
+    //    SceneLoader.Instance.Load(SceneNames.GameScene);
+    //    if (InputManager.Instance != null)
+    //    {
+    //        InputManager.Instance.EnablePlayerInput();
+    //    }
+    //    Debug.Log("Game Started");
+    //    if (PlayerRolesController.Instance != null)
+    //    {
+    //        //PlayerRolesController.Instance.ApplyRole();
+    //    }
+    //}
 
     public void GoToMenu()
     {
