@@ -1,4 +1,5 @@
 using System;
+using Fusion;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,11 +8,12 @@ using UnityEngine.Rendering;
 /// здоровье, мана/энергия и связанные с ними события.
 /// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
 /// </summary>
-public class PlayerStats : MonoBehaviour
+public class PlayerStats : NetworkBehaviour
 {
     [Header("Данные игрока")]
     [Tooltip("ScriptableObject с базовыми параметрами игрока (PlayerData).")]
     public PlayerData playerData;
+    public Animator playerAnim;
 
     [Header("Текущее состояние")]
     [SerializeField]
@@ -69,9 +71,14 @@ public class PlayerStats : MonoBehaviour
     /// Точка входа компонента.
     /// При старте берёт стартовые значения из PlayerData.
     /// </summary>
-    private void Awake()
+    public override void Spawned()
     {
         InitializeFromData();
+        if (PlayerRolesController.Instance == null)
+        {
+            Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
+            return;
+        }
         PlayerRolesController.Instance.OnRoleGiven += () =>
         {
             PlayerRolesController.Instance.ApplyRole();
@@ -156,6 +163,7 @@ public class PlayerStats : MonoBehaviour
         {
             // Игрок "умирает" — здесь можно запустить анимацию смерти, перезапуск уровня и т.п.
             OnDeath?.Invoke();
+            playerAnim.SetInteger("health", -1);
         }
     }
 

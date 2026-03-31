@@ -10,6 +10,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
+        Debug.Log("BasicPlayerSpawner Awake: " + this.gameObject.name);
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -59,6 +60,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             // Create a unique position for the player
             Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            runner.SetPlayerObject(player, networkPlayerObject);
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayerObject);
         }
@@ -78,17 +80,26 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void StartSharedGame()
-    {
-        StartGame(GameMode.Shared);
-        SceneLoader.Instance.Load(SceneNames.GameScene);
-    }
-
     async void StartGame(GameMode mode)
     {
-        // Create the Fusion runner and let it know that we will be providing user input
-        _runner = gameObject.AddComponent<NetworkRunner>();
-        if (_runner == null) _runner = gameObject.AddComponent<NetworkRunner>();
+        Debug.Log($"Starting game with mode: {mode}");
+        // 1. Check if a runner already exists on THIS object
+        _runner = GetComponent<NetworkRunner>();
+
+        // 2. If not, check if ANY runner exists in the whole scene
+        if (_runner == null)
+        {
+            _runner = FindFirstObjectByType<NetworkRunner>();
+            Debug.Log($"Applied runner to {_runner}");
+        }
+
+        // 3. ONLY if both are null, create a new one
+        if (_runner == null)
+        {
+            _runner = gameObject.AddComponent<NetworkRunner>();
+        }
+
+        // Now proceed with your existing StartGame logic...
         _runner.ProvideInput = true;
 
         // Create the NetworkSceneInfo from the current scene
@@ -104,23 +115,21 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = mode,
             SessionName = "TestRoom",
-            Scene = scene,
+            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
 
-    private void OnGUI()
+    public void StartHostFromButton()
     {
-        if (_runner == null)
+        if(_runner == null)
         {
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
-            {
-                StartGame(GameMode.Host);
-            }
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-            {
-                StartGame(GameMode.Client);
-            }
+            StartGame(GameMode.Host);
+            SceneLoader.Instance.Load(SceneNames.GameScene);
+            //if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+            //{
+            //    StartGame(GameMode.Client);
+            //}
         }
-    }
+    }   
 }

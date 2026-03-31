@@ -1,8 +1,9 @@
 using System;
+using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerRolesController : MonoBehaviour
+public class PlayerRolesController : NetworkBehaviour
 {
     [Header("Roles Stats")]
     [Tooltip("ScriptableObject с базовыми параметрами ролей игрока (PlayerRolesData).")]
@@ -20,7 +21,7 @@ public class PlayerRolesController : MonoBehaviour
     public int RoleId { get; private set; }
     public PlayerRoles.RoleType roleName { get; private set; }
 
-    private void Awake()
+    public override void Spawned()
     {
         if (playerRoles == null)
         {
