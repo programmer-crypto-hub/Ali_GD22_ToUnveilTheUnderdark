@@ -5,6 +5,8 @@ public class DiceManager : MonoBehaviour
 {
     public static DiceManager Instance { get; private set; }
 
+    public PlayerMovement playerMovement;
+
     [Header("Animation Settings")]
     [SerializeField]
     public Animator playerAnim;
@@ -15,11 +17,21 @@ public class DiceManager : MonoBehaviour
     [Header("Dice Settings")]
     //public GameObject dice;
     public int diceRollResult;
+    public int spaceLength;
 
     public void Awake()
     {
         rollDiceButton.onClick.AddListener(RollDice);
-        PlayerMovement.Instance.OnDiceRolled();
+        //playerMovement.OnDiceRolled();
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // Prevents duplicate managers
+        }
     }
 
     public void RollDice()

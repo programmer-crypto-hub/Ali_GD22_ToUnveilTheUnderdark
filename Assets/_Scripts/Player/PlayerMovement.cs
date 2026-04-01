@@ -1,10 +1,15 @@
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Player Stats to Obtain Data")]
+    [SerializeField]
     [Tooltip("Reference to PlayerStats component to access player data and events.")]
     public PlayerStats playerStats;
+    [SerializeField]
+    public PlayerData playerData;
 
     public static PlayerMovement Instance { get; private set; }
 
@@ -16,19 +21,41 @@ public class PlayerMovement : MonoBehaviour
     public void Awake()
     {
         Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // Prevents duplicate managers
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("SpaceTrigger"))
+        {
+            if (GameManager.Instance.CurrentState == GameState.Playing && currentDiceValue > 0)
+            {
+                currentDiceValue--;
+                collision.enabled = false;
+                new WaitForSeconds(0.5f); // Задержка для предотвращения мгновенного повторного срабатывания
+            }
+        }
     }
 
     public void OnDiceRolled()
     {
         // Получаем результат броска кубика из DiceManager
-        int diceValue = DiceManager.Instance.GetDiceValue();
+        currentDiceValue = DiceManager.Instance.GetDiceValue();
 
         if (GameManager.Instance.CurrentState == GameState.Playing)
         {
             // Конвертируем результат броска кубика в количество шагов для перемещения игрока
             DiceManager.Instance.ConvertDiceToMovement();
+            transform.position += transform.forward * playerData.moveSpeed; 
             // Здесь можно добавить логику для перемещения игрока на основе результата броска кубика
-            Debug.Log($"Игрок может переместиться на {diceValue} шагов.");
+            Debug.Log($"Игрок может переместиться на {currentDiceValue} шагов.");
         }
 
         if (GameManager.Instance.CurrentState == GameState.Combat)
@@ -37,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
             DiceManager.Instance.ConvertDiceToCombat(damage);
             currentDamage *= damage;
             // Логика для боя, если игрок находится в боевом состоянии
-            Debug.Log($"Игрок атакует с силой {currentDamage} и броском кубика {diceValue}.");
+            Debug.Log($"Игрок атакует с силой {currentDamage} и броском кубика {currentDiceValue}.");
         }
     }
 

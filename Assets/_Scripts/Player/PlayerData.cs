@@ -1,4 +1,3 @@
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Player Data", menuName = "Game Data/Player Data", order = 0)]

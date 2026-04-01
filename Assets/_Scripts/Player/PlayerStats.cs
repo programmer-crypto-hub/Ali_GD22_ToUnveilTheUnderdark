@@ -1,7 +1,6 @@
 using System;
 using Fusion;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 /// <summary>
 /// Отвечает за текущие характеристики игрока:

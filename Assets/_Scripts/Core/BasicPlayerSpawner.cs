@@ -32,7 +32,11 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         input.Set(data);
     }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        Debug.LogWarning($"PHOTON SHUTDOWN! Reason: {shutdownReason}");
+    }
+
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
@@ -103,11 +107,11 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         _runner.ProvideInput = true;
 
         // Create the NetworkSceneInfo from the current scene
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        var sceneRef = SceneRef.FromIndex(2);
         var sceneInfo = new NetworkSceneInfo();
-        if (scene.IsValid)
+        if (sceneRef.IsValid)
         {
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+            sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive);
         }
 
         // Start or join (depends on gamemode) a session with a specific name
@@ -115,7 +119,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = mode,
             SessionName = "TestRoom",
-            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
+            Scene = sceneRef, // This tells Photon: "Move everyone here once connected"
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
@@ -131,5 +135,5 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             //    StartGame(GameMode.Client);
             //}
         }
-    }   
+    }
 }
