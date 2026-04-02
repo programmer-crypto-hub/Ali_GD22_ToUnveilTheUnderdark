@@ -83,8 +83,8 @@ GameObject:
   - component: {fileID: 2444064934309997047}
   - component: {fileID: 6931281691153542553}
   - component: {fileID: 3545818115528592465}
-  - component: {fileID: 4078182684462149788}
   - component: {fileID: -7534866868559491883}
+  - component: {fileID: -1075526300362029862}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -124,7 +124,7 @@ CharacterController:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   playerStats: {fileID: 527390180511744034}
-  cameraTransform: {fileID: 0}
+  cameraTransform: {fileID: 7963617936369087205}
   visualRoot: {fileID: 8057081993634875873}
   sprintMultiplier: 1.5
 --- !u!114 &69281992823560485
@@ -210,6 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   playerData: {fileID: 11400000, guid: 9fbc7337fd48aea4299e8b2737e8f3dd, type: 2}
+  playerAnim: {fileID: 7953576579434099920}
   currentHealth: 0
   caveCoins: 0
   currentDiceValue: 0
@@ -332,18 +333,6 @@ MonoBehaviour:
   braking: 10
   maxSpeed: 2
   rotationSpeed: 15
---- !u!114 &4078182684462149788
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903945349004856130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33dccbd4d4fe85d46aedcc4693bb8934, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!114 &-7534866868559491883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,8 +352,22 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 527390180511744034}
   - {fileID: 3545818115528592465}
-  - {fileID: 4078182684462149788}
+  - {fileID: -1075526300362029862}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &-1075526300362029862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4903945349004856130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33dccbd4d4fe85d46aedcc4693bb8934, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
+  _prefabBall: {fileID: 7969446836214049978, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
+  _prefabPhysxBall: {fileID: 841630568314210103, guid: d645abe6e88cce7439371c69044f77dc, type: 3}
 --- !u!1 &6739084408746339730
 GameObject:
   m_ObjectHideFlags: 0

@@ -1636,67 +1636,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6887556720292737267, guid: 05cf25e04a0a6484d9b47f61aa50e143, type: 3}
   m_PrefabInstance: {fileID: 1664015652}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1669585554
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -16.837723
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -15.903397
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -208
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 78597768631062177, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 444753356676618343, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: SortKey
-      value: 3936429726
-      objectReference: {fileID: 0}
-    - target: {fileID: 3627494216002454676, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-      propertyPath: m_Name
-      value: Ball
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
 --- !u!1 &1719266314
 GameObject:
   m_ObjectHideFlags: 0
@@ -2756,6 +2695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a7fd4fc6e8161489cabd869f2f75a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceManager
+  playerMovement: {fileID: 0}
   playerAnim: {fileID: 7953576579434099920, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
   rollDiceButton: {fileID: 1719266316}
   diceRollResult: 0
@@ -2884,4 +2824,3 @@ SceneRoots:
   - {fileID: 2035182368}
   - {fileID: 1829760365}
   - {fileID: 1232717392}
-  - {fileID: 1669585554}

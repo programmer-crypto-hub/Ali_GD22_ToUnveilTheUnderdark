@@ -13,6 +13,17 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("BasicPlayerSpawner Awake: " + this.gameObject.name);
     }
 
+    private bool _mouseButton0;
+    private bool _mouseButton1;
+
+    private void Update()
+    {
+        _mouseButton0 = _mouseButton0 || Input.GetMouseButton(0);
+        _mouseButton1 = _mouseButton1 || Input.GetMouseButton(1);
+        if (Input.GetMouseButtonDown(0)) _mouseButton0 = true;
+        if (Input.GetMouseButtonDown(1)) _mouseButton1 = true;
+    }
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
@@ -28,6 +39,16 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         if (Input.GetKey(KeyCode.D))
             data.direction += Vector3.right;
+
+        if (Input.GetMouseButton(0)) // Left click / Touchpad tap
+        {
+            data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
+        }
+
+        if (Input.GetMouseButton(1)) // Right click / Touchpad hold
+        {
+            data.buttons.Set(NetworkInputData.MOUSEBUTTON1, _mouseButton1);
+        }
 
         input.Set(data);
     }
@@ -56,6 +77,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkObject _playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
