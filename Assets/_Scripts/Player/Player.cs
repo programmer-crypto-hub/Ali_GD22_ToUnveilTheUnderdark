@@ -6,10 +6,22 @@ public class Player : NetworkBehaviour
     [SerializeField] private Ball _prefabBall;
     [SerializeField] private PhysxBall _prefabPhysxBall;
 
+    [Networked]
+    public bool spawnedProjectile { get; set; }
+
     [Networked] private TickTimer delay { get; set; }
 
     private NetworkCharacterController _cc;
     private Vector3 _forward;
+
+    public Material _material;
+    private ChangeDetector _changeDetector;
+
+    public override void Spawned()
+    {
+        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        _material = GetComponentInChildren<SpriteRenderer>().material;
+    }
 
     private void Awake()
     {
@@ -39,6 +51,7 @@ public class Player : NetworkBehaviour
                   {
                       o.GetComponent<Ball>().Spawned();
                   });
+                    spawnedProjectile = !spawnedProjectile;
                 }
             }
 
@@ -53,7 +66,23 @@ public class Player : NetworkBehaviour
                   {
                       o.GetComponent<PhysxBall>().Init(10 * _forward);
                   });
+                spawnedProjectile = !spawnedProjectile;
             }
         }
+    }
+
+    public override void Render()
+    {
+        foreach (var change in _changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(spawnedProjectile):
+                    _material.color = Color.white;
+                    break;
+
+            }
+        }
+        _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
     }
 }

@@ -368,6 +368,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   _prefabBall: {fileID: 7969446836214049978, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
   _prefabPhysxBall: {fileID: 841630568314210103, guid: d645abe6e88cce7439371c69044f77dc, type: 3}
+  _spawnedProjectile: 0
+  _material: {fileID: 2100000, guid: 514e8fde0c40f5344bd4aa0ab42286b3, type: 2}
 --- !u!1 &6739084408746339730
 GameObject:
   m_ObjectHideFlags: 0

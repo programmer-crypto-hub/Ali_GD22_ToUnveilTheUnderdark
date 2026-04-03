@@ -131,6 +131,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         // Create the NetworkSceneInfo from the current scene
         var sceneRef = SceneRef.FromIndex(2);
         var sceneInfo = new NetworkSceneInfo();
+        var sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
         if (sceneRef.IsValid)
         {
             sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive);
@@ -141,7 +142,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = mode,
             SessionName = "TestRoom",
-            Scene = sceneRef, // This tells Photon: "Move everyone here once connected"
+            Scene = SceneRef.FromIndex(1),   // This tells Photon: "Move everyone here once connected"
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }

@@ -13,19 +13,23 @@ MonoBehaviour:
   m_Name: NewPlayModeScenario
   m_EditorClassIdentifier: UnityEditor.MultiplayerModule.dll::Unity.Multiplayer.PlayMode.Editor.ScenarioConfig
   m_Description: 
-  m_EnableEditors: 1
+  m_EnableEditors: 0
   m_MainEditorInstance:
     Name: Main Editor
-    <CorrespondingNodeId>k__BackingField: 
-    m_Nodes: []
+    <CorrespondingNodeId>k__BackingField: Main Editor|0_run
+    m_Nodes:
+    - Main Editor|0_run
+    - Main Editor|0_deploy
     m_Role: 2
     m_PlayerTag: 
     m_InitialScene: {fileID: 102900000, guid: e1f10857c613f7240b534adc0f94f0f7, type: 3}
   m_EditorInstances: []
   m_LocalInstances:
   - Name: Instance
-    <CorrespondingNodeId>k__BackingField: 
-    m_Nodes: []
+    <CorrespondingNodeId>k__BackingField: Instance - Run
+    m_Nodes:
+    - Instance - Build
+    - Instance - Run
     m_BuildProfile: {fileID: 11400000, guid: 7851a2b52d2bdbb49bf1ff1036fe5b9d, type: 2}
     m_ServerSettings:
       DeployMode: 0
