@@ -85,7 +85,8 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             // Create a unique position for the player
             Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player);
+            //NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             runner.SetPlayerObject(player, networkPlayerObject);
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayerObject);
@@ -142,8 +143,8 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = mode,
             SessionName = "TestRoom",
-            Scene = SceneRef.FromIndex(1),   // This tells Photon: "Move everyone here once connected"
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
+            SceneManager = sceneManager
         });
     }
 
@@ -152,7 +153,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if(_runner == null)
         {
             StartGame(GameMode.Host);
-            SceneLoader.Instance.Load(SceneNames.GameScene);
+            var Scene = SceneRef.FromIndex(2);
             //if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
             //{
             //    StartGame(GameMode.Client);

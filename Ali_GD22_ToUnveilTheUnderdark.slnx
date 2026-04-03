@@ -1,11 +1,11 @@
 ﻿<Solution>
+  <Project Path="Fusion.Unity.Editor.csproj" />
   <Project Path="Edgar.Unity.csproj" />
   <Project Path="Edgar.Unity.Editor.csproj" />
   <Project Path="Fusion.Addons.Physics.csproj" />
   <Project Path="Edgar.Unity.Examples.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Fusion.Unity.csproj" />
-  <Project Path="Fusion.Unity.Editor.csproj" />
-  <Project Path="Unity.Fusion.CodeGen.csproj" />
   <Project Path="Fusion.Addons.Physics.Editor.csproj" />
+  <Project Path="Unity.Fusion.CodeGen.csproj" />
 </Solution>

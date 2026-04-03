@@ -21,6 +21,17 @@ public class PlayerRolesController : NetworkBehaviour
     public int RoleId { get; private set; }
     public PlayerRoles.RoleType roleName { get; private set; }
 
+    public void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("PlayerRolesController: уже существует другой экземпляр. Этот экземпляр будет отключен.", this);
+            enabled = false;
+            return;
+        }
+        Instance = this;
+
+    }
     public override void Spawned()
     {
         if (playerRoles == null)
