@@ -1,3 +1,5 @@
+
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -26,21 +28,25 @@ public class MeleeWeapon : WeaponBase
 
         StartAttackCooldown();
 
-        if (weaponData == null)
+        if (WeaponData == null)
         {
             Debug.LogWarning($"{name}: WeaponData не назначен, ближняя атака невозможна.", this);
             return;
         }
 
+        // Важно для урока 7.2 (урон через IDamageable):
+        // правило “игрок бьёт только врагов” обеспечивается настройкой hitLayers в инспекторе (обычно только слой Enemy).
         // Если не указан радиус, используем Range из WeaponData
         float radius = hitRadius > 0f ? hitRadius : Range;
 
         // Если attackOrigin не задан, используем позицию owner или самого оружия
         Vector3 origin = attackOrigin != null
             ? attackOrigin.position
-            : (owner != null ? owner.position : transform.position);
+            : (Owner != null ? Owner.position : transform.position);
 
-        // Простой поиск попаданий
+        // Простой поиск попаданий.
+        // OverlapSphere может вернуть несколько коллайдеров одного и того же врага,
+        // поэтому HashSet защищает от нанесения урона несколько раз за одну атаку.
         Collider[] hits = Physics.OverlapSphere(origin, radius, hitLayers);
 
         if (hits.Length == 0)
@@ -50,19 +56,18 @@ public class MeleeWeapon : WeaponBase
         else
         {
             Debug.Log($"{name}: ближняя атака, задели {hits.Length} объект(ов).");
+            HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
 
             foreach (Collider collider in hits)
             {
-                // Здесь позже, на Этапе 8, мы будем вызывать метод получения урона
-                // у врагов (например, через EnemyStats или интерфейс IDamageable).
                 Debug.Log($"Попали по объекту: {collider.name}");
 
-                // Псевдокод на будущее (НЕ реализуем сейчас, чтобы не ломать компиляцию):
-                // var damageable = collider.GetComponent<IDamageable>();
-                // if (damageable != null)
-                // {
-                //     damageable.TakeDamage(Damage);
-                // }
+                IDamageable damageable = collider.GetComponent<IDamageable>();
+                if (damageable == null)
+                    damageable = collider.GetComponentInParent<IDamageable>();
+
+                if (damageable != null && damagedTargets.Add(damageable))
+                    damageable.TakeDamage(Damage);
             }
         }
 
@@ -74,10 +79,10 @@ public class MeleeWeapon : WeaponBase
         // Рисуем сферу удара в редакторе, чтобы видеть радиус
         Gizmos.color = Color.red;
 
-        float radius = hitRadius > 0f ? hitRadius : (weaponData != null ? weaponData.range : 1.5f);
+        float radius = hitRadius > 0f ? hitRadius : (WeaponData != null ? WeaponData.range : 1.5f);
         Vector3 origin = attackOrigin != null
             ? attackOrigin.position
-            : (owner != null ? owner.position : transform.position);
+            : (Owner != null ? Owner.position : transform.position);
 
         Gizmos.DrawWireSphere(origin, radius);
     }

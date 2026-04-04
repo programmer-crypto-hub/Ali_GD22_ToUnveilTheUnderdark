@@ -10,19 +10,27 @@ using UnityEngine;
     order = 1)]
 public class EnemyData : ScriptableObject
 {
-    public enum EnemyType
+    public enum EnemyTypeByWeapons
     {
         Melee,   // Ближний бой (гоблины, орки)
         Ranged,  // Дальний бой (лучники, маги)
         Boss     // Боссы (особые враги)
     }
 
+    public enum EnemyTypeByHealth
+    {
+        Basic = 1,
+        Medium = 2,
+        Boss = 3
+    }
+
+
     [Header("Общее")]
     [Tooltip("Читаемое название врага (для UI и логирования).")]
     public string enemyName = "New Enemy";
 
     [Tooltip("Тип врага (ближний, дальний, босс).")]
-    public EnemyType enemyType = EnemyType.Melee;
+    public EnemyTypeByWeapons enemyType;
 
     [Header("Характеристики")]
     [Min(1f)]
