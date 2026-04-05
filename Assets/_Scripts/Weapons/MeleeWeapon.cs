@@ -28,7 +28,7 @@ public class MeleeWeapon : WeaponBase
 
         StartAttackCooldown();
 
-        if (WeaponData == null)
+        if (weaponData == null)
         {
             Debug.LogWarning($"{name}: WeaponData не назначен, ближн€€ атака невозможна.", this);
             return;
@@ -42,7 +42,7 @@ public class MeleeWeapon : WeaponBase
         // ≈сли attackOrigin не задан, используем позицию owner или самого оружи€
         Vector3 origin = attackOrigin != null
             ? attackOrigin.position
-            : (Owner != null ? Owner.position : transform.position);
+            : (owner != null ? owner.position : transform.position);
 
         // ѕростой поиск попаданий.
         // OverlapSphere может вернуть несколько коллайдеров одного и того же врага,
@@ -79,10 +79,10 @@ public class MeleeWeapon : WeaponBase
         // –исуем сферу удара в редакторе, чтобы видеть радиус
         Gizmos.color = Color.red;
 
-        float radius = hitRadius > 0f ? hitRadius : (WeaponData != null ? WeaponData.range : 1.5f);
+        float radius = hitRadius > 0f ? hitRadius : (weaponData != null ? weaponData.range : 1.5f);
         Vector3 origin = attackOrigin != null
             ? attackOrigin.position
-            : (Owner != null ? Owner.position : transform.position);
+            : (owner != null ? owner.position : transform.position);
 
         Gizmos.DrawWireSphere(origin, radius);
     }

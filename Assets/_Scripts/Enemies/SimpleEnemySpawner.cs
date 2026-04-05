@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Упрощённый спавнер врагов для базового обучения.
 /// Не использует сложный пул и словари — только Instantiate и простой список.
 /// </summary>
-public class SimpleEnemySpawner : MonoBehaviour
+public class SimpleEnemySpawner : NetworkBehaviour
 {
     [Header("Тип врага")]
     [Tooltip("Данные врага, которого будем спавнить.")]
@@ -128,8 +129,7 @@ public class SimpleEnemySpawner : MonoBehaviour
         }
 
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-
-        GameObject enemyObject = Instantiate(enemyData.prefab, spawnPoint.position, spawnPoint.rotation);
+        NetworkObject enemyObject = Runner.Spawn(enemyData.prefab, spawnPoint.position, spawnPoint.rotation);
 
         EnemyStats stats = enemyObject.GetComponent<EnemyStats>();
         if (stats != null)

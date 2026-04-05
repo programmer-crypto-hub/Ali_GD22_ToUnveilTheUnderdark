@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class BasicPlayerSpawner : NetworkBehaviour
 {
     void Awake()
     {

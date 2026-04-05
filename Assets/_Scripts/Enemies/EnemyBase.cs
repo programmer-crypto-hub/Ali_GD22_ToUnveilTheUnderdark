@@ -1,10 +1,11 @@
+
 /*
- * EnemyBase
- * Назначение: базовое поведение врага в runtime (цель, движение, атака, получение урона).
- * Что делает: хранит состояние здоровья экземпляра, преследует цель и выполняет простую атаку по кулдауну.
- * Связи: читает баланс из EnemyData, используется EnemySpawner и адаптером EnemyStats.
- * Паттерны: Single Responsibility (поведение врага), Data + Runtime State.
- */
+* EnemyBase
+* Назначение: базовое поведение врага в runtime (цель, движение, атака, получение урона).
+* Что делает: хранит состояние здоровья экземпляра, преследует цель и выполняет простую атаку по кулдауну.
+* Связи: читает баланс из EnemyData, используется EnemySpawner и адаптером EnemyStats.
+* Паттерны: Single Responsibility (поведение врага), Data + Runtime State.
+*/
 
 using System;
 using UnityEngine;
@@ -60,6 +61,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
     public float AttackRange => enemyData != null ? enemyData.attackRange : 0f;
     public float DetectionRange => enemyData != null ? enemyData.detectionRange : 0f;
     public bool IsDead => isDead;
+    protected Transform CurrentTarget => target;
 
     /// <summary>
     /// Событие смерти врага.

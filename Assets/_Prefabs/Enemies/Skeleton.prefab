@@ -10,8 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2303200516350181121}
   - component: {fileID: 5755079138758165399}
-  - component: {fileID: 885476361780710128}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skeleton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,22 +91,3 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &885476361780710128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800925988518144248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 040ef0c301250f44e92dccd352069d54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
-  enemyData: {fileID: 11400000, guid: da1bb4829e21bee418ed33348c3687a9, type: 2}
-  currentHealth: 0
-  target: {fileID: 7668859065092257100, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
-  autoResolveTargetOnStart: 1
-  attackCooldown: 1
-  destroyOnDeath: 1
-  destroyDelayAfterDeath: 0.15

@@ -15,8 +15,8 @@ public class PlayerRolesController : NetworkBehaviour
 
     [Header("UI Elements")]
     [Tooltip("Ссылка на UI элемент для отображения текущей роли игрока.")]
-    public GameObject rolePanel;
-    [SerializeField] public Image roleImage;
+    public GameObject rolePanel; 
+    //public Image roleImage;
 
     public int RoleId { get; private set; }
     public PlayerRoles.RoleType roleName { get; private set; }
@@ -60,14 +60,14 @@ public class PlayerRolesController : NetworkBehaviour
         RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length + 1);
         Debug.Log($"Applying role: {RoleId}");
         roleName = (PlayerRoles.RoleType)RoleId;
-        roleImage.sprite = playerRoles.roleSprite;
+        //roleImage.sprite = playerRoles.roleSprite;
     }
 
     public void DisplayRoleUI()
     {
         rolePanel.SetActive(true);
         new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
-        roleImage.enabled = true;
+        //roleImage.enabled = true;
         // Здесь можно добавить логику для отображения конкретного изображения или текста в зависимости от роли
         // Например:
         // roleImage.sprite = GetRoleSprite(roleName);
