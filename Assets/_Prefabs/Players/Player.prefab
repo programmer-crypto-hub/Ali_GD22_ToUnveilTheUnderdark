@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3736534847694233342}
   - component: {fileID: 8768870177514982805}
-  - component: {fileID: 7585905958450554815}
   - component: {fileID: 8355269837307476712}
   - component: {fileID: 4814032430911597572}
   - component: {fileID: 1810462194210233395}
@@ -118,14 +117,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &7585905958450554815
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 945048386864214550}
-  m_Enabled: 1
 --- !u!114 &8355269837307476712
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,7 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fusion.Unity::Fusion.EnableOnSingleRunner
   PreferredRunner: 0
   Components:
-  - {fileID: 7585905958450554815}
+  - {fileID: 0}
   _guid: 229d974e-643c-4c26-
 --- !u!1 &4845345056950368468
 GameObject:

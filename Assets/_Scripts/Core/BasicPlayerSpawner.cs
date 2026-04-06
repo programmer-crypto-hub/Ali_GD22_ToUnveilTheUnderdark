@@ -109,44 +109,61 @@ public class BasicPlayerSpawner : NetworkBehaviour
 
     async void StartGame(GameMode mode)
     {
+        GameObject runnerObject = new GameObject("Fusion_Runtime_Runner");
+        _runner = runnerObject.AddComponent<NetworkRunner>();
+        _runner.ProvideInput = true;
         Debug.Log($"Starting game with mode: {mode}");
-        // 1. Check if a runner already exists on THIS object
-        _runner = GetComponent<NetworkRunner>();
-
-        // 2. If not, check if ANY runner exists in the whole scene
+        _runner = Runner;
         if (_runner == null)
         {
             _runner = FindFirstObjectByType<NetworkRunner>();
             Debug.Log($"Applied runner to {_runner}");
         }
 
-        // 3. ONLY if both are null, create a new one
-        if (_runner == null)
-        {
-            _runner = gameObject.AddComponent<NetworkRunner>();
-        }
-
-        // Now proceed with your existing StartGame logic...
-        _runner.ProvideInput = true;
-
         // Create the NetworkSceneInfo from the current scene
         var sceneRef = SceneRef.FromIndex(2);
+
         var sceneInfo = new NetworkSceneInfo();
-        var sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
+        var sceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>();
+        if (sceneManager == null) sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
         if (sceneRef.IsValid)
         {
             sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive);
         }
+        //sceneManager.IsMultiplePeer = false;
 
         // Start or join (depends on gamemode) a session with a specific name
-        await _runner.StartGame(new StartGameArgs()
+        try
         {
-            GameMode = mode,
-            SessionName = "TestRoom",
-            Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/_Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
-            SceneManager = sceneManager
-        });
+            Debug.Log("Attempting to run");
+            var result = await _runner.StartGame(new StartGameArgs()
+            {
+                GameMode = mode,
+                SessionName = "TestRoom",
+                Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/_Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
+                SceneManager = sceneManager
+            });
+
+            Debug.Log($"Final Result: {result.Ok}, Reason: {result.ShutdownReason}");
+            if (result.Ok)
+            {
+                Debug.Log("Fusion Started Successfully! Loading GameScene...");
+            }
+            else
+            {
+                Debug.LogError($"Fusion Failed to Start: {result.ShutdownReason}");
+                Destroy(runnerObject);
+            }
+
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Fatal Error during StartGame: {e.Message}");
+        }
+
+
     }
+
 
     public void StartHostFromButton()
     {
