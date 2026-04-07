@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BasicPlayerSpawner : NetworkBehaviour
+public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks 
 {
     void Awake()
     {
@@ -57,9 +57,13 @@ public class BasicPlayerSpawner : NetworkBehaviour
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.LogWarning($"PHOTON SHUTDOWN! Reason: {shutdownReason}");
     }
-
-    public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+ 
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) {
+        Debug.Log("Connected to Fusion Server");
+    }
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) {
+        Debug.Log($"Disconnected: {reason}");
+    }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
@@ -83,13 +87,20 @@ public class BasicPlayerSpawner : NetworkBehaviour
     {
         if (runner.IsServer)
         {
+            Vector3 spawnPos = new Vector3(player.RawEncoded % 3, 0, 0);
+            // 1. Spawn the player prefab
+            NetworkObject networkPlayer = runner.Spawn(_playerPrefab, spawnPos, Quaternion.identity, player);
+
+            // 2. ASSIGN IT: This is what fills that "Local Player Object" field in the Inspector
+            runner.SetPlayerObject(player, networkPlayer);
+
+            Debug.Log($"Player {player} joined and assigned to {networkPlayer.name}");
             // Create a unique position for the player
             Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player);
-            //NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-            runner.SetPlayerObject(player, networkPlayerObject);
+            
+            runner.SetPlayerObject(player, networkPlayer); 
             // Keep track of the player avatars for easy access
-            _spawnedCharacters.Add(player, networkPlayerObject);
+            _spawnedCharacters.Add(player, networkPlayer);
         }
 
         if (_playerPrefab == null)
@@ -109,16 +120,13 @@ public class BasicPlayerSpawner : NetworkBehaviour
 
     async void StartGame(GameMode mode)
     {
-        GameObject runnerObject = new GameObject("Fusion_Runtime_Runner");
-        _runner = runnerObject.AddComponent<NetworkRunner>();
+        GameObject go = new GameObject("Fusion_Network_Runner");
+        var _runner = go.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
         Debug.Log($"Starting game with mode: {mode}");
-        _runner = Runner;
-        if (_runner == null)
-        {
-            _runner = FindFirstObjectByType<NetworkRunner>();
-            Debug.Log($"Applied runner to {_runner}");
-        }
+
+        _runner = FindFirstObjectByType<NetworkRunner>();
+        _runner.AddCallbacks(this); 
 
         // Create the NetworkSceneInfo from the current scene
         var sceneRef = SceneRef.FromIndex(2);
@@ -131,13 +139,13 @@ public class BasicPlayerSpawner : NetworkBehaviour
             sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive);
         }
         //sceneManager.IsMultiplePeer = false;
-
         // Start or join (depends on gamemode) a session with a specific name
         try
         {
+
             Debug.Log("Attempting to run");
             var result = await _runner.StartGame(new StartGameArgs()
-            {
+            { 
                 GameMode = mode,
                 SessionName = "TestRoom",
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/_Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
@@ -152,7 +160,7 @@ public class BasicPlayerSpawner : NetworkBehaviour
             else
             {
                 Debug.LogError($"Fusion Failed to Start: {result.ShutdownReason}");
-                Destroy(runnerObject);
+                Destroy(go);
             }
 
         }
@@ -160,8 +168,6 @@ public class BasicPlayerSpawner : NetworkBehaviour
         {
             Debug.LogError($"Fatal Error during StartGame: {e.Message}");
         }
-
-
     }
 
 

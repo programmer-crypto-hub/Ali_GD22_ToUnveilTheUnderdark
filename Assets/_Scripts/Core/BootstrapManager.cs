@@ -6,20 +6,8 @@ public class BootstrapManager : MonoBehaviour
 {
     private static bool _initialized = false;
 
-    private GameObject NetworkRunner;
-
     private void Awake()
     {
-        NetworkRunner = new GameObject("Fusion_Runtime_Runner");
-        var runner = NetworkRunner.AddComponent<NetworkRunner>();
-        var sceneManager = NetworkRunner.AddComponent<NetworkSceneManagerDefault>();
-        var eventManager = NetworkRunner.AddComponent<NetworkEvents>();
-
-        if (NetworkRunner != null)
-            DontDestroyOnLoad(NetworkRunner.gameObject);
-        else
-            Debug.LogWarning("No NetworkRunner found in the scene. If you are using Fusion, please ensure a NetworkRunner is present in the Bootstrap scene.");
-
         if (_initialized)
         { 
             Destroy(gameObject);

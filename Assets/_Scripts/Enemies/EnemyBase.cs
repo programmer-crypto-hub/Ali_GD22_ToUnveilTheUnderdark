@@ -9,11 +9,12 @@
 
 using System;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Базовый класс поведения врага для simple-ветки.
 /// </summary>
-public class EnemyBase : MonoBehaviour, IDamageable
+public class EnemyBase : NetworkBehaviour, IDamageable
 {
     private enum EnemyState
     {
@@ -52,6 +53,10 @@ public class EnemyBase : MonoBehaviour, IDamageable
     private float nextAttackTime;
     private bool isDead;
     private EnemyState currentState = EnemyState.Chase;
+
+    [Header("Animation Elements")]
+    [Tooltip("Enemy Animator")]
+    [SerializeField] private Animator enemyAnim;
 
     public EnemyData Data => enemyData;
     public float CurrentHealth => currentHealth;
@@ -102,6 +107,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
         // если цель уже мертва, враг прекращает преследование и атаку.
         if (targetDamageable != null && targetDamageable.IsDead)
             return;
+        if (!HasStateAuthority) return;
 
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
         if (distanceToTarget > DetectionRange)
@@ -218,8 +224,9 @@ public class EnemyBase : MonoBehaviour, IDamageable
         // и state-driven перемещение вместо прямой правки transform.position.
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
+        enemyAnim.SetTrigger("enemy_walk_trig");
 
-        transform.position += direction * MoveSpeed * Time.deltaTime;
+        transform.position += direction * MoveSpeed * Runner.DeltaTime; 
 
         if (direction != Vector3.zero)
         {
