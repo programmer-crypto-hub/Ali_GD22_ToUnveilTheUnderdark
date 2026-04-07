@@ -56,7 +56,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
 
     [Header("Animation Elements")]
     [Tooltip("Enemy Animator")]
-    [SerializeField] private Animator enemyAnim;
+    [SerializeField] public Animator enemyAnim;
 
     public EnemyData Data => enemyData;
     public float CurrentHealth => currentHealth;
