@@ -10,6 +10,8 @@ public class PlayerMovement : MonoBehaviour
     public PlayerStats playerStats;
     [SerializeField]
     public PlayerData playerData;
+    [SerializeField]
+    public PlayerController playerController;
 
     public static PlayerMovement Instance { get; private set; }
 
@@ -53,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
         {
             // Конвертируем результат броска кубика в количество шагов для перемещения игрока
             DiceManager.Instance.ConvertDiceToMovement();
-            transform.position += transform.forward * playerData.moveSpeed; 
+            playerController.HandleMovement();
             // Здесь можно добавить логику для перемещения игрока на основе результата броска кубика
             Debug.Log($"Игрок может переместиться на {currentDiceValue} шагов.");
         }

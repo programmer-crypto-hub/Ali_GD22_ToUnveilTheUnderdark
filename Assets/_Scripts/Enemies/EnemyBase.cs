@@ -130,6 +130,35 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         }
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        if (HasStateAuthority == false) return; // Only the Host moves the enemy
+
+        if (target == null)
+        {
+            FindClosestPlayer();
+            return;
+        }
+
+        Vector3 currentTargetPos = target.position;
+        Vector3 direction = (currentTargetPos - transform.position).normalized;
+        direction.y = 0;
+        if (target != null)
+        {
+            MoveTowardsTarget();
+        }
+    }
+
+    private void FindClosestPlayer()
+    {
+        // Look for the object with the 'Player' tag or a specific script
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            target = player.transform;
+        }
+    }
+
     /// <summary>
     /// Инициализирует врага данными и сбрасывает runtime-состояние.
     /// Обычно вызывается спавнером сразу после создания врага.
@@ -216,6 +245,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     /// </summary>
     public void MoveTowardsTarget()
     {
+        Debug.Log("Move Towards Target Method began");
         if (target == null)
             return;
 
@@ -224,9 +254,10 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         // и state-driven перемещение вместо прямой правки transform.position.
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
-        enemyAnim.SetTrigger("enemy_walk_trig");
+        enemyAnim.SetTrigger("enemy_move_trig");
 
-        transform.position += direction * MoveSpeed * Runner.DeltaTime; 
+        Debug.Log("Enemy is Moving");
+        transform.position += direction * MoveSpeed * Runner.DeltaTime;
 
         if (direction != Vector3.zero)
         {

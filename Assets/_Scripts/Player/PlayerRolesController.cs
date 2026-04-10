@@ -21,55 +21,57 @@ public class PlayerRolesController : NetworkBehaviour
     public int RoleId { get; private set; }
     public PlayerRoles.RoleType roleName { get; private set; }
 
-    public void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning("PlayerRolesController: уже существует другой экземпляр. Этот экземпляр будет отключен.", this);
-            enabled = false;
-            return;
-        }
-        Instance = this;
+    //public void Awake()
+    //{
+    //    if (Instance != null && Instance != this)
+    //    {
+    //        Debug.LogWarning("PlayerRolesController: уже существует другой экземпляр. Этот экземпляр будет отключен.", this);
+    //        enabled = false;
+    //        return;
+    //    }
+    //    Instance = this;
 
-    }
-    public override void Spawned()
-    {
-        if (playerRoles == null)
-        {
-            Debug.LogError("PlayerRolesController: PlayerRoles не назначены в инспекторе.", this);
-        }
+    //}
+    //public override void Spawned()
+    //{
+    //    if (playerRoles == null)
+    //    {
+    //        Debug.LogError("PlayerRolesController: PlayerRoles не назначены в инспекторе.", this);
+    //    }
 
-        rolePanel.SetActive(false);
+    //    rolePanel.SetActive(false);
 
-        ApplyRole();
-    }
+    //    ApplyRole();
+    //}
 
-    private void OnEnable()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning("PlayerRolesController: уже существует другой экземпляр. Этот экземпляр будет отключен.", this);
-            enabled = false;
-            return;
-        }
-        Instance = this;
-    }
+    //private void OnEnable()
+    //{
+    //    if (Instance != null && Instance != this)
+    //    {
+    //        Debug.LogWarning("PlayerRolesController: уже существует другой экземпляр. Этот экземпляр будет отключен.", this);
+    //        enabled = false;
+    //        return;
+    //    }
+    //    Instance = this;
+    //}
 
-    public void ApplyRole()
-    {
-        RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length + 1);
-        Debug.Log($"Applying role: {RoleId}");
-        roleName = (PlayerRoles.RoleType)RoleId;
-        //roleImage.sprite = playerRoles.roleSprite;
-    }
+    //public void ApplyRole()
+    //{
+    //    RoleId = UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerRoles.RoleType)).Length + 1);
+    //    Debug.Log($"Applying role: {RoleId}");
+    //    roleName = (PlayerRoles.RoleType)RoleId;
+    //    Debug.Log($"Applying role: {roleName}");
+    //    //playerRoles = _ScriptableObjects.Load<PlayerRoles>($"PlayerRoles/{roleName}");
+    //    //roleImage.sprite = playerRoles.roleSprite;
+    //}
 
-    public void DisplayRoleUI()
-    {
-        rolePanel.SetActive(true);
-        new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
-        //roleImage.enabled = true;
-        // Здесь можно добавить логику для отображения конкретного изображения или текста в зависимости от роли
-        // Например:
-        // roleImage.sprite = GetRoleSprite(roleName);
-    }
+    //public void DisplayRoleUI()
+    //{
+    //    rolePanel.SetActive(true);
+    //    new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
+    //    //roleImage.enabled = true;
+    //    // Здесь можно добавить логику для отображения конкретного изображения или текста в зависимости от роли
+    //    // Например:
+    //    // roleImage.sprite = GetRoleSprite(roleName);
+    //} 
 }

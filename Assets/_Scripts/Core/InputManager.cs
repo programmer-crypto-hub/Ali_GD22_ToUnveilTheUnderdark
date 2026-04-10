@@ -19,7 +19,6 @@ public class InputManager : MonoBehaviour
     private InputAction jumpAction;
     private InputAction attackAction;
     private InputAction interactAction;
-    private InputAction sprintAction;
     private InputAction crouchAction;
     private InputAction cancelAction;
     private InputAction weaponNextAction;
@@ -33,7 +32,6 @@ public class InputManager : MonoBehaviour
     public bool TurnEndPressed { get; private set; }
     public bool RollDicePressed { get; private set; }
     public bool InteractPressed { get; private set; }
-    public bool SprintHeld { get; private set; }
     public bool CrouchHeld { get; private set; }
 
     public Action OnJumpPressed;
@@ -85,7 +83,6 @@ public class InputManager : MonoBehaviour
         jumpAction = playerActionMap.FindAction("Jump");
         attackAction = playerActionMap.FindAction("Attack");
         interactAction = playerActionMap.FindAction("Interact");
-        sprintAction = playerActionMap.FindAction("Sprint");
         crouchAction = playerActionMap.FindAction("Crouch");
         weaponNextAction = playerActionMap.FindAction("Next");
         weaponPrevAction = playerActionMap.FindAction("Previous");
@@ -174,7 +171,6 @@ public class InputManager : MonoBehaviour
         MoveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         LookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
         ZoomInput = zoomAction != null ? zoomAction.ReadValue<Vector2>().y : 0f;
-        SprintHeld = sprintAction != null && sprintAction.IsPressed();
         CrouchHeld = crouchAction != null && crouchAction.IsPressed();
     }
 
@@ -307,12 +303,7 @@ public class InputManager : MonoBehaviour
     public bool IsInteractPressed()
     {
         return InteractPressed;
-    }
-
-    public bool IsSprintHeld()
-    {
-        return SprintHeld;
-    }
+    } 
 
     public bool IsCrouchHeld()
     {

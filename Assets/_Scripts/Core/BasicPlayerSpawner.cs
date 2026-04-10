@@ -1,9 +1,11 @@
 using Fusion;
+using Fusion.Addons.Physics;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Unity.Collections.Unicode; 
 
 public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks 
 {
@@ -85,12 +87,28 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer)
+        Debug.Log("OnPlayerJoined method active");
+        if (runner.IsServer && runner.IsRunning)
         {
             Vector3 spawnPos = new Vector3(player.RawEncoded % 3, 0, 0);
             // 1. Spawn the player prefab
-            NetworkObject networkPlayer = runner.Spawn(_playerPrefab, spawnPos, Quaternion.identity, player);
-
+            DontDestroyOnLoad(_playerPrefab);
+            if (_playerPrefab == null)
+            {
+                Debug.LogError("Player Prefab is not assigned in the Inspector!");
+                return; 
+            }
+            var networkPlayer = runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player, (runner, obj) => {
+                // This happens BEFORE the object is fully placed in the world
+                obj.gameObject.SetActive(true);
+            });
+            networkPlayer.gameObject.SetActive(true);
+            Debug.Log($"OnPlayerJoined: Spawning Player: {networkPlayer}");
+            if (networkPlayer == null)
+            {
+                Debug.LogError("FATAL: runner.Spawn returned NULL! The Prefab Table is likely out of sync.");
+                return;
+            }
             // 2. ASSIGN IT: This is what fills that "Local Player Object" field in the Inspector
             runner.SetPlayerObject(player, networkPlayer);
 
@@ -101,6 +119,10 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             runner.SetPlayerObject(player, networkPlayer); 
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayer);
+        }
+        else
+        {
+            Debug.LogWarning($"OnPlayerJoined called but runner is not server or not running. IsServer: {runner.IsServer}, IsRunning: {runner.IsRunning}");
         }
 
         if (_playerPrefab == null)
@@ -121,12 +143,13 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     async void StartGame(GameMode mode)
     {
         GameObject go = new GameObject("Fusion_Network_Runner");
+        var physics2D = go.AddComponent<RunnerSimulatePhysics2D>(); 
         var _runner = go.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
         Debug.Log($"Starting game with mode: {mode}");
 
         _runner = FindFirstObjectByType<NetworkRunner>();
-        _runner.AddCallbacks(this); 
+        _runner.AddCallbacks(this);
 
         // Create the NetworkSceneInfo from the current scene
         var sceneRef = SceneRef.FromIndex(2);
@@ -138,18 +161,19 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive);
         }
+        var spawner = FindFirstObjectByType<BasicPlayerSpawner>();
+        _runner.AddCallbacks(spawner);
         //sceneManager.IsMultiplePeer = false;
         // Start or join (depends on gamemode) a session with a specific name
         try
         {
-
             Debug.Log("Attempting to run");
             var result = await _runner.StartGame(new StartGameArgs()
-            { 
+            {
                 GameMode = mode,
                 SessionName = "TestRoom",
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/_Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
-                SceneManager = sceneManager
+                SceneManager = sceneManager 
             });
 
             Debug.Log($"Final Result: {result.Ok}, Reason: {result.ShutdownReason}");

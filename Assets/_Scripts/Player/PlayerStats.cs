@@ -73,18 +73,18 @@ public class PlayerStats : NetworkBehaviour
     public override void Spawned()
     {
         InitializeFromData();
-        if (PlayerRolesController.Instance == null)
-        {
-            Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
-            return;
-        }
-        PlayerRolesController.Instance.OnRoleGiven += () =>
-        {
-            PlayerRolesController.Instance.ApplyRole();
-            currentRole = PlayerRolesController.Instance.roleName.ToString();
-            currentRoleId = PlayerRolesController.Instance.RoleId;
-            OnRoleApplied?.Invoke(currentRole, currentRoleId);
-        };
+        //if (PlayerRolesController.Instance == null)
+        //{
+        //    Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
+        //    return;
+        //}
+        //PlayerRolesController.Instance.OnRoleGiven += () =>
+        //{
+        //    //PlayerRolesController.Instance.ApplyRole(); 
+        //    currentRole = PlayerRolesController.Instance.roleName.ToString();
+        //    currentRoleId = PlayerRolesController.Instance.RoleId;
+        //    OnRoleApplied?.Invoke(currentRole, currentRoleId);
+        //};
     }
 
     /// <summary>

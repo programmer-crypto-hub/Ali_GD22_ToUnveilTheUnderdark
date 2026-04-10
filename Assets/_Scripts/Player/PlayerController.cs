@@ -1,12 +1,13 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Fusion; 
 
 /// <summary>
 /// Player movement controller for 3D top-down.
 /// Reads input from InputManager, moves a CharacterController
 /// relative to the camera and rotates the visual model to face movement direction.
 /// </summary>
-[RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("References")]
     [Tooltip("Player stats component (health, move speed, etc.).")]
@@ -18,18 +19,15 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Root transform of the visual model (rotates to face movement direction).")]
     [SerializeField] private Transform visualRoot;
 
-    [Header("Movement")]
-    [Tooltip("Speed multiplier when sprinting.")]
-    [SerializeField] private float sprintMultiplier = 1.5f;
-
-    private CharacterController characterController;
+    private Rigidbody2D rb;
+    private Vector2 _moveContext; // Stores the WASD/Joystick value
 
     /// <summary>
     /// Инициализирует ссылки на CharacterController, PlayerStats и камеру.
     /// </summary>
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody2D>();
 
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();
@@ -55,7 +53,13 @@ public class PlayerController : MonoBehaviour
     /// Считает движение относительно камеры и двигает CharacterController.
     /// Вращает визуальную модель по направлению движения.
     /// </summary>
-    private void HandleMovement()
+
+    public void OnMove(InputValue value)
+    {
+        _moveContext = value.Get<Vector2>();
+    }
+
+    public void HandleMovement() 
     {
         Vector2 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
@@ -84,14 +88,10 @@ public class PlayerController : MonoBehaviour
             rotationSpeed = playerStats.playerData.rotationSpeed;
         }
 
-        if (InputManager.Instance.IsSprintHeld())
+        if (HasInputAuthority)
         {
-            speed *= sprintMultiplier;
+            rb.linearVelocity = _moveContext * speed;
         }
-
-        Vector3 velocity = moveDirection * speed;
-
-        characterController.Move(velocity * Time.deltaTime);
 
         // Вращаем модель по направлению движения (если есть движение)
         if (visualRoot != null && moveDirection.sqrMagnitude > 0.001f)
