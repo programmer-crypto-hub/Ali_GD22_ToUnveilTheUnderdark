@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1420776540301386352
+--- !u!1 &7136809491790409806
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,82 +8,82 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6115377377014972218}
-  - component: {fileID: 4163882458338899338}
-  - component: {fileID: -3003907195832002685}
-  - component: {fileID: -2624161945440412743}
-  - component: {fileID: 5697887900218380723}
-  m_Layer: 3
-  m_Name: Vampire
-  m_TagString: Enemy
+  - component: {fileID: 6993835568556070580}
+  - component: {fileID: 3613537980072612975}
+  - component: {fileID: 6758126957386612434}
+  - component: {fileID: 9138102446299026267}
+  - component: {fileID: 5229994264941623421}
+  m_Layer: 0
+  m_Name: Crab
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6115377377014972218
+--- !u!4 &6993835568556070580
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420776540301386352}
+  m_GameObject: {fileID: 7136809491790409806}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0237, z: 0.63}
-  m_LocalScale: {x: 17.610819, y: 17.610819, z: 17.610819}
+  m_LocalPosition: {x: 0.20208, y: 2.5966, z: -3.72611}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5329243992922482221}
+  - {fileID: 10716370294402322}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4163882458338899338
+--- !u!114 &3613537980072612975
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420776540301386352}
+  m_GameObject: {fileID: 7136809491790409806}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 040ef0c301250f44e92dccd352069d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
-  enemyData: {fileID: 11400000, guid: abccc88fd0f24b942b94d19cf510cca1, type: 2}
+  enemyData: {fileID: 0}
   currentHealth: 0
   target: {fileID: 7668859065092257100, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
   autoResolveTargetOnStart: 1
   attackCooldown: 1
   destroyOnDeath: 1
   destroyDelayAfterDeath: 0.15
-  enemyAnim: {fileID: -2624161945440412743}
---- !u!114 &-3003907195832002685
+  enemyAnim: {fileID: 9138102446299026267}
+--- !u!114 &6758126957386612434
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420776540301386352}
+  m_GameObject: {fileID: 7136809491790409806}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 1832469918
+  SortKey: 1781070198
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 4163882458338899338}
-  - {fileID: 5697887900218380723}
+  - {fileID: 3613537980072612975}
+  - {fileID: 5229994264941623421}
   ForceRemoteRenderTimeframe: 0
---- !u!95 &-2624161945440412743
+--- !u!95 &9138102446299026267
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420776540301386352}
+  m_GameObject: {fileID: 7136809491790409806}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 7924aa8238242fc4d85eac29da11167c, type: 2}
@@ -98,25 +98,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &5697887900218380723
+--- !u!114 &5229994264941623421
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420776540301386352}
+  m_GameObject: {fileID: 7136809491790409806}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkMecanimAnimator
-  Animator: {fileID: -2624161945440412743}
+  Animator: {fileID: 9138102446299026267}
   ApplyTiming: 2
   SyncSettings: 79
   StateHashes: 000000001aab7684f4c9bef1cbed3b577b1c8409c554573a1bff1659008a0dabaf0a2a38a19aa077bc9d6730fe310b5edd8108f8f33a35022d9174610ac29f10e4a05765a240b4a8df4c8b635ac11dd098b3dc72b4d9e2025abb2a77e3a2bf659b1cb7042653d8b4f8f899d7cee6c7166166e0853c80484621878f010a8afc35d421bd56
   TriggerHashes: 00000000
   TotalWords: 0
---- !u!1 &2875690696889083856
+--- !u!1 &8463751089638854651
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,38 +124,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5329243992922482221}
-  - component: {fileID: 6908892987728470148}
-  m_Layer: 3
+  - component: {fileID: 10716370294402322}
+  - component: {fileID: 4305918578522251958}
+  m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5329243992922482221
+--- !u!4 &10716370294402322
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2875690696889083856}
+  m_GameObject: {fileID: 8463751089638854651}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0289, y: -0.1072, z: 0.0008}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6115377377014972218}
+  m_Father: {fileID: 6993835568556070580}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &6908892987728470148
+--- !u!212 &4305918578522251958
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2875690696889083856}
+  m_GameObject: {fileID: 8463751089638854651}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -197,12 +197,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8270762584020218873, guid: 5cf81a43a3f11c842b802f96d2379800, type: 3}
+  m_Sprite: {fileID: -159299079651030013, guid: 0cba4a14617ce8049b1b3e7b762e3cb0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.12, y: 0.16}
+  m_Size: {x: 0.23, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

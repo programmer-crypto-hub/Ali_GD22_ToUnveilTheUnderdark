@@ -2,7 +2,87 @@ fileFormatVersion: 2
 guid: 5cf81a43a3f11c842b802f96d2379800
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton1_attack
+    second: {fileID: 7400000, guid: 08231278ebd4a864c9218d836112191c, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton1_death
+    second: {fileID: 7400000, guid: a7723abcb29f4084abbc071007d209a8, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton1_idle
+    second: {fileID: 7400000, guid: ca685049683e52a46861ce8ca19ac443, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton1_movement
+    second: {fileID: 7400000, guid: 38f8b6f76512ba14bbd5fb4c36a4eeea, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton1_take_damage
+    second: {fileID: 7400000, guid: ebffde0ea5b756943a06329f75818229, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_attack
+    second: {fileID: 7400000, guid: e2c4880de9d388a468546a7a8a090030, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_death
+    second: {fileID: 7400000, guid: f2df8d194d6dfdd4c9f1aec8f1737901, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_death2
+    second: {fileID: 7400000, guid: 8e5d61d90b3878d49a62a1445f5bfe24, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_idle
+    second: {fileID: 7400000, guid: 8740c2201f1baa549abe1381fc8fde35, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_movemen
+    second: {fileID: 7400000, guid: 552bbcb62400333458ee3e96721faa1f, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: skeleton2_take_damage
+    second: {fileID: 7400000, guid: 336f43b9a0d9fcb41b87d88bb77e432c, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: vampire_attack
+    second: {fileID: 7400000, guid: fbc5787f22568e84e998a52c0a4ae2ac, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: vampire_death
+    second: {fileID: 7400000, guid: 93700c32a8c378a4fad5572e047b06d3, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: vampire_idle
+    second: {fileID: 7400000, guid: 3643f9f92feab544a81fb78849ae1ac0, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: vampire_movement
+    second: {fileID: 7400000, guid: 08f31eccc443a4945945536d0d05d072, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: vampire_take_damage
+    second: {fileID: 7400000, guid: e187d903e5025ee47862914b422f59f8, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +182,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 639074831811905226
+  platformSettingsDirtyTick: 639115228202021271
   textureAssetName: 
   singleSpriteImportData:
   - name: 

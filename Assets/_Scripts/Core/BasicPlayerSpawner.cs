@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static Unity.Collections.Unicode; 
 
 public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks 
 {

@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,7 +54,7 @@ public class WeaponManager : MonoBehaviour
         // в диапазон [0, availableWeapons.Count - 1].
         int startIndex = Mathf.Clamp(defaultWeaponIndexInAvailable, 0, availableWeapons.Count - 1);
         currentAvailableIndex = startIndex;
-        EquipByEnableDisable(availableWeapons[startIndex]);
+        EquipByEnableDisable(availableWeapons[startIndex]); 
     }
 
     private void OnEnable()

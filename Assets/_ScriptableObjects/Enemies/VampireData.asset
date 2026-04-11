@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: VampireData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyName: Vampire
-  enemyType: 1
+  enemyType: 0
   maxHealth: 20
   moveSpeed: 7
   damage: 10
-  attackRange: 0.1
-  detectionRange: 0.3
+  attackRange: 1.5
+  detectionRange: 5
   experienceReward: 50
   prefab: {fileID: 1420776540301386352, guid: cb3213e507f153f42b1d0c56ec34dd77, type: 3}
