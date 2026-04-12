@@ -7,7 +7,7 @@ public class PhysxBall : NetworkBehaviour
 
     public void Init(Vector3 velocity)
     {
-        GetComponent<Rigidbody>().linearVelocity = velocity;
+        GetComponent<Rigidbody>().linearVelocity = velocity;  
     }
 
     public override void Spawned()

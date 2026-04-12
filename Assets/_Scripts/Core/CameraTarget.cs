@@ -4,16 +4,19 @@ public class CameraTarget : MonoBehaviour
 {
     [Header("Mouse Settings")]
     [SerializeField] private float mouseSensitivity = 0.3f;
-    [SerializeField] private float minVerticalAngle = -30f; // up
-    [SerializeField] private float maxVerticalAngle = 60f;  // down
+    [SerializeField] private float minVerticalAngle = -30f;
+    [SerializeField] private float maxVerticalAngle = 60f;
 
     [Header("State")]
     [SerializeField] private float currentYaw = 0f;    // Y
-    [SerializeField] private float currentPitch = 20f; // X
+    [SerializeField] private float currentPitch = 0f; // X
+
+    public Transform target; // Drag your Player Root here (at runtime)
+    [SerializeField] private Vector3 offset = new Vector3(0, 0, -10);
+    [SerializeField] private float smoothSpeed = 10f;
 
     private void Awake()
     {
-        // Obtaining initial rotation values from the transform to ensure correct starting orientation
         Vector3 euler = transform.localRotation.eulerAngles;
         currentYaw = euler.y;
         currentPitch = NormalizeAngle(euler.x);
@@ -21,16 +24,20 @@ public class CameraTarget : MonoBehaviour
         transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        if (InputManager.Instance == null)
-            return;
-        currentPitch = Mathf.Clamp(currentPitch, minVerticalAngle, maxVerticalAngle);
+        if (target == null) return;
 
-        transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
+        // Smoothly follow the player's position
+        Vector3 desiredPosition = target.position + offset;
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
     }
 
-    // Obtain the current mouse sensitivity value (for UI display or other purposes)
+    public void SetMouseSensitivity(float sensitivity)
+    {
+        mouseSensitivity = Mathf.Clamp(sensitivity, 0.1f, 10f);
+    }
+
     public float GetMouseSensitivity() => mouseSensitivity;
 
     private static float NormalizeAngle(float angle)

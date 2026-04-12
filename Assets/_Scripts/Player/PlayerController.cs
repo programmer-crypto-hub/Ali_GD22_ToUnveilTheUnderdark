@@ -19,21 +19,29 @@ public class PlayerController : NetworkBehaviour
     [Tooltip("Root transform of the visual model (rotates to face movement direction).")]
     [SerializeField] private Transform visualRoot;
 
-    private Rigidbody2D rb;
+    private Rigidbody rb;
     private Vector2 _moveContext; // Stores the WASD/Joystick value
 
     /// <summary>
     /// Инициализирует ссылки на CharacterController, PlayerStats и камеру.
     /// </summary>
-    private void Awake()
+    public override void Spawned()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody>();
 
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();
 
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
+
+        if (HasInputAuthority) // Only the local player should be followed
+        {
+            // Find the camera and give it our transform
+            var cam = Camera.main.GetComponent<CameraTarget>();
+            if (cam != null) cam.target = transform;
+            Camera.main.GetComponent<CameraTarget>().target = transform;
+        }
     }
 
     /// <summary>

@@ -11,21 +11,20 @@ public class Player : NetworkBehaviour
 
     [Networked] private TickTimer delay { get; set; }
 
-    private NetworkCharacterController _cc;
     private Vector3 _forward;
 
     public Material _material;
     private ChangeDetector _changeDetector;
-
+    private Rigidbody _rb;
     public override void Spawned()
     {
+        _rb = GetComponent<Rigidbody>();
         _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         _material = GetComponentInChildren<SpriteRenderer>().material;
     }
 
     private void Awake()
     {
-        _cc = GetComponent<NetworkCharacterController>();
         _forward = transform.forward;
     }
 
@@ -34,7 +33,7 @@ public class Player : NetworkBehaviour
         if (GetInput(out NetworkInputData data))
         {
             data.direction.Normalize();
-            _cc.Move(5 * data.direction * Runner.DeltaTime);
+            _rb.linearVelocity = data.direction * 5f;
 
             if (data.direction.sqrMagnitude > 0)
                 _forward = data.direction;

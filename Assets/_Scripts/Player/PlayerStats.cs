@@ -72,6 +72,7 @@ public class PlayerStats : NetworkBehaviour
     /// </summary>
     public override void Spawned()
     {
+        currentHealth = playerData.maxHealth; 
         InitializeFromData();
         //if (PlayerRolesController.Instance == null)
         //{

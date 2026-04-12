@@ -1819,7 +1819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7524c2fd699ccac499fe56b31a1c55d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasicPlayerSpawner
-  _playerPrefab: {fileID: -7534866868559491883, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
+  _playerPrefab: {fileID: 1005809161424700482, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
 --- !u!1 &1624920393
 GameObject:
   m_ObjectHideFlags: 0
