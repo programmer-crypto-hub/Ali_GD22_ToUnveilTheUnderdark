@@ -25,23 +25,10 @@ public class CameraTarget : MonoBehaviour
     {
         if (InputManager.Instance == null)
             return;
-
-        Vector2 lookInput = InputManager.Instance.GetLookInput();
-
-        float mouseX = lookInput.x * mouseSensitivity;
-        float mouseY = lookInput.y * mouseSensitivity;
-
-        currentYaw += mouseX;
-        currentPitch -= mouseY; // Y-axis inversion 3rd-person”
         currentPitch = Mathf.Clamp(currentPitch, minVerticalAngle, maxVerticalAngle);
 
         transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
     }
-
-    //public void SetMouseSensitivity(float sensitivity)
-    //{
-    //    mouseSensitivity = Mathf.Clamp(sensitivity, 0.1f, 10f);
-    //}
 
     // Obtain the current mouse sensitivity value (for UI display or other purposes)
     public float GetMouseSensitivity() => mouseSensitivity;

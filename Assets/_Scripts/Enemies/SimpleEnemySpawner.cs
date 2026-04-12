@@ -113,7 +113,7 @@ public class SimpleEnemySpawner : NetworkBehaviour
                 continue;
             }
 
-            SpawnEnemy();
+            SpawnEnemy(); 
         }
     }
 

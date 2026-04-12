@@ -14,8 +14,6 @@ public class InputManager : MonoBehaviour
     private InputAction moveAction;
     private InputAction turnEndAction;
     private InputAction rollDiceAction;
-    private InputAction lookAction;
-    private InputAction zoomAction;
     private InputAction jumpAction;
     private InputAction attackAction;
     private InputAction interactAction;
@@ -25,8 +23,6 @@ public class InputManager : MonoBehaviour
     private InputAction weaponPrevAction;
 
     public Vector2 MoveInput { get; private set; }
-    public Vector2 LookInput { get; private set; }
-    public float ZoomInput { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool AttackPressed { get; private set; }
     public bool TurnEndPressed { get; private set; }
@@ -78,8 +74,6 @@ public class InputManager : MonoBehaviour
         moveAction = playerActionMap.FindAction("Move");
         turnEndAction = playerActionMap.FindAction("TurnEnd");
         rollDiceAction = playerActionMap.FindAction("RollDice");
-        lookAction = playerActionMap.FindAction("Look");
-        zoomAction = playerActionMap.FindAction("Zoom");
         jumpAction = playerActionMap.FindAction("Jump");
         attackAction = playerActionMap.FindAction("Attack");
         interactAction = playerActionMap.FindAction("Interact");
@@ -169,8 +163,6 @@ public class InputManager : MonoBehaviour
     private void UpdateInputValues()
     {
         MoveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
-        LookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
-        ZoomInput = zoomAction != null ? zoomAction.ReadValue<Vector2>().y : 0f;
         CrouchHeld = crouchAction != null && crouchAction.IsPressed();
     }
 
@@ -268,16 +260,6 @@ public class InputManager : MonoBehaviour
     public Vector2 GetMoveInput()
     {
         return MoveInput;
-    }
-
-    public Vector2 GetLookInput()
-    {
-        return LookInput;
-    }
-
-    public float GetZoomInput()
-    {
-        return ZoomInput;
     }
 
     public bool IsJumpPressed()

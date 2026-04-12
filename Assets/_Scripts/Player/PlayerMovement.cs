@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -50,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Получаем результат броска кубика из DiceManager
         currentDiceValue = DiceManager.Instance.GetDiceValue();
+        DiceManager.Instance.DisplayDice(currentDiceValue);
 
         if (GameManager.Instance.CurrentState == GameState.Playing)
         {
@@ -70,9 +69,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void MoveFromDiceValue(int diceValue)
+    public void OnCollisionEnter2D(Collision2D other)
     {
-        // Логика для перемещения игрока на основе результата броска кубика
-        Debug.Log($"Игрок перемещается на {diceValue} шагов.");
+        if (currentDiceValue <= 0)
+        {
+            Debug.Log("Player has used all movement steps for this turn.");
+            return;
+        }
+        if (other.gameObject.CompareTag("Enemy") && GameManager.Instance.CurrentState == GameState.Playing && currentDiceValue > 0)
+        {
+            currentDiceValue--; // Decrease remaining steps left to move
+            new WaitForEndOfFrame(); // Delay to prevent immediate retriggering
+            Debug.Log(other + " triggered! Remaining steps: " + currentDiceValue);
+        }
     }
 }

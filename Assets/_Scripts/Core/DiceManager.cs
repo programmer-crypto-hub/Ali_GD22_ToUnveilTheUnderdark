@@ -13,11 +13,13 @@ public class DiceManager : MonoBehaviour
 
     [Header("UI Settings")]
     public Button rollDiceButton;
+    public Image diceImage; // <-- Добавьте это поле и назначьте через инспектор
+    public GameObject dicePanel; // Панель для отображения результата броска кубика
 
     [Header("Dice Settings")]
-    //public GameObject dice;
     public int diceRollResult;
     public int spaceLength;
+    public Image[] diceSprites;
 
     public void Awake()
     {
@@ -67,11 +69,27 @@ public class DiceManager : MonoBehaviour
         int movedSpaces = (diceRollResult /= diceToMoveApprox);
         Debug.Log($"Игрок может переместиться на {diceRollResult} шагов.");
     }
-
     public void ConvertDiceToCombat(float damage)
     {
         int diceToCombatApprox = 100 / 5;
         damage = (diceRollResult / diceToCombatApprox);
         // Применение процента к урону и округление до целого числа
+    }
+
+    public void DisplayDice(int diceValue)
+    {
+        if (diceSprites == null || diceImage == null)
+        {
+            Debug.LogWarning("Dice sprites or dice image is not assigned!");
+            return;
+        }
+        if (diceSprites != null && diceSprites.Length > 0)
+        {
+            dicePanel.SetActive(true); // Показываем панель с результатом броска кубика
+            diceImage = diceSprites[diceValue - 1];
+            diceImage.enabled = true;
+            new WaitForSeconds(2f); // Задержка для отображения результата броска кубика
+            diceImage.enabled = false; // Скрываем изображение после задержки
+        }
     }
 }
