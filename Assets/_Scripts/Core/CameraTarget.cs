@@ -1,6 +1,8 @@
+using Fusion;
+using Unity.Cinemachine;
 using UnityEngine;
 
-public class CameraTarget : MonoBehaviour
+public class CameraTarget : NetworkBehaviour
 {
     [Header("Mouse Settings")]
     [SerializeField] private float mouseSensitivity = 0.3f;
@@ -15,18 +17,42 @@ public class CameraTarget : MonoBehaviour
     [SerializeField] private Vector3 offset = new Vector3(0, 0, -10);
     [SerializeField] private float smoothSpeed = 10f;
 
-    private void Awake()
+    public CinemachineCamera vcam;
+
+    public void AssignPlayer(GameObject player)
+    {
+        vcam.Target.TrackingTarget = player.transform;
+    }
+
+    public override void Spawned()
     {
         Vector3 euler = transform.localRotation.eulerAngles;
         currentYaw = euler.y;
         currentPitch = NormalizeAngle(euler.x);
         currentPitch = Mathf.Clamp(currentPitch, minVerticalAngle, maxVerticalAngle);
         transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
+        if (HasInputAuthority)
+        {
+            AssignPlayer(this.gameObject);
+            var camScript = Camera.main.GetComponent<CameraTarget>();
+            if (camScript != null)
+            {
+                camScript.target = this.transform;
+                Debug.Log("Camera successfully linked to Player!");
+            }
+            else Debug.LogError("CameraTarget script not found on Main Camera!");
+        }
     }
+
+    public void SetTarget(Transform newTarget) => target = newTarget; 
 
     private void LateUpdate()
     {
-        if (target == null) return;
+        if (target == null)
+        {
+            Debug.LogError("Target not set for CameraTarget! Please assign a target transform.");
+            return; 
+        }
 
         // Smoothly follow the player's position
         Vector3 desiredPosition = target.position + offset;
@@ -44,6 +70,6 @@ public class CameraTarget : MonoBehaviour
     {
         while (angle > 180f) angle -= 360f;
         while (angle < -180f) angle += 360f;
-        return angle;
+        return angle; 
     }
 }

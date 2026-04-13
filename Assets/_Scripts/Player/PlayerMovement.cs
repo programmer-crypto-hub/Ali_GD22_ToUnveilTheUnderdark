@@ -46,8 +46,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnDiceRolled()
     {
-        // Получаем результат броска кубика из DiceManager
-        currentDiceValue = DiceManager.Instance.GetDiceValue();
+        currentDiceValue = DiceManager.Instance.diceRollResult;
         DiceManager.Instance.DisplayDice(currentDiceValue);
 
         if (GameManager.Instance.CurrentState == GameState.Playing)

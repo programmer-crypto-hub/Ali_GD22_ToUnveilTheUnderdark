@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
   enemyData: {fileID: 0}
   currentHealth: 0
-  target: {fileID: 7668859065092257100, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
+  target: {fileID: 2118434399438094922, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
   autoResolveTargetOnStart: 1
   attackCooldown: 1
   destroyOnDeath: 1
@@ -126,6 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 10716370294402322}
   - component: {fileID: 4305918578522251958}
+  - component: {fileID: 3891936301681113301}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -207,3 +208,24 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!65 &3891936301681113301
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8463751089638854651}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.23, y: 0.16, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}

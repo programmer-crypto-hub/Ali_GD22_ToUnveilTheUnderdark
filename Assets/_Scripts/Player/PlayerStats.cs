@@ -162,8 +162,9 @@ public class PlayerStats : NetworkBehaviour
         if (currentHealth <= 0f)
         {
             // Игрок "умирает" — здесь можно запустить анимацию смерти, перезапуск уровня и т.п.
-            OnDeath?.Invoke();
+            OnDeath?.Invoke(); 
             playerAnim.SetInteger("health", -1);
+            Debug.Log($"Player is Dead! Current Health: {currentHealth}", this);
         }
     }
 

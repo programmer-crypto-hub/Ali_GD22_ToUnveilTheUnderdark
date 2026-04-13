@@ -90,6 +90,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer && runner.IsRunning)
         {
             Vector3 spawnPos = new Vector3(player.RawEncoded % 3, 0, 0);
+            Quaternion spawnRotation = new Quaternion(-90, 0, 0, 0);
             // 1. Spawn the player prefab
             DontDestroyOnLoad(_playerPrefab);
             if (_playerPrefab == null)
@@ -97,7 +98,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 Debug.LogError("Player Prefab is not assigned in the Inspector!");
                 return; 
             }
-            var networkPlayer = runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player, (runner, obj) => {
+            var networkPlayer = runner.Spawn(_playerPrefab, spawnPos, spawnRotation, player, (runner, obj) => {
                 // This happens BEFORE the object is fully placed in the world
                 obj.gameObject.SetActive(true);
             });

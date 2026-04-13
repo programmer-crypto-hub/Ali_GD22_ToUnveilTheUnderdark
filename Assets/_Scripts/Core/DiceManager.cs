@@ -36,7 +36,7 @@ public class DiceManager : MonoBehaviour
         }
     }
 
-    public void RollDice()
+    private void RollDice()
     {
         GetDiceValue();
         Debug.Log($"Результат броска: {diceRollResult}");
@@ -48,7 +48,7 @@ public class DiceManager : MonoBehaviour
             playerAnim.SetTrigger("attack_trig");
     }
 
-    public int GetDiceValue()
+    private int GetDiceValue()
     {
         diceRollResult = Random.Range(1, 21); // Генерируем число от 1 до 20
         Debug.Log($"Игрок бросил кубик и получил: {diceRollResult}");

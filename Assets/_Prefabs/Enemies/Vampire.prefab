@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
   enemyData: {fileID: 11400000, guid: abccc88fd0f24b942b94d19cf510cca1, type: 2}
   currentHealth: 0
-  target: {fileID: 7668859065092257100, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
+  target: {fileID: 2118434399438094922, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
   autoResolveTargetOnStart: 1
   attackCooldown: 1
   destroyOnDeath: 1
@@ -126,6 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5329243992922482221}
   - component: {fileID: 6908892987728470148}
+  - component: {fileID: 541396622409240396}
   m_Layer: 3
   m_Name: Visual
   m_TagString: Untagged
@@ -207,3 +208,24 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!65 &541396622409240396
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2875690696889083856}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.12000001, y: 0.16000001, z: 0.20000003}
+  m_Center: {x: -0.029999997, y: 0.11000001, z: 0}

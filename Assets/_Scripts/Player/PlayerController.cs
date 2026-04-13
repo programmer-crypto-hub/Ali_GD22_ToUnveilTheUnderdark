@@ -38,8 +38,8 @@ public class PlayerController : NetworkBehaviour
         if (HasInputAuthority) // Only the local player should be followed
         {
             // Find the camera and give it our transform
-            var cam = Camera.main.GetComponent<CameraTarget>();
-            if (cam != null) cam.target = transform;
+            var cam = Camera.main.GetComponent<CameraTarget>(); 
+            if (cam != null) cam.target = transform; 
             Camera.main.GetComponent<CameraTarget>().target = transform;
         }
     }
@@ -64,12 +64,12 @@ public class PlayerController : NetworkBehaviour
 
     public void OnMove(InputValue value)
     {
-        _moveContext = value.Get<Vector2>();
+        _moveContext = value.Get<Vector2>(); 
     }
 
     public void HandleMovement() 
     {
-        Vector2 moveInput = InputManager.Instance.MoveInput;
+        Vector3 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
 
         if (moveInput.sqrMagnitude > 0.001f && cameraTransform != null)
@@ -83,7 +83,7 @@ public class PlayerController : NetworkBehaviour
             right.y = 0f;
             right.Normalize();
 
-            moveDirection = forward * moveInput.y + right * moveInput.x;
+            moveDirection = forward * moveInput.x + right * moveInput.x;
             moveDirection.Normalize();
         }
 
@@ -107,7 +107,7 @@ public class PlayerController : NetworkBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
             visualRoot.rotation = Quaternion.Slerp(
                 visualRoot.rotation,
-                targetRotation,
+                targetRotation, 
                 rotationSpeed * Mathf.Deg2Rad * Time.deltaTime
             );
         }
