@@ -24,8 +24,9 @@ public class CameraTarget : NetworkBehaviour
         vcam.Target.TrackingTarget = player.transform;
     }
 
-    public override void Spawned()
+    public override void Spawned() 
     {
+        if (vcam == null) vcam = FindFirstObjectByType<CinemachineCamera>();
         Vector3 euler = transform.localRotation.eulerAngles;
         currentYaw = euler.y;
         currentPitch = NormalizeAngle(euler.x);

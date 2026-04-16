@@ -98,7 +98,7 @@ public class PlayerController : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            rb.linearVelocity = _moveContext * speed;
+            transform.position += (Vector3)(_moveContext * speed * Time.deltaTime);
         }
 
         // Вращаем модель по направлению движения (если есть движение)

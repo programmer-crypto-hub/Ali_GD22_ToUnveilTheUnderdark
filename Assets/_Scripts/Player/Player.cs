@@ -33,7 +33,7 @@ public class Player : NetworkBehaviour
         if (GetInput(out NetworkInputData data))
         {
             data.direction.Normalize();
-            _rb.linearVelocity = data.direction * 5f;
+            transform.position += data.direction * 5f * Runner.DeltaTime;
 
             if (data.direction.sqrMagnitude > 0)
                 _forward = data.direction;
