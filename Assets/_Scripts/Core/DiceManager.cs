@@ -6,9 +6,6 @@ public class DiceManager : MonoBehaviour
     public static DiceManager Instance { get; private set; }
 
     public PlayerMovement playerMovement;
-
-    [Header("Animation Settings")]
-    [SerializeField]
     public Animator playerAnim;
 
     [Header("UI Settings")]

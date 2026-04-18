@@ -61,21 +61,21 @@ public class PlayerStats : NetworkBehaviour
         UpdateUI();
     }
 
-    // This runs every time Gold or Health changes on the network
-    // Tell the Stats UI to refresh the display for this player
-    public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
-    private void UpdateUI() => playerStatRow.SetStats(PlayerName, Health, Gold, XP);
-
     public void SetDefaultValues()
     {
         if (Object.HasStateAuthority) // Only the owner/host sets the starting data
         {
             XP = playerProgression.CurrentXP;
             Health = (int)playerData.maxHealth;
-            Gold = (int)playerData.currentPlayerCaveCoins;
+            Gold = (int)playerData.caveCoins;
             PlayerName = $"Player {Object.InputAuthority.PlayerId}";
         }
     }
+    // This runs every time Gold or Health changes on the network
+    // Tell the Stats UI to refresh the display for this player
+    public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
+    private void UpdateUI() => playerStatRow.SetStats(PlayerName, Health, Gold, XP);
+
 
     /// <summary>
     /// “екущее здоровье игрока (только дл€ чтени€).
