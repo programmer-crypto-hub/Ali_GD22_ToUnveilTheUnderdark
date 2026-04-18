@@ -89,7 +89,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("OnPlayerJoined method active");
         if (runner.IsServer && runner.IsRunning)
         {
-            Vector3 spawnPos = new Vector3(player.RawEncoded % 3, 0, 0); 
+            Vector3 spawnPos = new Vector3(player.RawEncoded % 5, 10, 0); 
             Quaternion spawnRotation = new Quaternion(-90, 0, 0, 0);
             // 1. Spawn the player prefab
             DontDestroyOnLoad(_playerPrefab);

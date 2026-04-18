@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 4426026941812541048}
   - component: {fileID: 2810038094282899616}
   - component: {fileID: 4266574084283723979}
-  - component: {fileID: 7001915343227554093}
   - component: {fileID: 4078633969993388044}
   - component: {fileID: 5278182071796830282}
   - component: {fileID: 1005809161424700482}
@@ -52,7 +51,6 @@ GameObject:
   - component: {fileID: 8226170631725845441}
   - component: {fileID: 2778794063948340745}
   - component: {fileID: 5106174648745346771}
-  - component: {fileID: -2248138054925834628}
   m_Layer: 6
   m_Name: PlayerUpdated
   m_TagString: Player
@@ -150,22 +148,6 @@ MonoBehaviour:
   - {fileID: 6338318759080299098}
   weaponAvailableAtStart: 0101
   defaultWeaponIndexInAvailable: 0
---- !u!114 &7001915343227554093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1322352118448638456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33dccbd4d4fe85d46aedcc4693bb8934, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player
-  _prefabBall: {fileID: 7969446836214049978, guid: aaf3778fb0e5c1342a491dbe9613dd0c, type: 3}
-  _prefabPhysxBall: {fileID: 841630568314210103, guid: d645abe6e88cce7439371c69044f77dc, type: 3}
-  _spawnedProjectile: 0
-  _material: {fileID: 2100000, guid: 9200f922eecd3dd45aa0983f9772af2a, type: 2}
 --- !u!95 &4078633969993388044
 Animator:
   serializedVersion: 7
@@ -225,11 +207,9 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4426026941812541048}
   - {fileID: 2810038094282899616}
-  - {fileID: 7001915343227554093}
   - {fileID: 5278182071796830282}
   - {fileID: 8797494165056479139}
   - {fileID: 2778794063948340745}
-  - {fileID: -2248138054925834628}
   - {fileID: 4296370042023099379}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8797494165056479139
@@ -324,27 +304,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 14.059006, y: 28.027225, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-2248138054925834628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1322352118448638456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcba9d1227abd142b0cead6f5749410, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraTarget
-  mouseSensitivity: 0.3
-  minVerticalAngle: -30
-  maxVerticalAngle: 60
-  currentYaw: 0
-  currentPitch: 0
-  target: {fileID: 6535451977806442004}
-  offset: {x: 0, y: 0, z: -10}
-  smoothSpeed: 10
-  vcam: {fileID: 0}
 --- !u!1 &4121463555556301857
 GameObject:
   m_ObjectHideFlags: 0

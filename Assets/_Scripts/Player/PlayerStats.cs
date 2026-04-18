@@ -12,6 +12,9 @@ public class PlayerStats : NetworkBehaviour
     [Header("Данные игрока")]
     [Tooltip("ScriptableObject с базовыми параметрами игрока (PlayerData).")]
     public PlayerData playerData;
+    public PlayerStatRow playerStatRow;
+    public PlayerProgression playerProgression;
+
     public Animator playerAnim;
 
     [Header("Текущее состояние")]
@@ -36,6 +39,44 @@ public class PlayerStats : NetworkBehaviour
     [SerializeField]
     [Tooltip("Current Combat Value, calculated from the current dice value and applied multipliers.")]
     private float diceValue;
+
+    [Networked]
+    [OnChangedRender(nameof(OnStatsChanged))]
+    public int Gold { get; set; }
+
+    [Networked]
+    [OnChangedRender(nameof(OnStatsChanged))]
+    public int Health { get; set; }
+    [Networked] public float XP { get; set; }
+    [Networked] public string PlayerName { get; set; }
+
+    public void OnStatsChanged()
+    {
+        // Invoke your existing Actions here!
+        // This ensures the Action fires on EVERY player's computer
+        OnCaveCoinsChanged?.Invoke(playerData.currentPlayerCaveCoins, playerData.maxCaveCoins);
+        OnHealthChanged?.Invoke(playerData.currentPlayerHealth, playerData.maxHealth);
+
+        // Update the UI only once per change
+        UpdateUI();
+    }
+
+    // This runs every time Gold or Health changes on the network
+    // Tell the Stats UI to refresh the display for this player
+    public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
+    private void UpdateUI() => playerStatRow.SetStats(PlayerName, Health, Gold, XP);
+
+    public void SetDefaultValues()
+    {
+        if (Object.HasStateAuthority) // Only the owner/host sets the starting data
+        {
+            XP = playerProgression.CurrentXP;
+            Health = (int)playerData.maxHealth;
+            Gold = (int)playerData.currentPlayerCaveCoins;
+            PlayerName = $"Player {Object.InputAuthority.PlayerId}";
+        }
+    }
+
     /// <summary>
     /// Текущее здоровье игрока (только для чтения).
     /// Для изменения используйте методы TakeDamage() или Heal().
@@ -74,18 +115,17 @@ public class PlayerStats : NetworkBehaviour
     {
         currentHealth = playerData.maxHealth; 
         InitializeFromData();
-        //if (PlayerRolesController.Instance == null)
-        //{
-        //    Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
-        //    return;
-        //}
-        //PlayerRolesController.Instance.OnRoleGiven += () =>
-        //{
-        //    //PlayerRolesController.Instance.ApplyRole(); 
-        //    currentRole = PlayerRolesController.Instance.roleName.ToString();
-        //    currentRoleId = PlayerRolesController.Instance.RoleId;
-        //    OnRoleApplied?.Invoke(currentRole, currentRoleId);
-        //};
+        if (PlayerRolesController.Instance == null)
+        {
+            Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
+            return;
+        }
+        PlayerRolesController.Instance.OnRoleGiven += () =>
+        {
+            currentRole = PlayerRolesController.Instance.roleName.ToString();
+            currentRoleId = PlayerRolesController.Instance.RoleId;
+            OnRoleApplied?.Invoke(currentRole, currentRoleId);
+        };
     }
 
     /// <summary>

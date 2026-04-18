@@ -27,6 +27,8 @@ public class PlayerController : NetworkBehaviour
     /// </summary>
     public override void Spawned()
     {
+        Debug.Log($"[SPAWN CHECK] {gameObject.name} has appeared! Is it active? {gameObject.activeInHierarchy}", gameObject);
+
         rb = GetComponent<Rigidbody>();
 
         if (playerStats == null)
@@ -98,7 +100,7 @@ public class PlayerController : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            transform.position += (Vector3)(_moveContext * speed * Time.deltaTime);
+            transform.position += (Vector3)(_moveContext * speed * Runner.DeltaTime);
         }
 
         // Вращаем модель по направлению движения (если есть движение)
@@ -108,7 +110,7 @@ public class PlayerController : NetworkBehaviour
             visualRoot.rotation = Quaternion.Slerp(
                 visualRoot.rotation,
                 targetRotation, 
-                rotationSpeed * Mathf.Deg2Rad * Time.deltaTime
+                rotationSpeed * Mathf.Deg2Rad * Runner.DeltaTime
             );
         }
     }

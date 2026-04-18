@@ -1,5 +1,6 @@
-using UnityEngine;
 using Fusion;
+using TMPro;
+using UnityEngine;
 
 public class PhysxBall : NetworkBehaviour
 {
@@ -7,14 +8,14 @@ public class PhysxBall : NetworkBehaviour
 
     public void Init(Vector3 velocity)
     {
-        GetComponent<Rigidbody>().linearVelocity = velocity;  
+        transform.position += transform.forward * velocity.magnitude * Runner.DeltaTime;
     }
 
     public override void Spawned()
     {
-        var forward = transform.forward;
+        //var forward = transform.forward;
         life = TickTimer.CreateFromSeconds(Runner, 5.0f);
-        GetComponent<Rigidbody>().linearVelocity = forward;
+        //transform.position += forward * velocity.magnitude * Runner.DeltaTime;
     }
 
     public override void FixedUpdateNetwork()

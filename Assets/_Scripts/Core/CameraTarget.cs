@@ -57,7 +57,7 @@ public class CameraTarget : NetworkBehaviour
 
         // Smoothly follow the player's position
         Vector3 desiredPosition = target.position + offset;
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Runner.DeltaTime);
     }
 
     public void SetMouseSensitivity(float sensitivity)
