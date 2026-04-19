@@ -4,7 +4,7 @@ using UnityEngine;
 /// Оружие дальнего боя.
 /// Создаёт снаряд, который летит вперёд.
 /// </summary>
-public class RangedWeapons : WeaponBase
+public class RangedWeapon : WeaponBase
 {
     [Header("Параметры дальнего боя")]
     [Tooltip("Точка, из которой вылетают снаряды (конец ствола/лука).")]

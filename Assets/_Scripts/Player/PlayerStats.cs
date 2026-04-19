@@ -21,6 +21,7 @@ public class PlayerStats : NetworkBehaviour
     [SerializeField]
     [Tooltip("Текущее здоровье игрока.")]
     private float currentHealth;
+    public bool IsDead => currentHealth <= 0f;
 
     private string currentRole;
     private int currentRoleId;

@@ -51,6 +51,9 @@ GameObject:
   - component: {fileID: 8226170631725845441}
   - component: {fileID: 2778794063948340745}
   - component: {fileID: 5106174648745346771}
+  - component: {fileID: 1324679542595317228}
+  - component: {fileID: 6747959071256591159}
+  - component: {fileID: 7662427363872413756}
   m_Layer: 6
   m_Name: PlayerUpdated
   m_TagString: Player
@@ -143,6 +146,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   playerStats: {fileID: 5278182071796830282}
+  playerCombatController: {fileID: 0}
   weaponInstances:
   - {fileID: 6558033684945617869}
   - {fileID: 6338318759080299098}
@@ -183,11 +187,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   playerData: {fileID: 11400000, guid: 9fbc7337fd48aea4299e8b2737e8f3dd, type: 2}
+  playerStatRow: {fileID: 0}
+  playerProgression: {fileID: 0}
   playerAnim: {fileID: 4078633969993388044}
   currentHealth: 0
   caveCoins: 0
   currentDiceValue: 0
   diceValue: 0
+  _Gold: 0
+  _Health: 0
+  _XP: 0
+  _PlayerName: 
 --- !u!114 &1005809161424700482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,6 +314,57 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 14.059006, y: 28.027225, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1324679542595317228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ef0169c6183aee4794bacdf735c90e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
+  animator: {fileID: 4078633969993388044}
+  playerStats: {fileID: 5278182071796830282}
+  moveSpeedParameter: MoveSpeed
+  attackTriggerParameter: Attack
+  attackTypeParameter: AttackType
+  isDeadParameter: IsDead
+--- !u!114 &6747959071256591159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a197fcd86d1234c8622c1b78443247, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackAnimationEvents
+  playerCombatController: {fileID: 7662427363872413756}
+--- !u!114 &7662427363872413756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e476f489f692c004d8daff2c2c536509, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombatController
+  playerStats: {fileID: 5278182071796830282}
+  weaponManager: {fileID: 4266574084283723979}
+  playerAnimationController: {fileID: 1324679542595317228}
+  audioSource: {fileID: 0}
+  attackEffectPoint: {fileID: 0}
+  attackStartEffectPrefab: {fileID: 0}
+  attackActionEffectPrefab: {fileID: 0}
+  enableDebugLogs: 0
 --- !u!1 &4121463555556301857
 GameObject:
   m_ObjectHideFlags: 0
