@@ -195,7 +195,9 @@ MonoBehaviour:
   caveCoins: 0
   currentDiceValue: 0
   diceValue: 0
+  _currentPlayerLevel: 0
   _InventoryItemIDs: 
+  maxLevel: 20
   _Gold: 0
   _Health: 0
   _XP: 0
@@ -380,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b2dc6ffaa0ab9442b5d0d8fb2b3e9b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopSystem
-  masterDatabase: {fileID: 0}
+  masterDatabase: {fileID: 11400000, guid: f668c37ce5783d24cbd1c635d02ac459, type: 2}
 --- !u!1 &4121463555556301857
 GameObject:
   m_ObjectHideFlags: 0

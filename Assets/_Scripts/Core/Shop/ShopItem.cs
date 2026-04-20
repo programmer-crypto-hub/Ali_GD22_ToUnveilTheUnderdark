@@ -12,15 +12,3 @@ public class ShopItem : ScriptableObject
     public int requiredRole;
     public int requiredLevel;
 }
-
-// ItemDatabase.cs - The Master List
-[CreateAssetMenu(fileName = "ItemDatabase", menuName = "Shop/Database")]
-public class ItemDatabase : ScriptableObject
-{
-    public List<ShopItem> allItems;
-
-    public ShopItem GetItemByID(int id)
-    {
-        return allItems.Find(item => item.itemID == id);
-    }
-}
