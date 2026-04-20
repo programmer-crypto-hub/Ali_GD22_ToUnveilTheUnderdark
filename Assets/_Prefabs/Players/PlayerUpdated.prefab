@@ -54,6 +54,7 @@ GameObject:
   - component: {fileID: 1324679542595317228}
   - component: {fileID: 6747959071256591159}
   - component: {fileID: 7662427363872413756}
+  - component: {fileID: -6294055781264973135}
   m_Layer: 6
   m_Name: PlayerUpdated
   m_TagString: Player
@@ -194,6 +195,7 @@ MonoBehaviour:
   caveCoins: 0
   currentDiceValue: 0
   diceValue: 0
+  _InventoryItemIDs: 
   _Gold: 0
   _Health: 0
   _XP: 0
@@ -220,6 +222,7 @@ MonoBehaviour:
   - {fileID: 5278182071796830282}
   - {fileID: 8797494165056479139}
   - {fileID: 2778794063948340745}
+  - {fileID: -6294055781264973135}
   - {fileID: 4296370042023099379}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8797494165056479139
@@ -365,6 +368,19 @@ MonoBehaviour:
   attackStartEffectPrefab: {fileID: 0}
   attackActionEffectPrefab: {fileID: 0}
   enableDebugLogs: 0
+--- !u!114 &-6294055781264973135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b2dc6ffaa0ab9442b5d0d8fb2b3e9b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopSystem
+  masterDatabase: {fileID: 0}
 --- !u!1 &4121463555556301857
 GameObject:
   m_ObjectHideFlags: 0

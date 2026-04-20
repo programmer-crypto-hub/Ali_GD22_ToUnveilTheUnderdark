@@ -1,48 +1,37 @@
+using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-//using UnityEngine.UIElements;
 
-public class GameSession : MonoBehaviour
+public class GameSession : NetworkBehaviour
 {
-    [Header("Player References")]
-    public PlayerStats playerStats;
-
     [Header("UI Elements")]
-    [SerializeField]
-    public Button endTurnBTN;
-    [SerializeField]
-    public GameObject movementPanel;
+    [SerializeField] private Button endTurnBTN;
+    [SerializeField] private GameObject movementPanel;
 
-    [Header("Events")]
-    public Action OnPlayerTurnStarted;
-    public Action OnPlayerTurnEnded;
-    public Action OnPosIndexChanged;
+    public static GameSession Instance { get; private set; }
 
-    [Header("Misc")]
-    public bool isPlayerTurn { get; private set; } = false;
-    public int playerPosIndex { get; set; } = 0;
-    public static GameSession instance { get; private set; }
+    // This networked variable tells everyone which PlayerRef currently has authority to act
+    [Networked, OnChangedRender(nameof(OnTurnChanged))]
+    public PlayerRef CurrentTurnPlayer { get; set; }
 
-    public void Awake()
+    public override void Spawned() => Instance = this;
+
+    // This runs on everyone's machine whenever the turn changes
+    void OnTurnChanged()
     {
-        if (endTurnBTN != null)
-            endTurnBTN.onClick.AddListener(EndPlayerTurn);
+        bool isMyTurn = (Runner.LocalPlayer == CurrentTurnPlayer);
+        
+        // Toggle UI based on turn authority
+        if (endTurnBTN != null) endTurnBTN.gameObject.SetActive(isMyTurn);
+        movementPanel.SetActive(isMyTurn);
+        
+        if (isMyTurn) InputManager.Instance.InitializePlayerInputSystem();
+        else InputManager.Instance.OnDestroy();
     }
 
-    public void StartPlayerTurn()
+    // Only the Host should call this to move to the next player
+    public void CycleTurn(PlayerRef nextPlayer)
     {
-        isPlayerTurn = true;
-        InputManager.Instance.InitializePlayerInputSystem();
-        movementPanel.SetActive(true);
-        // «десь можно добавить логику дл€ начала хода игрока, например, активацию UI или сброс действий.
-    }
-
-    public void EndPlayerTurn()
-    {
-        isPlayerTurn = false;
-        InputManager.Instance.OnDestroy();
-        movementPanel.SetActive(false);
-        // «десь можно добавить логику дл€ окончани€ хода игрока, например, деактивацию UI или обработку действий.
+        if (HasStateAuthority) CurrentTurnPlayer = nextPlayer;
     }
 }

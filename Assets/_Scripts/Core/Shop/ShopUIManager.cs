@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
-public class ShopUIManager : MonoBehaviour
+public class ShopUIManager : NetworkBehaviour
 {
     public static ShopUIManager Instance;
 
@@ -17,32 +18,53 @@ public class ShopUIManager : MonoBehaviour
 
     public void ToggleShop(bool isOpen)
     {
+        // Local check to prevent UI from opening out of turn
+        if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
+        {
+            Debug.Log("It's not your turn to shop!");
+            return;
+        }
+
         shopPanel.SetActive(isOpen);
         if (isOpen) RefreshShop();
     }
 
     private void RefreshShop()
     {
-        // Clear old buttons
         foreach (Transform child in itemContainer) Destroy(child.gameObject);
 
-        // Find the local player's data 
-        var localPlayer = GameObject.FindWithTag("Player").GetComponent<PlayerData>();
+        // Get local player via Fusion 2 Runner
+        var localPlayer = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<PlayerStats>();
+        int myRole = PlayerRolesController.Instance.ReturnRoleId();
 
         foreach (var item in allItems)
         {
+
             GameObject btnObj = Instantiate(itemPrefab, itemContainer);
-            Button btn = btnObj.GetComponent<Button>();
+            ShopItemSlot slot = btnObj.GetComponent<ShopItemSlot>();
 
-            // ROLE LOCK: Disable button if the role doesn't match
-            bool canBuy = (int)PlayerRolesController.Instance.ReturnRoleName() == item.requiredRole && localPlayer.currentPlayerCaveCoins >= item.cost;
-            btn.interactable = canBuy;
+            bool canAfford = localPlayer.Gold >= item.cost;
+            bool correctRole = (myRole == item.requiredRole);
 
-            // Handle the click: Link it to the Player's RPC logic
-            btn.onClick.AddListener(() => {
-                localPlayer.GetComponent<ShopSystem>().RPC_RequestPurchase(item.cost, item.requiredRole);
-                ToggleShop(false); // Close shop after purchase
+            int playerLevel = localPlayer.currentPlayerLevel;
+
+            if (playerLevel < item.requiredLevel)
+            {
+                slot.lockOverlay.SetActive(true);
+                slot.lockLevelText.text = $"Reach Level {item.requiredLevel}";
+                slot.buyButton.interactable = false;
+            }
+            else
+            {
+                slot.lockOverlay.SetActive(false);
+            }
+
+            slot.Setup(item, canAfford, correctRole);
+
+            slot.buyButton.onClick.AddListener(() => {
+                localPlayer.GetComponent<ShopSystem>().RPC_RequestPurchase(item.itemID);
             });
+
         }
     }
 }

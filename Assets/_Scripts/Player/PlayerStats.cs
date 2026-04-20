@@ -41,6 +41,14 @@ public class PlayerStats : NetworkBehaviour
     [Tooltip("Current Combat Value, calculated from the current dice value and applied multipliers.")]
     private float diceValue;
 
+    [Header("Progression")]
+    [Networked]
+    public int currentPlayerLevel { get; set; } = 0;
+    public int maxLevel = 20;
+
+    [Networked, Capacity(20)] // Max 20 items
+    public NetworkArray<int> InventoryItemIDs => default;
+
     [Networked]
     [OnChangedRender(nameof(OnStatsChanged))]
     public int Gold { get; set; }
