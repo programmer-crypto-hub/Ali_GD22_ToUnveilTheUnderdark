@@ -1,4 +1,5 @@
 using UnityEngine;
+using Fusion;
 
 public enum GameState
 {
@@ -6,13 +7,13 @@ public enum GameState
     Playing = 1,
     Combat = 2,
 }
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     // Singleton instance
     public static GameManager Instance { get; private set; }
     public GameState CurrentState { get; private set; } = GameState.MainMenu;
 
-    public void Awake()
+    public override void Spawned()
     {
         if (Instance != null && Instance != this)
         {

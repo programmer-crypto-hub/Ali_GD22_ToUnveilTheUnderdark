@@ -1,4 +1,5 @@
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Назначение: отдельная точка боевой логики игрока.
@@ -6,7 +7,7 @@ using UnityEngine;
 /// Связи: использует PlayerStats, WeaponManager и PlayerAnimationController. Через этот класс позже удобно подключать звук, VFX и shake камеры.
 /// Паттерны: Single Responsibility, Orchestrator для боевого цикла игрока.
 /// </summary>
-public class PlayerCombatController : MonoBehaviour
+public class PlayerCombatController : NetworkBehaviour
 {
     [Header("Связи")]
     [Tooltip("Статы игрока. Нужны для проверки смерти и блокировки атаки.")]
@@ -37,7 +38,7 @@ public class PlayerCombatController : MonoBehaviour
 
     private bool isAttackInProgress;
 
-    private void Awake()
+    public override void Spawned()
     {
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();

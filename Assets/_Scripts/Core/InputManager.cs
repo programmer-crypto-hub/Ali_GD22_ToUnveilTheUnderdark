@@ -1,8 +1,9 @@
 using UnityEngine;
+using Fusion;
 using System;
 using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+public class InputManager : NetworkBehaviour
 {
     public static InputManager Instance { get; private set; }
 
@@ -39,7 +40,7 @@ public class InputManager : MonoBehaviour
     public Action OnWeaponNextPressed;
     public Action OnWeaponPrevPressed;
 
-    private void Awake()
+    public override void Spawned()
     {
         if (Instance != null && Instance != this)
         {

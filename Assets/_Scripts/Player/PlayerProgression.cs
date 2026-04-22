@@ -1,12 +1,13 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// ќтвечает за прогрессию игрока:
 /// уровень, опыт и повышение уровн€.
 /// </summary>
-public class PlayerProgression : MonoBehaviour
+public class PlayerProgression : NetworkBehaviour
 {
     [Header("—в€зи")]
     [Tooltip("—сылка на PlayerStats дл€ возможного усилени€ характеристик при уровне.")]
@@ -60,7 +61,7 @@ public class PlayerProgression : MonoBehaviour
     // —обытие дл€ обновлени€ UI опыта: (текущий опыт, опыт до следующего уровн€)
     public event Action<float, float> OnXPChanged;
 
-    private void Awake()
+    public override void Spawned()
     {
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();

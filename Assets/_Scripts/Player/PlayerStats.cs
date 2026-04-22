@@ -1,12 +1,6 @@
-using System;
 using Fusion;
+using System;
 using UnityEngine;
-
-/// <summary>
-/// Отвечает за текущие характеристики игрока:
-/// здоровье, мана/энергия и связанные с ними события.
-/// Хранит ТЕКУЩИЕ значения в рантайме и даёт методы для урона и лечения.
-/// </summary>
 public class PlayerStats : NetworkBehaviour
 {
     [Header("Данные игрока")]
@@ -17,30 +11,21 @@ public class PlayerStats : NetworkBehaviour
 
     public Animator playerAnim;
 
-    [Header("Текущее состояние")]
-    [SerializeField]
-    [Tooltip("Текущее здоровье игрока.")]
-    private float currentHealth;
-    public bool IsDead => currentHealth <= 0f;
-
     private string currentRole;
     private int currentRoleId;
 
-    [Header("Currencies")]
-    [SerializeField]
-    [Tooltip("Текущее количество монет (Cave Coins).")]
-    private float caveCoins;
+    [Networked, OnChangedRender(nameof(OnStatsChanged))]
+    public float CurrentHealth { get; set; }
+    public bool IsDead => CurrentHealth <= 0f;
 
-    [Header("Movement")]
-    [SerializeField]
-    [Tooltip("Rolled Die Amount")]
-    private float currentDiceValue;
+    [Networked, OnChangedRender(nameof(OnStatsChanged))]
+    public float MaxHealth { get; set; }
 
-    [Header("Combat")]
-    [SerializeField]
-    [Tooltip("Current Combat Value, calculated from the current dice value and applied multipliers.")]
-    private float diceValue;
+    [Networked, OnChangedRender(nameof(OnStatsChanged))]
+    public int Gold { get; set; }
 
+    [Networked, OnChangedRender(nameof(OnStatsChanged))]
+    public float CurrentDiceValue { get; set; }
     [Header("Progression")]
     [Networked]
     public int currentPlayerLevel { get; set; } = 0;
@@ -51,24 +36,20 @@ public class PlayerStats : NetworkBehaviour
 
     [Networked]
     [OnChangedRender(nameof(OnStatsChanged))]
-    public int Gold { get; set; }
-
-    [Networked]
-    [OnChangedRender(nameof(OnStatsChanged))]
     public int Health { get; set; }
     [Networked] public float XP { get; set; }
     [Networked] public string PlayerName { get; set; }
 
-    public void OnStatsChanged()
-    {
-        // Invoke your existing Actions here!
-        // This ensures the Action fires on EVERY player's computer
-        OnCaveCoinsChanged?.Invoke(playerData.currentPlayerCaveCoins, playerData.maxCaveCoins);
-        OnHealthChanged?.Invoke(playerData.currentPlayerHealth, playerData.maxHealth);
 
-        // Update the UI only once per change
-        UpdateUI();
-    }
+    public void OnStatsChanged()
+{
+    // These ensure your existing UI listeners still work!
+    OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    OnGoldChanged?.Invoke(Gold, 9999); // Max gold
+    OnDiceRolled?.Invoke(CurrentDiceValue, 20f); // D20
+    
+    UpdateUI();
+}
 
     public void SetDefaultValues()
     {
@@ -80,147 +61,75 @@ public class PlayerStats : NetworkBehaviour
             PlayerName = $"Player {Object.InputAuthority.PlayerId}";
         }
     }
-    // This runs every time Gold or Health changes on the network
+    // This runs every time CaveCoins or Health changes on the network
     // Tell the Stats UI to refresh the display for this player
     public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
     private void UpdateUI() => playerStatRow.SetStats(PlayerName, Health, Gold, XP);
 
-
-    /// <summary>
-    /// Текущее здоровье игрока (только для чтения).
-    /// Для изменения используйте методы TakeDamage() или Heal().
-    /// </summary>
-    public float CurrentHealth => currentHealth;
-
-    /// <summary>
-    /// Currency Values
-    /// For Modifying use AddCaveCoins() or SpendCaveCoins() methods.
-    /// </summary>
-    public float CaveCoins => caveCoins;
-
     public int CurrentRoleId => currentRoleId;
     public string CurrentRole => currentRole;
 
-    // События для связи с другими системами (UI, эффекты и т.п.)
-    /// <summary>
-    /// Вызывается при изменении здоровья.
-    /// Параметры: текущее здоровье, максимальное здоровье.
-    /// </summary>
     public event Action<float, float> OnHealthChanged;
-    public event Action<float, float> OnCaveCoinsChanged;
+    public event Action<int, int> OnGoldChanged;
     public event Action<float, float> OnDiceRolled;
     public event Action<string, int> OnRoleApplied;
 
-    /// <summary>
-    /// Вызывается один раз в момент "смерти" игрока (здоровье упало до 0).
-    /// </summary>
     public event Action OnDeath;
 
-    /// <summary>
-    /// Точка входа компонента.
-    /// При старте берёт стартовые значения из PlayerData.
-    /// </summary>
     public override void Spawned()
     {
-        currentHealth = playerData.maxHealth; 
-        InitializeFromData();
-        if (PlayerRolesController.Instance == null)
+        if (HasStateAuthority) // Only the Server/Host sets initial values
         {
-            Debug.Log("PlayerStats: PlayerRolesController не найден в сцене!", this);
-            return;
-        }
-        PlayerRolesController.Instance.OnRoleGiven += () =>
-        {
-            currentRole = PlayerRolesController.Instance.roleName.ToString();
-            currentRoleId = PlayerRolesController.Instance.RoleId;
-            OnRoleApplied?.Invoke(currentRole, currentRoleId);
-        };
-    }
-
-    /// <summary>
-    /// Инициализирует текущие значения из PlayerData.
-    /// Можно вызвать повторно, например, при респауне.
-    /// </summary>
-    public void InitializeFromData()
-    {
-        if (playerData == null)
-        {
-            Debug.LogError("PlayerStats: PlayerData не назначен!", this);
-            return;
+            MaxHealth = playerData.maxHealth;
+            CurrentHealth = MaxHealth;
+            Gold = (int)playerData.caveCoins;
         }
 
-        // Берём стартовые значения и ограничиваем их в разумных пределах.
-        currentHealth = Mathf.Clamp(playerData.maxHealth, 1f, float.MaxValue);
-        caveCoins = Mathf.Clamp(playerData.caveCoins, 0f, float.MaxValue);
-        currentDiceValue = 0f;
-
-        // Уведомляем подписчиков о начальных значениях.
-        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-        OnCaveCoinsChanged?.Invoke(CaveCoins, playerData.maxCaveCoins);
-        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
-
+        // Subscribe to Role changes (Keep your existing logic here)
+        if (PlayerRolesController.Instance != null)
+        {
+            PlayerRolesController.Instance.OnRoleGiven += () =>
+            {
+                currentRole = PlayerRolesController.Instance.roleName.ToString();
+                currentRoleId = PlayerRolesController.Instance.RoleId;
+                OnRoleApplied?.Invoke(currentRole, currentRoleId);
+            };
+        }
     }
 
-    /// <summary>
-    /// Применяет бонусы за повышение уровня:
-    /// меняет maxHealth / maxMana и обновляет текущие значения
-    /// с подниманием событий OnHealthChanged / OnManaChanged.
-    /// Вызывать этот метод предпочтительнее, чем напрямую
-    /// менять currentHealth и ScriptableObject снаружи.
-    /// </summary>
     public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
     {
-        if (playerData == null)
-        {
-            Debug.LogWarning("PlayerStats.ApplyLevelUpBonuses: PlayerData не назначен.", this);
-            return;
-        }
+        if (!HasStateAuthority) return; // Only the server calculates the level up
 
-        // Увеличиваем максимальные значения
-        playerData.maxHealth += healthBonus;
-        playerData.maxCaveCoins += caveCoinsBonus;
+        // We modify the NETWORKED variables, NOT the ScriptableObject
+        MaxHealth += healthBonus;
+        CurrentHealth = MaxHealth; // Heal to full on level up
 
-        // Синхронизируем текущее с новыми максимумами
-        currentHealth = playerData.maxHealth;
-
-        // События вызываем здесь, внутри PlayerStats
-        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
+        // If you have a MaxGold variable, increase that too
+        // Gold += caveCoinsBonus; 
     }
 
-    /// <summary>
-    /// Наносит урон игроку.
-    /// Не даёт опустить здоровье ниже 0 и при необходимости вызывает OnDeath.
-    /// </summary>
     public void TakeDamage(float amount)
     {
-        if (playerData == null)
+        if (!HasStateAuthority) return; // SERVER ONLY
+        if (amount <= 0f || CurrentHealth <= 0f) return;
+
+        CurrentHealth = Mathf.Clamp(CurrentHealth - amount, 0f, MaxHealth);
+
+        if (CurrentHealth <= 0f)
         {
-            Debug.LogWarning("PlayerStats.TakeDamage: PlayerData не назначен.", this);
-            return;
-        }
-
-        // Не реагируем на некорректный урон или если игрок уже мёртв.
-        if (amount <= 0f || currentHealth <= 0f)
-            return;
-
-        currentHealth -= amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
-
-        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
-
-        if (currentHealth <= 0f)
-        {
-            // Игрок "умирает" — здесь можно запустить анимацию смерти, перезапуск уровня и т.п.
-            OnDeath?.Invoke(); 
-            playerAnim.SetInteger("health", -1);
-            Debug.Log($"Player is Dead! Current Health: {currentHealth}", this);
+            OnDeath?.Invoke();
+            // Since Animator isn't networked by default, use an RPC for the animation
+            RPC_PlayDeathAnimation();
         }
     }
 
-    /// <summary>
-    /// Лечит игрока на указанное значение.
-    /// Не поднимает здоровье выше максимального и не лечит мёртвого игрока.
-    /// </summary>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayDeathAnimation()
+    {
+        playerAnim.SetInteger("health", -1);
+    }
+
     public void Heal(float amount)
     {
         if (playerData == null)
@@ -230,54 +139,33 @@ public class PlayerStats : NetworkBehaviour
         }
 
         // Нет смысла лечить на неположительное значение или лечить мёртвого.
-        if (amount <= 0f || currentHealth <= 0f)
+        if (amount <= 0f || CurrentHealth <= 0f)
             return;
 
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, playerData.maxHealth);
+        CurrentHealth += amount;
+        CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, playerData.maxHealth);
 
-        OnHealthChanged?.Invoke(currentHealth, playerData.maxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, playerData.maxHealth);
     }
 
-    /// <summary>
-    /// Adds cave coins to the player's current amount.
-    /// Doesnt add coins if the player already has the maximum amount.
-    /// </summary>
-    
-    public void AddCaveCoins(float amount)
+    public void AddGold(int amount)
     {
-        if (playerData == null)
-        {
-            Debug.LogWarning("PlayerStats.AddCaveCoins: PlayerData не назначен.", this);
-            return;
-        }
-        if (amount <= 0f || caveCoins >= playerData.maxCaveCoins)
-            return;
-        caveCoins += amount;
-        caveCoins = Mathf.Clamp(caveCoins, 0f, playerData.maxCaveCoins);
-        OnCaveCoinsChanged?.Invoke(caveCoins, playerData.maxCaveCoins);
+        if (!HasStateAuthority) return; // SERVER ONLY
+        if (amount <= 0) return;
+
+        Gold += amount;
+        // Note: We don't modify playerData.maxCaveCoins here! 
+        // We use a local variable or a networked MaxGold.
     }
 
-    /// <summary>
-    /// Control Dice Rolling for Player Stats 
-    /// </summary>
-    
     public void RollDice()
     {
-        if (playerData == null)
-        {
-            Debug.LogWarning("PlayerStats.RollDice: PlayerData не назначен.", this);
-            return;
-        }
-        currentDiceValue = UnityEngine.Random.Range(1f, playerData.maxDiceValue + 1f);
-        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
+        if (!HasStateAuthority) return; // SERVER ONLY
+
+        // The Server generates the random number so no one can cheat
+        CurrentDiceValue = UnityEngine.Random.Range(1f, playerData.maxDiceValue + 1f);
     }
 
-    /// <summary>
-    /// Apply Multipliers to the current dice value, for example, from buffs or debuffs.
-    /// Will not change the current dice value if the multiplier is more than or equal to 10.
-    /// </summary>
-    
     public void ApplyDiceMultiplier(float multiplier)
     {
         if (playerData == null)
@@ -287,8 +175,8 @@ public class PlayerStats : NetworkBehaviour
         }
         if (multiplier <= 0f || multiplier >= 10f)
             return;
-        currentDiceValue *= multiplier;
-        currentDiceValue = Mathf.Clamp(currentDiceValue, 1f, playerData.maxDiceValue);
-        OnDiceRolled?.Invoke(currentDiceValue, playerData.maxDiceValue);
+        CurrentDiceValue *= multiplier;
+        CurrentDiceValue = Mathf.Clamp(CurrentDiceValue, 1f, playerData.maxDiceValue);
+        OnDiceRolled?.Invoke(CurrentDiceValue, playerData.maxDiceValue);
     }
 }

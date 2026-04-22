@@ -1,7 +1,8 @@
 using UnityEngine;
+using Fusion;
 using UnityEngine.UI;
 
-public class DiceManager : MonoBehaviour
+public class DiceManager : NetworkBehaviour
 {
     public static DiceManager Instance { get; private set; }
 
@@ -18,7 +19,7 @@ public class DiceManager : MonoBehaviour
     public int spaceLength;
     public Image[] diceSprites;
 
-    public void Awake()
+    public override void Spawned()
     {
         rollDiceButton.onClick.AddListener(RollDice);
         //playerMovement.OnDiceRolled();

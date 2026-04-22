@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Назначение: управляет доступными оружиями игрока и переключением между ними.
@@ -7,7 +8,7 @@ using UnityEngine;
 /// Связи: работает вместе с PlayerStats и PlayerCombatController. Сам больше не решает, в какой кадр должна произойти атака.
 /// Паттерны: Single Responsibility, композиция оружий через дочерние объекты.
 /// </summary>
-public class WeaponManager : MonoBehaviour
+public class WeaponManager : NetworkBehaviour
 {
     [Header("Связи")]
     [Tooltip("Статы игрока. Нужны для проверки смерти и будущих модификаторов урона.")]
@@ -40,7 +41,7 @@ public class WeaponManager : MonoBehaviour
     /// </summary>
     public PlayerStats PlayerStats => playerStats;
 
-    private void Awake()
+    public override void Spawned()
     {
         if (playerStats == null)
             playerStats = GetComponent<PlayerStats>();

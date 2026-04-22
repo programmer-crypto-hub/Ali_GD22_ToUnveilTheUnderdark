@@ -1,30 +1,29 @@
-using UnityEngine;
+using Fusion;
 using System;
 
-public class EventBus : MonoBehaviour
+public class EventBus : NetworkBehaviour
 {
     public static EventBus Instance { get; private set; }
+
+    // Add this new event
+    public event Action OnMapGenerated;
 
     public event Action OnGamePaused;
     public event Action OnGameResumed;
 
-    public void Awake()
+    public override void Spawned()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
-    public void RaiseGamePaused()
-    {
-        OnGamePaused?.Invoke();
+        // Fusion handles Singleton logic differently; 
+        // strictly ensure only one exists globally.
+        if (Instance == null) Instance = this;
     }
 
-    public void RaiseGameResumed()
+    // Call this to tell the UI/Game the map is ready
+    public void RaiseMapGenerated()
     {
-        OnGameResumed?.Invoke();
+        OnMapGenerated?.Invoke();
     }
+
+    public void RaiseGamePaused() => OnGamePaused?.Invoke();
+    public void RaiseGameResumed() => OnGameResumed?.Invoke();
 }

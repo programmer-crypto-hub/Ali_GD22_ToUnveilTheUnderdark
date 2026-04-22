@@ -1,6 +1,7 @@
 using UnityEngine;
+using Fusion;
 
-public class PlayerAnimationController : MonoBehaviour
+public class PlayerAnimationController : NetworkBehaviour
 {
     /// <summary>
     /// Тип анимации атаки, который будет выставлен в параметр AttackType у Animator.
@@ -33,7 +34,7 @@ public class PlayerAnimationController : MonoBehaviour
     [Tooltip("Имя bool-параметра смерти в Animator Controller.")]
     [SerializeField] private string isDeadParameter = "IsDead";
 
-    private void Awake()
+    public override void Spawned()
     {
         if (animator == null)
             animator = GetComponent<Animator>();

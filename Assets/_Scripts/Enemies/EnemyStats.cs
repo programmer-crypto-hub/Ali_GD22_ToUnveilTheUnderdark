@@ -8,12 +8,13 @@
 
 using System;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Адаптер к EnemyBase для совместимости с системами наград/подписок.
 /// Источник истины по здоровью/смерти находится в EnemyBase.
 /// </summary>
-public class EnemyStats : MonoBehaviour
+public class EnemyStats : NetworkBehaviour
 {
     [Header("Ссылки")]
     [Tooltip("Компонент EnemyBase, который хранит runtime-состояние врага.")]
@@ -32,7 +33,7 @@ public class EnemyStats : MonoBehaviour
     /// </summary>
     public event Action<EnemyStats> OnDied;
 
-    private void Awake()
+    public override void Spawned()
     {
         // EnemyStats — компонент “обвязки”.
         // Чтобы префабы были устойчивыми, стараемся автоматически найти EnemyBase на том же объекте.

@@ -1,6 +1,7 @@
 using UnityEngine;
+using Fusion;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [Header("Player Stats to Obtain Data")]
     [SerializeField]
@@ -18,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private float currentDamage = 0;
     private int currentDiceValue { get; set; }
 
-    public void Awake()
+    public override void Spawned()
     {
         Instance = this;
         if (Instance == null)

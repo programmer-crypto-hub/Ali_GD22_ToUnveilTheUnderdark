@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks 
+public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks 
 {
-    void Awake()
+    public override void Spawned()
     {
         DontDestroyOnLoad(this.gameObject);
-        Debug.Log("BasicPlayerSpawner Awake: " + this.gameObject.name);
+        Debug.Log("BasicPlayerSpawner Spawned: " + this.gameObject.name);
     }
 
     private bool _mouseButton0;
@@ -119,6 +119,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             runner.SetPlayerObject(player, networkPlayer); 
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayer);
+            
         }
         else
         {
@@ -143,6 +144,9 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     async void StartGame(GameMode mode)
     {
         GameObject go = new GameObject("Fusion_Network_Runner");
+        go.AddComponent<GameManager>();
+        go.AddComponent<SceneLoader>();
+        go.AddComponent<NetworkMapManager>();
         var physics2D = go.AddComponent<RunnerSimulatePhysics2D>(); 
         var _runner = go.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
@@ -163,6 +167,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
         var spawner = FindFirstObjectByType<BasicPlayerSpawner>();
         _runner.AddCallbacks(spawner);
+        var mapManager = FindFirstObjectByType<NetworkMapManager>();
         //sceneManager.IsMultiplePeer = false;
         // Start or join (depends on gamemode) a session with a specific name
         try

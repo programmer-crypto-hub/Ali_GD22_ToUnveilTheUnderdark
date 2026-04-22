@@ -74,10 +74,10 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     /// </summary>
     public event Action OnDied;
 
-    private void Awake()
+    public override void Spawned()
     {
         // Важно для учеников:
-        // Awake вызывается при создании объекта (в том числе сразу после Instantiate).
+        // Spawned вызывается при создании объекта (в том числе сразу после Instantiate).
         // Здесь мы можем подготовить runtime-состояние (например, здоровье),
         // если EnemyData уже назначен в инспекторе на префабе.
         if (enemyData != null)

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Fusion;
 
 /// <summary>
 /// Назначение: мост между Animation Event и боевой логикой игрока.
@@ -6,13 +7,13 @@ using UnityEngine;
 /// Связи: висит рядом с Animator на visual-объекте и знает только о PlayerCombatController.
 /// Паттерны: Adapter / Bridge для Animation Event.
 /// </summary>
-public class PlayerAttackAnimationEvents : MonoBehaviour
+public class PlayerAttackAnimationEvents : NetworkBehaviour
 {
     [Header("Связи")]
     [Tooltip("Боевой контроллер игрока, который обрабатывает фазы атаки.")]
     [SerializeField] private PlayerCombatController playerCombatController;
 
-    private void Awake()
+    public override void Spawned()
     {
         if (playerCombatController == null)
             playerCombatController = GetComponentInParent<PlayerCombatController>();

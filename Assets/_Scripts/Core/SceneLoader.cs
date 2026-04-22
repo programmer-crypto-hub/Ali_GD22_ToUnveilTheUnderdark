@@ -1,12 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using Fusion;
 using UnityEngine.SceneManagement;
 
-public class SceneLoader : MonoBehaviour
+public class SceneLoader : NetworkBehaviour
 {
     public static SceneLoader Instance { get; private set; }
 
-    private void Awake()
+    public override void Spawned()
     {
         if (Instance != null && Instance != this)
         {

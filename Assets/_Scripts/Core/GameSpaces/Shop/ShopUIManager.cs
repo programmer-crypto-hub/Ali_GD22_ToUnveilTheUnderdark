@@ -11,6 +11,7 @@ public class ShopUIManager : NetworkBehaviour
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private Transform itemContainer;
     [SerializeField] private GameObject itemPrefab; // UI button with an icon/text
+    [SerializeField] private ItemDatabase masterDatabase;
 
     public List<ShopItem> allItems; // Drag all shop items here in Inspector
 
@@ -61,10 +62,23 @@ public class ShopUIManager : NetworkBehaviour
 
             slot.Setup(item, canAfford, correctRole);
 
-            slot.buyButton.onClick.AddListener(() => {
+            slot.buyButton.onClick.AddListener(() =>
+            {
                 localPlayer.GetComponent<ShopSystem>().RPC_RequestPurchase(item.itemID);
             });
+        }
+        foreach (int id in localPlayer.InventoryItemIDs)
+        {
+            if (id == 0) continue; // Skip empty slots
 
+            // Get the visual data from your Master Database
+            ShopItem item = masterDatabase.GetItemByID(id);
+
+            // Instantiate a simple icon prefab
+            GameObject icon = Instantiate(itemPrefab, itemContainer);
+            icon.GetComponent<Image>().sprite = item.icon;
+
+            // Add a tooltip trigger here so you can see the description!
         }
     }
 }
