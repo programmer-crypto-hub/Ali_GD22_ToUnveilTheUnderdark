@@ -11,12 +11,12 @@ public class PlayerData : ScriptableObject
     [Header("Main Characteristics")]
     [Min(1f)]
     [Tooltip("Maximum Health Value by Default.")]
-    public float maxHealth = 100f;
+    public int maxHealth = 100;
 
     [Header("Movement")]
     [Min(0f)]
     [Tooltip("Default Speed Value, used by PlayerController.")]
-    public float moveSpeed = 5f;
+    public int moveSpeed = 5;
 
     [Min(0f)]
     [Tooltip("Default Jump Force, affecting Vertical Axis.")]
@@ -29,7 +29,7 @@ public class PlayerData : ScriptableObject
 
     [Min(1f)]
     [Tooltip("Maximal Dice Value")]
-    public float maxDiceValue = 20f;
+    public int maxDiceValue = 20;
 
     [Min(0f)]
     [Tooltip("—корость поворота персонажа (градусы в секунду).")]
@@ -38,18 +38,18 @@ public class PlayerData : ScriptableObject
     [Header("Currencies")]
     [Min(0f)]
     [Tooltip("Starting amount of in-game currency (e.g., coins).")]
-    public float caveCoins = 0f;
+    public int caveCoins = 0;
 
     [Min(1f)]
     [Tooltip("Maximum amount of in-game currency the player can hold.")]
-    public float maxCaveCoins = 200f;
+    public int maxCaveCoins = 200;
 
     [Header("In-Game Stats (Visibile for other players")]
     [Min(0f)]
     [Tooltip("Current amount of in-game currency (e.g., coins).")]
-    public float currentPlayerCaveCoins = 0f;
+    public int currentPlayerCaveCoins = 0;
 
     [Min(0f)]
     [Tooltip("Current Health Value.")]
-    public float currentPlayerHealth = 100f;
+    public int currentPlayerHealth = 100;
 }

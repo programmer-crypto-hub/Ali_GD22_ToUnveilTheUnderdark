@@ -3,8 +3,6 @@ using System;
 using UnityEngine;
 public class PlayerStats : NetworkBehaviour
 {
-    [Header("ƒанные игрока")]
-    [Tooltip("ScriptableObject с базовыми параметрами игрока (PlayerData).")]
     public PlayerData playerData;
     public PlayerStatRow playerStatRow;
     public PlayerProgression playerProgression;
@@ -15,18 +13,18 @@ public class PlayerStats : NetworkBehaviour
     private int currentRoleId;
 
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
-    public float CurrentHealth { get; set; }
-    public bool IsDead => CurrentHealth <= 0f;
+    public int CurrentHealth { get; set; }
+    public bool IsDead => CurrentHealth <= 0;
 
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
-    public float MaxHealth { get; set; }
+    public int MaxHealth { get; set; }
 
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
     public int Gold { get; set; }
 
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
-    public float CurrentDiceValue { get; set; }
-    [Header("Progression")]
+    public int CurrentDiceValue { get; set; }
+
     [Networked]
     public int currentPlayerLevel { get; set; } = 0;
     public int maxLevel = 20;
@@ -36,8 +34,7 @@ public class PlayerStats : NetworkBehaviour
 
     [Networked]
     [OnChangedRender(nameof(OnStatsChanged))]
-    public int Health { get; set; }
-    [Networked] public float XP { get; set; }
+    public float XP { get; set; }
     [Networked] public string PlayerName { get; set; }
 
 
@@ -56,15 +53,15 @@ public class PlayerStats : NetworkBehaviour
         if (Object.HasStateAuthority) // Only the owner/host sets the starting data
         {
             XP = playerProgression.CurrentXP;
-            Health = (int)playerData.maxHealth;
+            CurrentHealth = (int)playerData.maxHealth;
             Gold = (int)playerData.caveCoins;
             PlayerName = $"Player {Object.InputAuthority.PlayerId}";
         }
     }
     // This runs every time CaveCoins or Health changes on the network
     // Tell the Stats UI to refresh the display for this player
-    public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
-    private void UpdateUI() => playerStatRow.SetStats(PlayerName, Health, Gold, XP);
+    //public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
+    private void UpdateUI() => playerStatRow.SetStats(PlayerName, CurrentHealth, Gold, XP);
 
     public int CurrentRoleId => currentRoleId;
     public string CurrentRole => currentRole;
@@ -97,7 +94,7 @@ public class PlayerStats : NetworkBehaviour
         }
     }
 
-    public void ApplyLevelUpBonuses(float healthBonus, float caveCoinsBonus)
+    public void ApplyLevelUpBonuses(int healthBonus, float caveCoinsBonus)
     {
         if (!HasStateAuthority) return; // Only the server calculates the level up
 
@@ -109,12 +106,12 @@ public class PlayerStats : NetworkBehaviour
         // Gold += caveCoinsBonus; 
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(int amount)
     {
         if (!HasStateAuthority) return; // SERVER ONLY
         if (amount <= 0f || CurrentHealth <= 0f) return;
 
-        CurrentHealth = Mathf.Clamp(CurrentHealth - amount, 0f, MaxHealth);
+        CurrentHealth = Mathf.Clamp(CurrentHealth - amount, 0, MaxHealth);
 
         if (CurrentHealth <= 0f)
         {
@@ -130,8 +127,9 @@ public class PlayerStats : NetworkBehaviour
         playerAnim.SetInteger("health", -1);
     }
 
-    public void Heal(float amount)
+    public void Heal(int amount)
     {
+        if (!HasStateAuthority) return; // SERVER ONLY
         if (playerData == null)
         {
             Debug.LogWarning("PlayerStats.Heal: PlayerData не назначен.", this);
@@ -139,13 +137,11 @@ public class PlayerStats : NetworkBehaviour
         }
 
         // Ќет смысла лечить на неположительное значение или лечить мЄртвого.
-        if (amount <= 0f || CurrentHealth <= 0f)
+        if (amount <= 0 || CurrentHealth <= 0)
             return;
 
         CurrentHealth += amount;
-        CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, playerData.maxHealth);
-
-        OnHealthChanged?.Invoke(CurrentHealth, playerData.maxHealth);
+        CurrentHealth = Mathf.Clamp(CurrentHealth, 0, playerData.maxHealth);
     }
 
     public void AddGold(int amount)
@@ -163,20 +159,21 @@ public class PlayerStats : NetworkBehaviour
         if (!HasStateAuthority) return; // SERVER ONLY
 
         // The Server generates the random number so no one can cheat
-        CurrentDiceValue = UnityEngine.Random.Range(1f, playerData.maxDiceValue + 1f);
+        CurrentDiceValue = UnityEngine.Random.Range(1, playerData.maxDiceValue + 1);
     }
 
     public void ApplyDiceMultiplier(float multiplier)
     {
+        if (!HasStateAuthority) return; // SERVER ONLY
         if (playerData == null)
         {
             Debug.LogWarning("PlayerStats.ApplyDiceMultiplier: PlayerData не назначен.", this);
             return;
         }
-        if (multiplier <= 0f || multiplier >= 10f)
+        if (multiplier <= 0 || multiplier >= 10)
             return;
-        CurrentDiceValue *= multiplier;
-        CurrentDiceValue = Mathf.Clamp(CurrentDiceValue, 1f, playerData.maxDiceValue);
+        CurrentDiceValue = Mathf.RoundToInt(CurrentDiceValue * multiplier);
+        CurrentDiceValue = Mathf.Clamp(CurrentDiceValue, 1, playerData.maxDiceValue);
         OnDiceRolled?.Invoke(CurrentDiceValue, playerData.maxDiceValue);
     }
 }

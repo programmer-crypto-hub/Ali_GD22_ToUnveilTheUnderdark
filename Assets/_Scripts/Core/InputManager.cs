@@ -9,7 +9,7 @@ public class InputManager : NetworkBehaviour
 
     public InputActionAsset inputActions;
 
-    private InputActionMap playerActionMap;
+    public InputActionMap playerActionMap;
     private InputActionMap uiActionMap;
 
     private InputAction moveAction;

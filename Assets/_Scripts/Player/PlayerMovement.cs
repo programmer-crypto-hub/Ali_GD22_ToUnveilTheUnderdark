@@ -14,9 +14,9 @@ public class PlayerMovement : NetworkBehaviour
 
     public static PlayerMovement Instance { get; private set; }
 
-    [Header("Player Stats")]
-    [Tooltip("Current Stats of the Player")]
-    private float currentDamage = 0;
+    [Networked]
+    public float currentDamage { get; set; }
+    [Networked]
     private int currentDiceValue { get; set; }
 
     public override void Spawned()
@@ -31,7 +31,6 @@ public class PlayerMovement : NetworkBehaviour
             Destroy(gameObject); // Prevents duplicate managers
         }
     }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("SpaceTrigger"))
@@ -47,6 +46,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public void OnDiceRolled()
     {
+        if (!HasStateAuthority) return;
         currentDiceValue = DiceManager.Instance.diceRollResult;
         DiceManager.Instance.DisplayDice(currentDiceValue);
 

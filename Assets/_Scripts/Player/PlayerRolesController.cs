@@ -16,13 +16,14 @@ public class PlayerRolesController : NetworkBehaviour
 
     [Header("UI Elements")]
     [Tooltip("—сылка на UI элемент дл€ отображени€ текущей роли игрока.")]
-    [SerializeField]
-    public GameObject rolePanel;
-    [SerializeField]
-    public Image roleImage;
-
-    public int RoleId { get; private set; }
-    public PlayerRoles.RoleType roleName { get; private set; }
+    [Networked]
+    public GameObject rolePanel { get; set; }
+    [Networked]
+    public Image roleImage { get; set; }
+    [Networked]
+    public int RoleId { get; set; }
+    [Networked]
+    public PlayerRoles.RoleType roleName { get; set; }
 
     public override void Spawned()
     {

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using Fusion;
 using UnityEngine.UI;
 
@@ -11,17 +12,49 @@ public class DiceManager : NetworkBehaviour
 
     [Header("UI Settings")]
     public Button rollDiceButton;
-    public Image diceImage; // <-- Добавьте это поле и назначьте через инспектор
-    public GameObject dicePanel; // Панель для отображения результата броска кубика
+    [Networked] public Image diceImage { get; set; } // <-- Добавьте это поле и назначьте через инспектор
+    [Networked] public GameObject dicePanel { get; set; } // Панель для отображения результата броска кубика
 
     [Header("Dice Settings")]
-    public int diceRollResult;
+    [Networked, OnChangedRender(nameof(OnDiceChanged))] public int diceRollResult { get; set; }
     public int spaceLength;
-    public Image[] diceSprites;
+    [Networked] public Image[] diceSprites { get; set; }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_RequestRollDice()
+    {
+        int result = GetDiceValue();
+        diceRollResult = result;
+        Debug.Log($"Результат броска: {diceRollResult}");
+        //playerAnim.SetTrigger("roll_Trig");
+        new WaitForSeconds(5f); // Задержка для анимации броска кубика
+    }
+
+    void OnDiceChanged()
+    {
+        if (diceRollResult < 0) return;
+        dicePanel.SetActive(true);
+        diceImage.enabled = true;
+        // 1. Play the "Rolling" animation for everyone
+        playerAnim.SetTrigger("roll_Trig");
+
+        // 2. Instead of a 'WaitForSeconds', use an Animation Event or 
+        // a simple timer to trigger the NEXT animation
+        StartCoroutine(PlayResultAnimationAfterDelay(2f));
+    }
+    private IEnumerator PlayResultAnimationAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Check the game state locally to play the right follow-up
+        if (GameManager.Instance.CurrentState == GameState.Playing)
+            playerAnim.SetTrigger("walk_trig");
+        else if (GameManager.Instance.CurrentState == GameState.Combat)
+            playerAnim.SetTrigger("attack_trig");
+    }
     public override void Spawned()
     {
-        rollDiceButton.onClick.AddListener(RollDice);
+        rollDiceButton.onClick.AddListener(RPC_RequestRollDice);
         //playerMovement.OnDiceRolled();
 
         if (Instance == null)
@@ -32,18 +65,6 @@ public class DiceManager : NetworkBehaviour
         {
             Destroy(gameObject); // Prevents duplicate managers
         }
-    }
-
-    private void RollDice()
-    {
-        GetDiceValue();
-        Debug.Log($"Результат броска: {diceRollResult}");
-        //playerAnim.SetTrigger("roll_Trig");
-        new WaitForSeconds(5f); // Задержка для анимации броска кубика
-        if (GameManager.Instance.CurrentState == GameState.Playing)
-            playerAnim.SetTrigger("walk_trig");
-        if (GameManager.Instance.CurrentState == GameState.Combat)
-            playerAnim.SetTrigger("attack_trig");
     }
 
     private int GetDiceValue()
