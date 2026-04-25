@@ -24,27 +24,28 @@ public class GameManager : NetworkBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    //public void StartGame()
-    //{
-    //    CurrentState = GameState.Playing;
-    //    Time.timeScale = 1f;
-    //    SceneLoader.Instance.Load(SceneNames.GameScene);
-    //    if (InputManager.Instance != null)
-    //    {
-    //        InputManager.Instance.EnablePlayerInput();
-    //    }
-    //    Debug.Log("Game Started");
-    //    if (PlayerRolesController.Instance != null)
-    //    {
-    //        //PlayerRolesController.Instance.ApplyRole();
-    //    }
-    //}
+    public void StartGame()
+    {
+        CurrentState = GameState.Playing;
+        Time.timeScale = 1f;
+        SceneLoader.Instance.Load(SceneNames.GameScene);
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.EnablePlayerInput();
+        }
+        Debug.Log("Game Started");
+        if (PlayerRolesController.Instance != null)
+        {
+            PlayerRolesController.Instance.ApplyRole();
+        }
+    }
 
     public void GoToMenu()
     {
         CurrentState = GameState.MainMenu;
-        //Time.timeScale = 1f;
+        Time.timeScale = 1f;
         SceneLoader.Instance.Load(SceneNames.MainMenu);
+        SceneLoader.Instance.LoadWithLoading(SceneNames.GameScene);
         if (InputManager.Instance != null)
         {
             InputManager.Instance.EnableUIInput();

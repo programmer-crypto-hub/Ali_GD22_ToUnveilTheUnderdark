@@ -89,6 +89,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         Debug.Log("OnPlayerJoined method active");
         if (runner.IsServer && runner.IsRunning)
         {
+            GameManager.Instance.StartGame();
             Vector3 spawnPos = new Vector3(player.RawEncoded % 5, 10, 0); 
             Quaternion spawnRotation = new Quaternion(-90, 0, 0, 0);
             // 1. Spawn the player prefab
@@ -156,7 +157,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         _runner.AddCallbacks(this);
 
         // Create the NetworkSceneInfo from the current scene
-        var sceneRef = SceneRef.FromIndex(2);
+        var sceneRef = SceneRef.FromIndex(3);
 
         var sceneInfo = new NetworkSceneInfo();
         var sceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>();
@@ -205,7 +206,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         if(_runner == null)
         {
             StartGame(GameMode.Host);
-            var Scene = SceneRef.FromIndex(2);
+            var Scene = SceneRef.FromIndex(3);
             //if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
             //{
             //    StartGame(GameMode.Client);
