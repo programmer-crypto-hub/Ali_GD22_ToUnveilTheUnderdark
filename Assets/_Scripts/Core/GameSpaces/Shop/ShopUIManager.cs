@@ -20,11 +20,11 @@ public class ShopUIManager : NetworkBehaviour
     public void ToggleShop(bool isOpen)
     {
         // Local check to prevent UI from opening out of turn
-        if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
-        {
-            Debug.Log("It's not your turn to shop!");
-            return;
-        }
+        //if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
+        //{
+        //    Debug.Log("It's not your turn to shop!");
+        //    return;
+        //}
 
         shopPanel.SetActive(isOpen);
         if (isOpen) RefreshShop();

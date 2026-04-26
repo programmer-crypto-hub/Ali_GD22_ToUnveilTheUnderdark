@@ -9,7 +9,7 @@ public class NetworkMapManager : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnSeedChanged))]
     public int MapSeed { get; set; }
 
-    public DungeonGenerator Grid2DGenerator;
+    //public DungeonGenerator Grid2DGenerator;
 
     public override void Spawned()
     {
@@ -34,11 +34,11 @@ public class NetworkMapManager : NetworkBehaviour
         Debug.Log($"Generating Edgar Map with Seed: {seed}");
 
         // 1. Tell Edgar to use our specific networked seed
-        Grid2DGenerator.GeneratorConfig.Seed = seed;
+        //Grid2DGenerator.GeneratorConfig.Seed = seed;
 
-        // 2. Trigger the generation
-        // Note: Use 'Generate()' for runtime generation
-        Grid2DGenerator.Generate();
+        //// 2. Trigger the generation
+        //// Note: Use 'Generate()' for runtime generation
+        //Grid2DGenerator.Generate();
         EventBus.Instance.RaiseMapGenerated();
     }
 

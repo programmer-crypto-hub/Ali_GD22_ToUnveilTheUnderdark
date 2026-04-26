@@ -60,7 +60,7 @@ public class PlayerAnimationController : NetworkBehaviour
         if (animator == null)
             return;
 
-        if (playerStats != null && playerStats.Health < 0)
+        if (playerStats != null && playerStats.CurrentHealth < 0)
         {
             animator.SetFloat(moveSpeedParameter, 0f);
             return;

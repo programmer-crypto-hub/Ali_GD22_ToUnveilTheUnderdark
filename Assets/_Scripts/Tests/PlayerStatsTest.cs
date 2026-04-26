@@ -52,13 +52,13 @@ public class PlayerStatsTest : MonoBehaviour
         // Нанести урон по нажатию клавиши H.
         if (Input.GetKeyDown(KeyCode.H))
         {
-            playerStats.TakeDamage(10f);
+            playerStats.TakeDamage(10);
         }
 
         // Вылечить по нажатию клавиши J.
         if (Input.GetKeyDown(KeyCode.J))
         {
-            playerStats.Heal(10f);
+            playerStats.Heal(10);
         }
     }
 

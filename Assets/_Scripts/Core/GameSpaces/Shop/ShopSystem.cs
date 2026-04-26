@@ -10,7 +10,7 @@ public class ShopSystem : NetworkBehaviour
     public void RPC_RequestPurchase(int itemID)
     {
         // 1. Turn Check
-        if (Object.InputAuthority != GameSession.Instance.CurrentTurnPlayer) return;
+        //if (Object.InputAuthority != GameSession.Instance.CurrentTurnPlayer) return;
 
         // 2. Lookup item data from the SO Database
         ShopItem item = masterDatabase.GetItemByID(itemID);

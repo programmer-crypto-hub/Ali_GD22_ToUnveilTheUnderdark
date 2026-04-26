@@ -19,8 +19,8 @@ public class GameSession : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_RequestEndTurn()
     {
-        // 1. Logic runs on Server: Cycle to the next player
-        // (You likely have a list of PlayerRefs)
+        //1.Logic runs on Server: Cycle to the next player
+        //(You likely have a list of PlayerRefs)
         PlayerRef nextPlayer = CurrentTurnPlayer(Object.InputAuthority);
 
         // 2. Update the [Networked] Turn property
@@ -30,7 +30,7 @@ public class GameSession : NetworkBehaviour
     void OnTurnChanged()
     {
         bool isMyTurn = (Runner.LocalPlayer == CurrentTurnPlayer);
-        
+
         // Toggle UI based on turn authority
         if (endTurnBTN != null) endTurnBTN.gameObject.SetActive(isMyTurn);
         movementPanel.SetActive(isMyTurn);

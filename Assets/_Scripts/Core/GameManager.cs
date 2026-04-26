@@ -6,6 +6,8 @@ public enum GameState
     MainMenu = 0,
     Playing = 1,
     Combat = 2,
+    Lost = 3,
+    Won = 4,
 }
 public class GameManager : NetworkBehaviour
 {
@@ -28,7 +30,6 @@ public class GameManager : NetworkBehaviour
     {
         CurrentState = GameState.Playing;
         Time.timeScale = 1f;
-        SceneLoader.Instance.Load(SceneNames.GameScene);
         if (InputManager.Instance != null)
         {
             InputManager.Instance.EnablePlayerInput();
@@ -53,17 +54,33 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Got to Main Menu");
     }
 
-//    public void Resume()
-//    {
-//        if (CurrentState != GameState.Paused)
-//        {
-//            Debug.LogWarning("Cannot resume the game because it is not paused.");
-//            return;
-//        }
-//        CurrentState = GameState.Playing;
-//        Time.timeScale = 1f;
-//        Debug.Log("Game Resumed");
-//        EventBus.Instance.RaiseGameResumed();
-//    }
-}
+    /// <summary>
+    /// Переводит игру в состояние поражения и включает UI-ввод.
+    /// </summary>
+    public void EnterLoseState()
+    {
+        if (CurrentState != GameState.Playing)
+            return;
 
+        CurrentState = GameState.Lost;
+        Time.timeScale = 0f;
+        if (InputManager.Instance != null)
+            InputManager.Instance.EnableUIInput();
+        Debug.Log("Game lost");
+    }
+
+    /// <summary>
+    /// Переводит игру в состояние победы и включает UI-ввод.
+    /// </summary>
+    public void EnterWinState()
+    {
+        if (CurrentState != GameState.Playing)
+            return;
+
+        CurrentState = GameState.Won;
+        Time.timeScale = 0f;
+        if (InputManager.Instance != null)
+            InputManager.Instance.EnableUIInput();
+        Debug.Log("Game won");
+    }
+}

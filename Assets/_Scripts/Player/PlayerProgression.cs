@@ -26,7 +26,7 @@ public class PlayerProgression : NetworkBehaviour
     [Header("ѕрибавка к статам пр иповышении уровн€")]
     [SerializeField]
     [Tooltip("”величение максимального здоровь€ при каждом уровне.")]
-    private float healthIncreasePerLevel = 10f;
+    private int healthIncreasePerLevel = 10;
 
     [SerializeField]
     [Tooltip("”величение количества монет (Cave Coins) при каждом уровне.")]
