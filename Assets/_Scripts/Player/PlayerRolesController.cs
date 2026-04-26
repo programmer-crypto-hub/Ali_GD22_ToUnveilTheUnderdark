@@ -16,10 +16,8 @@ public class PlayerRolesController : NetworkBehaviour
 
     [Header("UI Elements")]
     [Tooltip("—сылка на UI элемент дл€ отображени€ текущей роли игрока.")]
-    [Networked]
-    public GameObject rolePanel { get; set; }
-    [Networked]
-    public Image roleImage { get; set; }
+    public GameObject rolePanel;
+    public Image roleImage;
     [Networked]
     public int RoleId { get; set; }
     [Networked]

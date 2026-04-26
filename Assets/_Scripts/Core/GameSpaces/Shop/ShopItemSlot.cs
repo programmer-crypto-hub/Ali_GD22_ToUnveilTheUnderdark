@@ -5,6 +5,8 @@ using TMPro;
 
 public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public static ShopItemSlot Instance; // Singleton for easy access in PlayerButtonController
+
     public Image iconImage;
     public TextMeshProUGUI costText;
     public TextMeshProUGUI nameText;

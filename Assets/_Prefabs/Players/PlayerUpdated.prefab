@@ -191,15 +191,13 @@ MonoBehaviour:
   playerStatRow: {fileID: 0}
   playerProgression: {fileID: 0}
   playerAnim: {fileID: 4078633969993388044}
-  currentHealth: 0
-  caveCoins: 0
-  currentDiceValue: 0
-  diceValue: 0
+  _CurrentHealth: 0
+  _MaxHealth: 0
+  _Gold: 0
+  _CurrentDiceValue: 0
   _currentPlayerLevel: 0
   _InventoryItemIDs: 
   maxLevel: 20
-  _Gold: 0
-  _Health: 0
   _XP: 0
   _PlayerName: 
 --- !u!114 &1005809161424700482
@@ -219,11 +217,16 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 2268690765001546277}
   - {fileID: 4426026941812541048}
   - {fileID: 2810038094282899616}
+  - {fileID: 4266574084283723979}
   - {fileID: 5278182071796830282}
   - {fileID: 8797494165056479139}
   - {fileID: 2778794063948340745}
+  - {fileID: 1324679542595317228}
+  - {fileID: 6747959071256591159}
+  - {fileID: 7662427363872413756}
   - {fileID: -6294055781264973135}
   - {fileID: 4296370042023099379}
   ForceRemoteRenderTimeframe: 0

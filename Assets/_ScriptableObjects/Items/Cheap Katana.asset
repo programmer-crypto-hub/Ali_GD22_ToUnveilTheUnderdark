@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 869ef05a88ca9864795c3ba743cbec54, type: 3}
+  m_Name: Cheap Katana
+  m_EditorClassIdentifier: Assembly-CSharp::ShopItem
+  itemID: 13
+  itemName: Cheap Katana
+  description: A long blade to ensure more damage and hit radius.
+  cost: 17
+  icon: {fileID: 2877298791648403826, guid: de267c089aab8e04f9973b37351fe6eb, type: 3}
+  requiredRole: 0
+  requiredLevel: 3

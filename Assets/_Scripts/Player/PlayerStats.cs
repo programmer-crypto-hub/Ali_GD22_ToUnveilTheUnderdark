@@ -26,7 +26,7 @@ public class PlayerStats : NetworkBehaviour
     public int CurrentDiceValue { get; set; }
 
     [Networked]
-    public int currentPlayerLevel { get; set; } = 0;
+    public int currentPlayerLevel { get; set; }
     public int maxLevel = 20;
 
     [Networked, Capacity(20)] // Max 20 items

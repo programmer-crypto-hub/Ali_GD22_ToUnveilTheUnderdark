@@ -1,12 +1,14 @@
 using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
+using static Unity.Collections.Unicode;
 
 public class PlayerButtonController : MonoBehaviour
 {
     [Header("Buttons")]
     public Button rollDiceButton;
     public Button shopButton;
+    public Button endTurnButton;
 
     private void OnEnable()
     {
@@ -24,16 +26,26 @@ public class PlayerButtonController : MonoBehaviour
 
         if (localPlayer != null)
         {
-            BindToPlayer(localPlayer);
+            RemoveListeners(); // Clear any old listeners to prevent duplicates
+            BindToPlayer();
         }
     }
-
-    public void BindToPlayer(PlayerStats player)
+    private void OnDisable()
     {
-        // Clear and re-bind (to avoid double-subscriptions)
+        // Unsubscribe to prevent memory leaks
+        if (EventBus.Instance != null)
+            EventBus.Instance.OnMapGenerated -= HandleMapReady;
+    }
+    private void RemoveListeners()
+    {
         rollDiceButton.onClick.RemoveAllListeners();
+        endTurnButton.onClick.RemoveAllListeners();
+        shopButton.onClick.RemoveAllListeners();
+    }
+    public void BindToPlayer()
+    {
         rollDiceButton.onClick.AddListener(DiceManager.Instance.RPC_RequestRollDice);
-
+        endTurnButton.onClick.AddListener(GameSession.Instance.RPC_RequestEndTurn);
         shopButton.onClick.AddListener(() => ShopUIManager.Instance.ToggleShop(true));
 
         Debug.Log("UI Bound to local player after Edgar generation.");

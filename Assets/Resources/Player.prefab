@@ -303,7 +303,6 @@ MonoBehaviour:
   playerStats: {fileID: 527390180511744034}
   cameraTransform: {fileID: 7963617936369087205}
   visualRoot: {fileID: 8057081993634875873}
-  sprintMultiplier: 1.5
 --- !u!114 &69281992823560485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,11 +361,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   playerData: {fileID: 11400000, guid: 9fbc7337fd48aea4299e8b2737e8f3dd, type: 2}
+  playerStatRow: {fileID: 0}
+  playerProgression: {fileID: 0}
   playerAnim: {fileID: 7953576579434099920}
-  currentHealth: 0
-  caveCoins: 0
-  currentDiceValue: 0
-  diceValue: 0
+  _CurrentHealth: 0
+  _MaxHealth: 0
+  _Gold: 0
+  _CurrentDiceValue: 0
+  _currentPlayerLevel: 0
+  _InventoryItemIDs: 
+  maxLevel: 20
+  _XP: 0
+  _PlayerName: 
 --- !u!95 &7953576579434099920
 Animator:
   serializedVersion: 7
@@ -402,6 +408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   playerStats: {fileID: 527390180511744034}
+  playerCombatController: {fileID: 0}
   weaponInstances:
   - {fileID: 3785676241643531492}
   - {fileID: 1658017169704776404}
@@ -425,7 +432,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7240475040572009894}
+  - {fileID: 69281992823560485}
   - {fileID: 527390180511744034}
+  - {fileID: 2444064934309997047}
   - {fileID: -1075526300362029862}
   - {fileID: 6175436562431393425}
   ForceRemoteRenderTimeframe: 0

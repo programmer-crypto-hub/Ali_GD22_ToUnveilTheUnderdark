@@ -17,14 +17,28 @@ public class ShopUIManager : NetworkBehaviour
 
     private void Awake() => Instance = this;
 
+    private void OnEnable()
+    {
+        if (GameSession.Instance != null)
+            GameSession.Instance.OnTurnChanged += HandleTurnChanged;
+    }
+
+    private void HandleTurnChanged()
+    {
+        // If the turn is no longer mine, force the shop to close
+        if (GameSession.Instance.CurrentTurnPlayer != Runner.LocalPlayer)
+        {
+            ToggleShop(false);
+        }
+    }
     public void ToggleShop(bool isOpen)
     {
         // Local check to prevent UI from opening out of turn
-        //if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
-        //{
-        //    Debug.Log("It's not your turn to shop!");
-        //    return;
-        //}
+        if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
+        {
+            Debug.Log("It's not your turn to shop!");
+            return;
+        }
 
         shopPanel.SetActive(isOpen);
         if (isOpen) RefreshShop();
@@ -40,16 +54,21 @@ public class ShopUIManager : NetworkBehaviour
 
         foreach (var item in allItems)
         {
-
             GameObject btnObj = Instantiate(itemPrefab, itemContainer);
             ShopItemSlot slot = btnObj.GetComponent<ShopItemSlot>();
 
+            slot.iconImage.sprite = item.icon;
+            slot.nameText.text = item.itemName;
+            slot.costText.text = $"{item.cost}g";
+
             bool canAfford = localPlayer.Gold >= item.cost;
-            bool correctRole = (myRole == item.requiredRole);
+            bool roleMatch = localPlayer.CurrentRoleId == item.requiredRole;
+            bool levelMatch = localPlayer.currentPlayerLevel >= item.requiredLevel;
 
-            int playerLevel = localPlayer.currentPlayerLevel;
+            slot.buyButton.interactable = canAfford && roleMatch && levelMatch;
+            slot.lockOverlay.SetActive(!levelMatch);
 
-            if (playerLevel < item.requiredLevel)
+            if (localPlayer.currentPlayerLevel < item.requiredLevel)
             {
                 slot.lockOverlay.SetActive(true);
                 slot.lockLevelText.text = $"Reach Level {item.requiredLevel}";
@@ -60,11 +79,14 @@ public class ShopUIManager : NetworkBehaviour
                 slot.lockOverlay.SetActive(false);
             }
 
-            slot.Setup(item, canAfford, correctRole);
+            bool levelMet = localPlayer.currentPlayerLevel >= item.requiredLevel;
+            slot.lockOverlay.SetActive(!levelMet);
+            if (!levelMet) slot.lockLevelText.text = $"Level {item.requiredLevel}";
+            slot.Setup(item, canAfford, roleMatch);
 
-            slot.buyButton.onClick.AddListener(() =>
-            {
+            slot.buyButton.onClick.AddListener(() => {
                 localPlayer.GetComponent<ShopSystem>().RPC_RequestPurchase(item.itemID);
+                ToggleShop(false); // Close shop after buying
             });
         }
         foreach (int id in localPlayer.InventoryItemIDs)

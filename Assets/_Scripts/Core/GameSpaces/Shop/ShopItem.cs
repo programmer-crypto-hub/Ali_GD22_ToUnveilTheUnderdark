@@ -4,6 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewShopItem", menuName = "Shop/Item")]
 public class ShopItem : ScriptableObject
 {
+    public static ShopItem Instance { get; private set; }
     public int itemID;
     public string itemName;
     [TextArea] public string description; // For the tooltip

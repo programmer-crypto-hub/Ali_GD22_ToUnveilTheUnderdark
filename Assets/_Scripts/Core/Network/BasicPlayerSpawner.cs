@@ -12,6 +12,16 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     {
         DontDestroyOnLoad(this.gameObject);
         Debug.Log("BasicPlayerSpawner Spawned: " + this.gameObject.name);
+        if (HasStateAuthority)
+        {
+            // Find the GameSession (which should be on your NetworkRunner or global object)
+            var session = FindFirstObjectByType<GameSession>();
+            if (session != null)
+            {
+                // Object.InputAuthority is the PlayerRef for the person controlling this prefab
+                session.RegisterPlayer(Object.InputAuthority);
+            }
+        }
     }
 
     private bool _mouseButton0;

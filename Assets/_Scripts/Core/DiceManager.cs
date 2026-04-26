@@ -12,13 +12,13 @@ public class DiceManager : NetworkBehaviour
 
     [Header("UI Settings")]
     public Button rollDiceButton;
-    [Networked] public Image diceImage { get; set; } // <-- Добавьте это поле и назначьте через инспектор
-    [Networked] public GameObject dicePanel { get; set; } // Панель для отображения результата броска кубика
+    public Image diceImage; // <-- Добавьте это поле и назначьте через инспектор
+    public GameObject dicePanel; // Панель для отображения результата броска кубика
 
     [Header("Dice Settings")]
     [Networked, OnChangedRender(nameof(OnDiceChanged))] public int diceRollResult { get; set; }
     public int spaceLength;
-    [Networked] public Image[] diceSprites { get; set; }
+    public Sprite[] diceSprites;
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_RequestRollDice()
@@ -33,6 +33,10 @@ public class DiceManager : NetworkBehaviour
     void OnDiceChanged()
     {
         if (diceRollResult < 0) return;
+        if (diceRollResult >= 1 && diceRollResult <= diceSprites.Length)
+        {
+            diceImage.sprite = diceSprites[diceRollResult - 1];
+        }
         dicePanel.SetActive(true);
         diceImage.enabled = true;
         // 1. Play the "Rolling" animation for everyone
@@ -105,7 +109,7 @@ public class DiceManager : NetworkBehaviour
         if (diceSprites != null && diceSprites.Length > 0)
         {
             dicePanel.SetActive(true); // Показываем панель с результатом броска кубика
-            diceImage = diceSprites[diceValue - 1];
+            diceImage.sprite = diceSprites[diceValue - 1];
             diceImage.enabled = true;
             new WaitForSeconds(2f); // Задержка для отображения результата броска кубика
             diceImage.enabled = false; // Скрываем изображение после задержки
