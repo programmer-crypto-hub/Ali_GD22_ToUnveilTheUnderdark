@@ -20,7 +20,13 @@ public class ShopUIManager : NetworkBehaviour
     private void OnEnable()
     {
         if (GameSession.Instance != null)
-            GameSession.Instance.OnTurnChanged += HandleTurnChanged;
+            GameSession.Instance.OnTurnChangedEvent += HandleTurnChanged;
+    }
+    private void OnDisable()
+    {
+        // Always unsubscribe to prevent memory leaks!
+        if (GameSession.Instance != null)
+            GameSession.Instance.OnTurnChangedEvent -= HandleTurnChanged;
     }
 
     private void HandleTurnChanged()

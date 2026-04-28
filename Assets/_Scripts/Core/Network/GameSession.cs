@@ -1,5 +1,6 @@
 using Fusion;
 using UnityEngine;
+using System;
 using UnityEngine.UI;
 
 public class GameSession : NetworkBehaviour
@@ -10,6 +11,7 @@ public class GameSession : NetworkBehaviour
 
     public static GameSession Instance;
 
+    public event Action OnTurnChangedEvent;
     // This networked variable tells everyone which PlayerRef currently has authority to act
     [Networked, OnChangedRender(nameof(OnTurnChanged))]
     public PlayerRef CurrentTurnPlayer { get; set; }

@@ -8,6 +8,12 @@ using UnityEngine.SceneManagement;
 
 public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks 
 {
+    private void OnEnable()
+    {
+        // If the runner is already active, register now
+        var runner = FindFirstObjectByType<NetworkRunner>();
+        if (runner != null) runner.AddCallbacks(this);
+    }
     public override void Spawned()
     {
         DontDestroyOnLoad(this.gameObject);
@@ -100,8 +106,8 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer && runner.IsRunning)
         {
             GameManager.Instance.StartGame();
-            Vector3 spawnPos = new Vector3(player.RawEncoded % 5, 10, 0); 
-            Quaternion spawnRotation = new Quaternion(-90, 0, 0, 0);
+            Vector3 spawnPos = new Vector3(player.RawEncoded % 5, 10, 0);
+            Quaternion spawnRotation = Quaternion.Euler(-90, 0, 0);
             // 1. Spawn the player prefab
             DontDestroyOnLoad(_playerPrefab);
             if (_playerPrefab == null)
@@ -136,11 +142,6 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         {
             Debug.LogWarning($"OnPlayerJoined called but runner is not server or not running. IsServer: {runner.IsServer}, IsRunning: {runner.IsRunning}");
         }
-
-        if (_playerPrefab == null)
-        {
-            _playerPrefab = Resources.Load<NetworkObject>("Player");
-        }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -154,12 +155,14 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 
     async void StartGame(GameMode mode)
     {
+        var _runner = FindFirstObjectByType<NetworkRunner>();
         GameObject go = new GameObject("Fusion_Network_Runner");
-        go.AddComponent<GameManager>();
-        go.AddComponent<SceneLoader>();
-        go.AddComponent<NetworkMapManager>();
-        var physics2D = go.AddComponent<RunnerSimulatePhysics2D>(); 
-        var _runner = go.AddComponent<NetworkRunner>();
+        if (_runner == null)
+            _runner = go.AddComponent<NetworkRunner>();
+        _runner.AddCallbacks(this);
+        var physics2D = go.AddComponent<RunnerSimulatePhysics2D>();
+        DontDestroyOnLoad(go);
+        DontDestroyOnLoad(this);
         _runner.ProvideInput = true;
         Debug.Log($"Starting game with mode: {mode}");
 

@@ -14,7 +14,17 @@ public class TooltipSystem : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // If an instance already exists, kill this one
+            Destroy(gameObject);
+            return; // Don't let any more code run in this Awake!
+        }
         gameObject.SetActive(false); // Hide on start
     }
 

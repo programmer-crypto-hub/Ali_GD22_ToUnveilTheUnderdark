@@ -49,12 +49,12 @@ public class PlayerController : NetworkBehaviour
     /// <summary>
     /// Главный игровой цикл контроллера.
     /// </summary>
-    private void Update()
+    public void HandleMovement()
     {
         if (InputManager.Instance == null)
             return;
 
-        HandleMovement();
+        FixedUpdateNetwork();
 
         InputManager.Instance.ResetButtonFlags();
     }
@@ -69,14 +69,15 @@ public class PlayerController : NetworkBehaviour
         _moveContext = value.Get<Vector2>(); 
     }
 
-    public void HandleMovement() 
+    public override void FixedUpdateNetwork()
     {
         Vector3 moveInput = InputManager.Instance.MoveInput;
         Vector3 moveDirection = Vector3.zero;
 
-        if (moveInput.sqrMagnitude > 0.001f && cameraTransform != null)
+        float speed = playerStats.playerData.moveSpeed;
+
+        if (GetInput(out NetworkInputData data))
         {
-            // Для топ-даун: движение по XZ, игнорируем Y
             Vector3 forward = cameraTransform.forward;
             forward.y = 0f;
             forward.Normalize();
@@ -85,33 +86,16 @@ public class PlayerController : NetworkBehaviour
             right.y = 0f;
             right.Normalize();
 
-            moveDirection = forward * moveInput.x + right * moveInput.x;
-            moveDirection.Normalize();
-        }
+            // Fix the X/Y mapping
+            Vector3 move = (forward * data.direction.y) + (right * data.direction.x);
 
-        float speed = 5f;
-        float rotationSpeed = 720f;
-
-        if (playerStats != null && playerStats.playerData != null)
-        {
-            speed = playerStats.playerData.moveSpeed;
-            rotationSpeed = playerStats.playerData.rotationSpeed;
-        }
-
-        if (HasInputAuthority)
-        {
-            transform.position += (Vector3)(_moveContext * speed * Runner.DeltaTime);
-        }
-
-        // Вращаем модель по направлению движения (если есть движение)
-        if (visualRoot != null && moveDirection.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            visualRoot.rotation = Quaternion.Slerp(
-                visualRoot.rotation,
-                targetRotation, 
-                rotationSpeed * Mathf.Deg2Rad * Runner.DeltaTime
-            );
+            if (move.magnitude > 0.1f)
+            {
+                if (GameManager.Instance.CurrentState == GameState.Playing)
+                    playerStats.playerAnim.SetTrigger("walk_trig");
+                // Use simple Translate or a Rigidbody for networked movement
+                transform.position += move.normalized * speed * Runner.DeltaTime;
+            }
         }
     }
 }

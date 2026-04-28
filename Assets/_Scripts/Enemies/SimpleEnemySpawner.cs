@@ -119,6 +119,7 @@ public class SimpleEnemySpawner : NetworkBehaviour
 
     public EnemyBase SpawnEnemy()
     {
+        if (Runner == null || !Runner.IsRunning) return null;
         if (enemyData == null || enemyData.prefab == null)
         {
             Debug.LogWarning($"{name}: SimpleEnemySpawner Ч нет корректных данных врага.");

@@ -41,12 +41,22 @@ public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (TooltipSystem.Instance == null)
+        {
+            Debug.LogError("TooltipSystem is missing! Check if it's in the current scene or was destroyed.");
+            return;
+        }
         // itemData is the ScriptableObject assigned in Setup()
         TooltipSystem.Instance.Show(itemData.description, itemData.itemName);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (TooltipSystem.Instance == null)
+        {
+            Debug.LogError("TooltipSystem is missing! Check if it's in the current scene or was destroyed.");
+            return;
+        }
         TooltipSystem.Instance.Hide();
     }
 }

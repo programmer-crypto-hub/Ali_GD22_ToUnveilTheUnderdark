@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerStatRow : MonoBehaviour
 {
@@ -8,20 +9,20 @@ public class PlayerStatRow : MonoBehaviour
     private PlayerStats playerStats;
     private PlayerProgression playerProgression;
 
-    [SerializeField] private Text nameText;
-    [SerializeField] private Text healthText;
-    [SerializeField] private Text goldText;
-    [SerializeField] private Text xpText;
-    [SerializeField] private Text xpLevelText;
+    [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI healthText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI xpText;
+    [SerializeField] private TextMeshProUGUI xpLevelText;
 
     // This is the function the Manager calls to fill in the blanks
     public void SetStats(string pName, int health, int gold, float xp)
     {
         nameText.text = pName;
-        healthText.text = $"HP: {health}";
-        goldText.text = $"Cave Coins: {gold}";
-        xpText.text = $"XP: {xp}";
-        xpLevelText.text = $"Level: {playerProgression.CurrentLevel}";
+        healthText.text = $"{health}";
+        goldText.text = $"{gold}";
+        xpText.text = $"{xp}";
+        xpLevelText.text = $"(Level: {playerProgression.CurrentLevel})";
         string finalXPText = xpText.text + xpLevelText.text;
     }
 }

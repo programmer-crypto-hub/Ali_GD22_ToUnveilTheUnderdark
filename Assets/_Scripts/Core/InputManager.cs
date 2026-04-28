@@ -1,9 +1,8 @@
 using UnityEngine;
-using Fusion;
 using System;
 using UnityEngine.InputSystem;
 
-public class InputManager : NetworkBehaviour
+public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
 
@@ -40,7 +39,7 @@ public class InputManager : NetworkBehaviour
     public Action OnWeaponNextPressed;
     public Action OnWeaponPrevPressed;
 
-    public override void Spawned()
+    public void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -50,8 +49,12 @@ public class InputManager : NetworkBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        playerActionMap = null;
+        if (inputActions != null)
+        {
+            // This finds the map named "Player" inside your blue asset file
+            playerActionMap = inputActions.FindActionMap("Player");
+            playerActionMap.Enable();
+        }
     }
 
     private void Start()

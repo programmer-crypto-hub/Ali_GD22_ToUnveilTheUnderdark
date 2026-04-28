@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   playerStats: {fileID: 5278182071796830282}
-  playerCombatController: {fileID: 0}
+  playerCombatController: {fileID: 7662427363872413756}
   weaponInstances:
   - {fileID: 6558033684945617869}
   - {fileID: 6338318759080299098}
@@ -188,8 +188,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   playerData: {fileID: 11400000, guid: 9fbc7337fd48aea4299e8b2737e8f3dd, type: 2}
-  playerStatRow: {fileID: 0}
-  playerProgression: {fileID: 0}
+  playerStatRow: {fileID: 2078577506607821414, guid: a7d8bc71dea03d348b2908cc0284fac7, type: 3}
+  playerProgression: {fileID: 2268690765001546277}
   playerAnim: {fileID: 4078633969993388044}
   _CurrentHealth: 0
   _MaxHealth: 0

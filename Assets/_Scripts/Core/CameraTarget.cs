@@ -49,6 +49,11 @@ public class CameraTarget : NetworkBehaviour
 
     private void LateUpdate()
     {
+        if (Runner == null || !Runner.IsRunning)
+        {
+            Debug.LogError("Runner isn't running yet! Can't execute LateUpdate() - CameraTarget");
+            return;
+        }
         if (target == null)
         {
             Debug.LogError("Target not set for CameraTarget! Please assign a target transform.");
@@ -57,7 +62,7 @@ public class CameraTarget : NetworkBehaviour
 
         // Smoothly follow the player's position
         Vector3 desiredPosition = target.position + offset;
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Runner.DeltaTime);
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
     }
 
     public void SetMouseSensitivity(float sensitivity)

@@ -35,7 +35,11 @@ public class NetworkMapManager : NetworkBehaviour
 
         // 1. Tell Edgar to use our specific networked seed
         //Grid2DGenerator.GeneratorConfig.Seed = seed;
-
+        if (EventBus.Instance == null)
+        {
+            Debug.LogError("EventBus is missing! Check if it's in the current scene or was destroyed.");
+            return;
+        }
         //// 2. Trigger the generation
         //// Note: Use 'Generate()' for runtime generation
         //Grid2DGenerator.Generate();

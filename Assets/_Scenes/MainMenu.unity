@@ -1673,6 +1673,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1585282487}
   - component: {fileID: 1585282489}
+  - component: {fileID: 1585282490}
   m_Layer: 0
   m_Name: BasicPlayerSpawner
   m_TagString: Untagged
@@ -1708,6 +1709,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasicPlayerSpawner
   _playerPrefab: {fileID: 1005809161424700482, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
+--- !u!114 &1585282490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1585282486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 122426359
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1585282489}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &1624920393
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,9 @@
 using Fusion;
+using UnityEngine;
 using System;
+using Unity.VisualScripting;
 
-public class EventBus : NetworkBehaviour
+public class EventBus : MonoBehaviour
 {
     public static EventBus Instance { get; private set; }
 
@@ -11,11 +13,19 @@ public class EventBus : NetworkBehaviour
     public event Action OnGamePaused;
     public event Action OnGameResumed;
 
-    public override void Spawned()
+    public void Awake()
     {
-        // Fusion handles Singleton logic differently; 
-        // strictly ensure only one exists globally.
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // If an instance already exists, kill this one
+            Destroy(gameObject);
+            return; // Don't let any more code run in this Awake!
+        }
     }
 
     // Call this to tell the UI/Game the map is ready
