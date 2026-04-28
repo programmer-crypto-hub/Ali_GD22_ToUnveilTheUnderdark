@@ -142,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1410,6 +1410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d89e585af3b5e3458b2f7cc783f8a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatRow
+  playerProgression: {fileID: 2268690765001546277, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
   nameText: {fileID: 5189362094748863940}
   healthText: {fileID: 4440065816185699708}
   goldText: {fileID: 7299949319923285610}

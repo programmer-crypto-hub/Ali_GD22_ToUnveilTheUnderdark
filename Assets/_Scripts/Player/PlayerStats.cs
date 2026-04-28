@@ -25,7 +25,7 @@ public class PlayerStats : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
     public int CurrentDiceValue { get; set; }
 
-    [Networked]
+    [Networked] 
     public int currentPlayerLevel { get; set; }
     public int maxLevel = 20;
 

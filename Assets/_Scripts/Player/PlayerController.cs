@@ -91,10 +91,9 @@ public class PlayerController : NetworkBehaviour
 
             if (move.magnitude > 0.1f)
             {
+                transform.position += move.normalized * speed * Runner.DeltaTime;
                 if (GameManager.Instance.CurrentState == GameState.Playing)
                     playerStats.playerAnim.SetTrigger("walk_trig");
-                // Use simple Translate or a Rigidbody for networked movement
-                transform.position += move.normalized * speed * Runner.DeltaTime;
             }
         }
     }

@@ -133,7 +133,7 @@ MonoBehaviour:
   SyncSettings: 79
   StateHashes: 000000002b1a167c9579f0c40d286c403f2391ee20e23b681753fd33a1609f6296d159392afa8626c282e70ae875b701d213a006
   TriggerHashes: 0000000011b19e0265342d2e
-  TotalWords: 2
+  TotalWords: 3
 --- !u!114 &4266574084283723979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +274,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 1
@@ -320,7 +320,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 14.059006, y: 28.027225, z: 0}
+  m_Size: {x: 14.059006, y: 28.027225, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1324679542595317228
 MonoBehaviour:
@@ -336,10 +336,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
   animator: {fileID: 4078633969993388044}
   playerStats: {fileID: 5278182071796830282}
-  moveSpeedParameter: MoveSpeed
-  attackTriggerParameter: Attack
+  moveSpeedParameter: moveSpeed
+  attackTriggerParameter: attack_trig
   attackTypeParameter: AttackType
-  isDeadParameter: IsDead
+  isDeadParameter: isDead
 --- !u!114 &6747959071256591159
 MonoBehaviour:
   m_ObjectHideFlags: 0

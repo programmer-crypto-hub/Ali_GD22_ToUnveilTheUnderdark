@@ -16,7 +16,6 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     }
     public override void Spawned()
     {
-        DontDestroyOnLoad(this.gameObject);
         Debug.Log("BasicPlayerSpawner Spawned: " + this.gameObject.name);
         if (HasStateAuthority)
         {
@@ -102,47 +101,31 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log("OnPlayerJoined method active");
-        if (runner.IsServer && runner.IsRunning)
+        if (runner.IsServer)
         {
-            GameManager.Instance.StartGame();
-            Vector3 spawnPos = new Vector3(player.RawEncoded % 5, 10, 0);
-            Quaternion spawnRotation = Quaternion.Euler(-90, 0, 0);
-            // 1. Spawn the player prefab
-            DontDestroyOnLoad(_playerPrefab);
-            if (_playerPrefab == null)
-            {
-                Debug.LogError("Player Prefab is not assigned in the Inspector!");
-                return; 
-            }
-            var networkPlayer = runner.Spawn(_playerPrefab, spawnPos, spawnRotation, player, (runner, obj) => {
-                // This happens BEFORE the object is fully placed in the world
-                obj.gameObject.SetActive(true);
-            });
-            networkPlayer.gameObject.SetActive(true);
-            Debug.Log($"OnPlayerJoined: Spawning Player: {networkPlayer}");
-            if (networkPlayer == null)
-            {
-                Debug.LogError("FATAL: runner.Spawn returned NULL! The Prefab Table is likely out of sync.");
-                return;
-            }
-            // 2. ASSIGN IT: This is what fills that "Local Player Object" field in the Inspector
-            runner.SetPlayerObject(player, networkPlayer);
+            // 1. Calculate a simple spawn position
+            Vector3 spawnPos = new Vector3(player.RawEncoded % 5 * 2, 0, 0);
 
-            Debug.Log($"Player {player} joined and assigned to {networkPlayer.name}");
-            // Create a unique position for the player
-            Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-            
-            runner.SetPlayerObject(player, networkPlayer); 
-            // Keep track of the player avatars for easy access
-            _spawnedCharacters.Add(player, networkPlayer);
-            
-        }
-        else
-        {
-            Debug.LogWarning($"OnPlayerJoined called but runner is not server or not running. IsServer: {runner.IsServer}, IsRunning: {runner.IsRunning}");
+            // 2. Spawn the PREFAB (No DontDestroyOnLoad needed here!)
+            var networkPlayer = runner.Spawn(_playerPrefab, spawnPos, Quaternion.identity, player);
+
+            if (networkPlayer != null)
+            {
+                // 3. Set the Player Object so Fusion knows who this is
+                runner.SetPlayerObject(player, networkPlayer);
+
+                // 4. Now that the player exists, start the game logic
+                if (GameManager.Instance != null) GameManager.Instance.StartGame();
+
+                Debug.Log($"Spawned and assigned player {player}");
+            }
+            else
+            {
+                Debug.LogError("Failed to spawn player prefab!");
+            }
         }
     }
+
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {

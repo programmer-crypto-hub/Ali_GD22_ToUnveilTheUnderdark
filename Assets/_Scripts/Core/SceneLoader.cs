@@ -1,120 +1,40 @@
-using System.Collections;
 using UnityEngine;
-using System;
-using Fusion;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
-public class SceneLoader : NetworkBehaviour
+public class SceneLoader : MonoBehaviour
 {
+    [SerializeField] private GameObject loadingScreen; // Your placeholder UI panel
     public static SceneLoader Instance { get; private set; }
 
-    [SerializeField, Min(0f)] private float minimumLoadingDuration = 3.2f;
-
-    private string _pendingSceneName;
-    private bool _waitForLoadingScene;
-    private Func<IEnumerator> _pendingPreloadRoutine;
-
-    public override void Spawned()
+    private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
+        Debug.Log("Scene Loader script active");
         Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        LoadScene();
     }
 
-    private void OnDestroy()
+    public async void LoadScene()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    public void Load(string sceneName)
-    {
-        Debug.Log($"Loaded Scene: {sceneName}");
-        SceneManager.LoadScene(sceneName);
-    }
-
-    public void LoadAsync(string sceneName)
-    {
-        StartCoroutine(LoadSceneAsyncCoroutine(sceneName));
-    }
-
-    public void LoadWithLoading(string targetSceneName, Func<IEnumerator> preloadRoutine = null)
-    {
-        if (string.IsNullOrWhiteSpace(targetSceneName))
+        Debug.Log("LoadScene method active");
+        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
         {
-            Debug.LogError("SceneLoader: target scene name is empty.");
-            return;
-        }
+            // Start the load
+            Debug.Log("Scene started loading");
+            var op = SceneManager.LoadSceneAsync(nextSceneIndex);
 
-        if (targetSceneName == SceneNames.Loading)
-        {
-            Load(targetSceneName);
-            return;
-        }
-
-        _pendingSceneName = targetSceneName;
-        _pendingPreloadRoutine = preloadRoutine;
-        _waitForLoadingScene = true;
-        Load(SceneNames.Loading);
-    }
-
-    private IEnumerator LoadSceneAsyncCoroutine(string sceneName)
-    {
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
-        operation.allowSceneActivation = false;
-        float startTime = Time.unscaledTime;
-        while (!operation.isDone)
-        {
-            bool minDurationReached = Time.unscaledTime - startTime >= minimumLoadingDuration;
-            bool loadingReady = operation.progress >= 0.9f;
-
-            if (loadingReady && minDurationReached)
+            // Wait for it to finish
+            while (!op.isDone)
             {
-                operation.allowSceneActivation = true;
+                Debug.Log("Loading hasn't finished yet");
+                await Task.Yield();
             }
-            yield return null;
         }
-
-        Debug.Log($"Loaded Scene Asynchronously: {sceneName}");
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (!_waitForLoadingScene)
-            return;
-
-        if (scene.name != SceneNames.Loading)
-            return;
-
-        _waitForLoadingScene = false;
-
-        if (string.IsNullOrWhiteSpace(_pendingSceneName))
+        else
         {
-            Debug.LogError("SceneLoader: pending scene is empty after Loading scene opened.");
-            return;
+            Debug.LogError("No more scenes in Build Settings!");
+            if (loadingScreen != null) loadingScreen.SetActive(false);
         }
-
-        StartCoroutine(LoadPendingSceneFlow());
-    }
-
-    private IEnumerator LoadPendingSceneFlow()
-    {
-        // Даем Loading сцене гарантированно отрисоваться хотя бы один кадр.
-        yield return null;
-
-        if (_pendingPreloadRoutine != null)
-        {
-            yield return StartCoroutine(_pendingPreloadRoutine.Invoke());
-        }
-
-        string sceneToLoad = _pendingSceneName;
-        _pendingSceneName = null;
-        _pendingPreloadRoutine = null;
-
-        yield return StartCoroutine(LoadSceneAsyncCoroutine(sceneToLoad));
     }
 }

@@ -13,7 +13,7 @@ public class GameManager : NetworkBehaviour
 {
     // Singleton instance
     public static GameManager Instance { get; private set; }
-    public GameState CurrentState { get; private set; } = GameState.MainMenu;
+    public GameState CurrentState { get; private set; }
 
     public override void Spawned()
     {
@@ -45,8 +45,7 @@ public class GameManager : NetworkBehaviour
     {
         CurrentState = GameState.MainMenu;
         Time.timeScale = 1f;
-        SceneLoader.Instance.Load(SceneNames.MainMenu);
-        SceneLoader.Instance.LoadWithLoading(SceneNames.GameScene);
+        SceneLoader.Instance.LoadScene();
         if (InputManager.Instance != null)
         {
             InputManager.Instance.EnableUIInput();

@@ -1,23 +1,18 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Оружие ближнего боя.
-/// Реализует атаку через сферу вокруг точки удара.
-/// </summary>
 public class MeleeWeapon : WeaponBase
 {
-    [Header("Параметры ближней атаки")]
-    [Tooltip("Точка, откуда считается удар (обычно у меча/руки).")]
+    [Header("Melee attack parameters")]
+    [Tooltip("The point from which the attack is calculated (usually the sword/hand).")]
     [SerializeField]
     private Transform attackOrigin;
 
-    [Tooltip("Радиус удара. Если 0, можно использовать Range из WeaponData.")]
+    [Tooltip("The radius of the attack. If 0, the Range from WeaponData can be used.")]
     [SerializeField]
     private float hitRadius = 1.5f;
 
-    [Tooltip("Слои, по которым можно наносить урон (враги, разрушаемые объекты).")]
+    [Tooltip("Layers that can be damaged by this attack (enemies, breakable objects).")]
     [SerializeField]
     private LayerMask hitLayers;
 

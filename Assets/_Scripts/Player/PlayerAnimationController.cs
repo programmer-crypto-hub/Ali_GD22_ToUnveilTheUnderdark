@@ -29,7 +29,7 @@ public class PlayerAnimationController : NetworkBehaviour
     [SerializeField] private string attackTriggerParameter = "Attack";
 
     [Tooltip("Имя int-параметра типа атаки в Animator Controller. Через него Animator решает, какой attack-state запускать: melee или ranged.")]
-    [SerializeField] private string attackTypeParameter = "AttackType";
+    [SerializeField] private string attackTypeParameter = "AttackType"; 
 
     [Tooltip("Имя bool-параметра смерти в Animator Controller.")]
     [SerializeField] private string isDeadParameter = "IsDead";

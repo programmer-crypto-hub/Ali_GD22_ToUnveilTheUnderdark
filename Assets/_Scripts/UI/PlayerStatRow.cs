@@ -6,8 +6,8 @@ public class PlayerStatRow : MonoBehaviour
 {
     [Header("Player Stats")]
     [Tooltip("Script referrals for the player stats texts.")]
-    private PlayerStats playerStats;
-    private PlayerProgression playerProgression;
+    private readonly PlayerStats playerStats;
+    [SerializeField]private PlayerProgression playerProgression;
 
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI healthText;
@@ -23,6 +23,5 @@ public class PlayerStatRow : MonoBehaviour
         goldText.text = $"{gold}";
         xpText.text = $"{xp}";
         xpLevelText.text = $"(Level: {playerProgression.CurrentLevel})";
-        string finalXPText = xpText.text + xpLevelText.text;
     }
 }
