@@ -9,7 +9,7 @@ public class NetworkMapManager : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnSeedChanged))]
     public int MapSeed { get; set; }
 
-    //public DungeonGenerator Grid2DGenerator;
+    public DungeonGeneratorGrid2D generator;
 
     public override void Spawned()
     {
@@ -40,10 +40,12 @@ public class NetworkMapManager : NetworkBehaviour
             Debug.LogError("EventBus is missing! Check if it's in the current scene or was destroyed.");
             return;
         }
-        //// 2. Trigger the generation
-        //// Note: Use 'Generate()' for runtime generation
-        //Grid2DGenerator.Generate();
+        UnityEngine.Random.InitState(seed);
+        // 2. Trigger the generation
+        // Note: Use 'Generate()' for runtime generation
         EventBus.Instance.RaiseMapGenerated();
+        generator = GetComponent<DungeonGeneratorGrid2D>();
+        generator.Generate(); // Everyone builds the same Lego set!
     }
 
 }

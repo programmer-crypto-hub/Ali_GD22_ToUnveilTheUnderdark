@@ -1,196 +1,104 @@
 using UnityEngine;
 using Fusion;
 
-/// <summary>
-/// Назначение: отдельная точка боевой логики игрока.
-/// Что делает: принимает запрос на атаку, проверяет условия, запускает анимацию и обрабатывает Animation Event.
-/// Связи: использует PlayerStats, WeaponManager и PlayerAnimationController. Через этот класс позже удобно подключать звук, VFX и shake камеры.
-/// Паттерны: Single Responsibility, Orchestrator для боевого цикла игрока.
-/// </summary>
 public class PlayerCombatController : NetworkBehaviour
 {
-    [Header("Связи")]
-    [Tooltip("Статы игрока. Нужны для проверки смерти и блокировки атаки.")]
+    [Header("Connections")]
     [SerializeField] private PlayerStats playerStats;
-
-    [Tooltip("Менеджер оружия игрока. Через него берётся текущее оружие и выполняется его Attack().")]
     [SerializeField] private WeaponManager weaponManager;
-
-    [Tooltip("Контроллер анимации игрока. Он только запускает анимационные состояния.")]
     [SerializeField] private PlayerAnimationController playerAnimationController;
 
-    [Header("Будущие звук и эффекты")]
-    [Tooltip("Источник звука для будущих SFX атаки. Пока это болванка под дальнейшее расширение уроков.")]
+    [Header("Effects")]
     [SerializeField] private AudioSource audioSource;
-
-    [Tooltip("Точка, из которой удобно выпускать визуальные эффекты атаки: вспышку, след, частицы, muzzle flash.")]
     [SerializeField] private Transform attackEffectPoint;
-
-    [Tooltip("Заготовка эффекта старта атаки. Например, лёгкая вспышка, след меча или эффект натяжения тетивы.")]
     [SerializeField] private GameObject attackStartEffectPrefab;
-
-    [Tooltip("Заготовка эффекта в момент действия атаки. Для melee это может быть вспышка удара, для ranged — вспышка выстрела.")]
     [SerializeField] private GameObject attackActionEffectPrefab;
 
-    [Header("Отладка")]
-    [Tooltip("Если включено, контроллер будет писать в Console подробные сообщения о фазах атаки.")]
-    [SerializeField] private bool enableDebugLogs;
+    // Use a networked "count" or "state" to trigger animations on proxies
+    [Networked] private int AttackTriggerCount { get; set; }
+    private int _localAttackCount;
 
-    private bool isAttackInProgress;
+    private bool _isAttackInProgress;
 
-    public override void Spawned()
+    public override void Render()
     {
-        if (playerStats == null)
-            playerStats = GetComponent<PlayerStats>();
-
-        if (weaponManager == null)
-            weaponManager = GetComponent<WeaponManager>();
-
-        if (playerAnimationController == null)
-            playerAnimationController = GetComponentInChildren<PlayerAnimationController>();
-
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
+        // Detect if the AttackTriggerCount increased on the network
+        if (AttackTriggerCount > _localAttackCount)
+        {
+            _localAttackCount = AttackTriggerCount;
+            TriggerVisualAttack();
+        }
     }
 
-    /// <summary>
-    /// Пытается начать атаку игрока.
-    /// На этом шаге мы не наносим урон и не спавним projectile:
-    /// мы только запускаем красивую и предсказуемую анимацию.
-    /// </summary>
     public bool TryStartAttack()
     {
-        if (!CanStartAttack())
+        if (!Object.HasInputAuthority || !CanStartAttack())
             return false;
 
-        isAttackInProgress = true;
+        // 1. Tell the server to increment the attack count
+        // This will automatically sync to all clients
+        AttackTriggerCount++;
 
-        PlayerAnimationController.AttackAnimationType attackAnimationType = ResolveAttackAnimationType();
-
-        if (enableDebugLogs)
-            Debug.Log($"{name}: атака запущена, тип анимации = {attackAnimationType}, ждём Animation Event.", this);
-
-        PlayAttackStartEffects();
-        playerAnimationController.PlayAttack(attackAnimationType);
+        _isAttackInProgress = true;
         return true;
     }
 
-    /// <summary>
-    /// Вызывается из Animation Event в тот кадр, когда attack-действие должно реально произойти.
-    /// Для melee это обычно момент удара.
-    /// Для ranged это обычно момент выстрела или спавна projectile.
-    /// </summary>
-    public void HandleAttackActionAnimationEvent()
+    private void TriggerVisualAttack()
     {
-        if (!isAttackInProgress)
-            return;
+        var type = ResolveAttackAnimationType();
+        playerAnimationController.PlayAttack(type);
 
-        if (weaponManager == null)
-            return;
-
-        weaponManager.PerformCurrentWeaponAttack();
-        PlayAttackActionEffects();
-
-        if (enableDebugLogs)
-            Debug.Log($"{name}: сработал Animation Event действия атаки.", this);
+        // Play local-only "wind up" effects
+        PlayAttackStartEffects();
     }
 
-    /// <summary>
-    /// Вызывается из Animation Event в конце клипа атаки.
-    /// Снимает внутреннюю блокировку и позволяет начать следующую атаку.
-    /// </summary>
+    // Called by Unity Animation Event
+    public void HandleAttackActionAnimationEvent()
+    {
+        // ONLY the person who "owns" this player should calculate damage
+        if (!Object.HasStateAuthority) return;
+
+        if (weaponManager.weaponPrefabs != null)
+        {
+            weaponManager.PerformCurrentWeaponAttack();
+            // Tell everyone to play the "Hit/Muzzle" effect
+            RPC_PlayActionEffects();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayActionEffects()
+    {
+        // This runs on everyone's machine
+        if (attackActionEffectPrefab != null && attackEffectPoint != null)
+            Instantiate(attackActionEffectPrefab, attackEffectPoint.position, attackEffectPoint.rotation);
+
+        // audioSource.PlayOneShot(attackClip);
+    }
+
     public void HandleAttackFinishedAnimationEvent()
     {
-        isAttackInProgress = false;
-
-        if (enableDebugLogs)
-            Debug.Log($"{name}: анимация атаки завершена.", this);
+        _isAttackInProgress = false;
     }
 
     private bool CanStartAttack()
     {
-        if (playerStats == null || weaponManager == null || playerAnimationController == null)
-            return false;
-
-        if (playerStats.IsDead)
-            return false;
-
-        if (isAttackInProgress)
-            return false;
-
-        if (weaponManager.CurrentWeapon == null)
-            return false;
-
-        return weaponManager.CurrentWeapon.CanAttack();
+        var weapon = weaponManager.CurrentWeapon;
+        return playerStats != null && !playerStats.IsDead && !_isAttackInProgress 
+        && weaponManager.weaponPrefabs != null && weapon != null && weapon.CanAttack(); 
     }
 
-    /// <summary>
-    /// Определяет, какую анимацию атаки нужно запускать для текущего оружия.
-    /// Сейчас правило очень простое и хорошо читается на уроке:
-    /// если текущее оружие дальнее, играем ranged-анимацию,
-    /// во всех остальных случаях — melee-анимацию.
-    /// </summary>
     private PlayerAnimationController.AttackAnimationType ResolveAttackAnimationType()
     {
-        if (weaponManager == null || weaponManager.CurrentWeapon == null)
-            return PlayerAnimationController.AttackAnimationType.Melee;
-
-        // Это удобная учебная точка расширения.
-        // Позже, если появятся:
-        // - тяжёлая атака,
-        // - магия,
-        // - комбо,
-        // - специальный выстрел,
-        // здесь можно будет сделать более богатое правило выбора анимации,
-        // не трогая WeaponManager и не засоряя PlayerAnimationController боевой логикой.
-        if (weaponManager.CurrentWeapon is RangedWeapon)
+        var weapon = weaponManager.CurrentWeapon;
+        if (weapon is RangedWeapon) // Assuming RangedWeapon exists
             return PlayerAnimationController.AttackAnimationType.Ranged;
-
         return PlayerAnimationController.AttackAnimationType.Melee;
     }
 
-    /// <summary>
-    /// Болванка под стартовые эффекты атаки.
-    /// Сюда позже удобно добавлять:
-    /// - звук замаха мечом;
-    /// - натяжение лука;
-    /// - включение trail renderer;
-    /// - лёгкую вспышку/частицы у оружия.
-    /// </summary>
     private void PlayAttackStartEffects()
     {
         if (attackStartEffectPrefab != null && attackEffectPoint != null)
             Instantiate(attackStartEffectPrefab, attackEffectPoint.position, attackEffectPoint.rotation);
-
-        if (audioSource != null)
-        {
-            // Здесь позже можно вызывать:
-            // audioSource.PlayOneShot(attackStartClip);
-            // Пока оставляем только точку расширения, чтобы не перегружать урок.
-        }
-    }
-
-    /// <summary>
-    /// Болванка под эффекты в кадр реального действия атаки.
-    /// Самая удобная точка для будущего расширения:
-    /// - звук попадания/выстрела;
-    /// - muzzle flash;
-    /// - частицы удара;
-    /// - shake камеры;
-    /// - вспышка на оружии;
-    /// - spawn дополнительных VFX, если они должны совпасть с gameplay.
-    /// </summary>
-    private void PlayAttackActionEffects()
-    {
-        if (attackActionEffectPrefab != null && attackEffectPoint != null)
-            Instantiate(attackActionEffectPrefab, attackEffectPoint.position, attackEffectPoint.rotation);
-
-        if (audioSource != null)
-        {
-            // Здесь позже можно вызывать:
-            // audioSource.PlayOneShot(attackActionClip);
-            // Для ranged сюда обычно кладут звук выстрела.
-            // Для melee — звук контакта или "whoosh", если он должен совпасть именно с кадром удара.
-        }
     }
 }

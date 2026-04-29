@@ -11,5 +11,8 @@ public class ShopItem : ScriptableObject
     public int cost;
     public Sprite icon;
     public int requiredRole;
-    public int requiredLevel;
+    // If value is 0, then all Roles can access it (default)
+    // Else, only the Role with that ID can access it (PlayerRoles.RoleType enum) (1 or 2)
+    // Only Mage and Medic should have limited items (medkits, potions)
+    public int requiredLevel = 0;
 }

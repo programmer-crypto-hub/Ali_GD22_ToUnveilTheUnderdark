@@ -146,13 +146,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29b9777988882e34ba4ebce63d912b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
-  playerStats: {fileID: 5278182071796830282}
-  playerCombatController: {fileID: 7662427363872413756}
-  weaponInstances:
-  - {fileID: 6558033684945617869}
-  - {fileID: 6338318759080299098}
-  weaponAvailableAtStart: 0101
-  defaultWeaponIndexInAvailable: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _UnlockedWeaponMask: 0
+  _CurrentWeaponIndex: 0
+  weaponPrefabs: []
 --- !u!95 &4078633969993388044
 Animator:
   serializedVersion: 7
@@ -228,6 +227,8 @@ MonoBehaviour:
   - {fileID: 6747959071256591159}
   - {fileID: 7662427363872413756}
   - {fileID: -6294055781264973135}
+  - {fileID: 6558033684945617869}
+  - {fileID: 6338318759080299098}
   - {fileID: 4296370042023099379}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8797494165056479139
@@ -372,7 +373,6 @@ MonoBehaviour:
   attackEffectPoint: {fileID: 0}
   attackStartEffectPrefab: {fileID: 0}
   attackActionEffectPrefab: {fileID: 0}
-  enableDebugLogs: 0
 --- !u!114 &-6294055781264973135
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,11 +15,29 @@ MonoBehaviour:
   Connections: []
   CorridorIndividualRoomTemplates: []
   CorridorRoomTemplateSets: []
-  DefaultIndividualRoomTemplates: []
+  DefaultIndividualRoomTemplates:
+  - {fileID: 5897277536528680458, guid: 62bd72b9444e6e14e93c4e8590dff350, type: 3}
   DefaultRoomTemplateSets: []
-  Rooms: []
+  Rooms:
+  - {fileID: 3808089565729487351}
   EditorData:
     PanOffset: {x: 0, y: 0}
     Zoom: 1
   RoomType: Edgar.Unity.Room
   ConnectionType: Edgar.Unity.Connection
+--- !u!114 &3808089565729487351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8074dc491ddc34f4e83332d9eae76980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Edgar.Unity::Edgar.Unity.Room
+  Position: {x: 352, y: 240}
+  Name: Room
+  IndividualRoomTemplates: []
+  RoomTemplateSets: []
