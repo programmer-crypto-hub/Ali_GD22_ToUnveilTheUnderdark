@@ -106,15 +106,14 @@ public class WeaponManager : NetworkBehaviour
     {
         // 1. Detect enemies in a circle in front of the player
         Vector2 attackPos = (Vector2)transform.position + (Vector2)transform.up * 0.5f;
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPos, weapon.Range, enemyLayer);
+        Collider2D[] hitObjects = Physics2D.OverlapCircleAll(attackPos, weapon.Range, enemyLayer);
 
-        foreach (var enemy in hitEnemies)
+        foreach (var obj in hitObjects)
         {
-            // 2. Apply damage via the enemy's networked stats script
-            if (enemy.TryGetComponent<EnemyStats>(out var stats))
+            // Interface check instead of a specific script!
+            if (obj.TryGetComponent<IDamageable>(out var damageable))
             {
-                stats.TakeDamage(weapon.Damage + playerStats.CurrentHealth);
-                Debug.Log($"Hit {enemy.name} for {weapon.Damage} damage!");
+                damageable.TakeDamage(weapon.Damage);
             }
         }
     }

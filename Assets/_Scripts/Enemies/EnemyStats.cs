@@ -1,114 +1,74 @@
-/*
- * EnemyStats
- * Назначение: совместимый адаптер над EnemyBase для систем, ожидающих EnemyStats.
- * Что делает: проксирует характеристики/урон/смерть и ретранслирует событие OnDied.
- * Связи: используется EnemyDeathRewarder и другими подсистемами, где ожидается EnemyStats.
- * Паттерны: Adapter, Facade.
- */
-
 using System;
 using UnityEngine;
 using Fusion;
 
-/// <summary>
-/// Адаптер к EnemyBase для совместимости с системами наград/подписок.
-/// Источник истины по здоровью/смерти находится в EnemyBase.
-/// </summary>
-public class EnemyStats : NetworkBehaviour
+public class EnemyStats : NetworkBehaviour, IDamageable
 {
-    [Header("Ссылки")]
-    [Tooltip("Компонент EnemyBase, который хранит runtime-состояние врага.")]
-    [SerializeField] private EnemyBase enemyBase;
+    [Header("Data Source")]
+    [Tooltip("The Scriptable Object holding this enemy's default rules.")]
+    [SerializeField] private EnemyData enemyData;
 
-    public EnemyData EnemyData => enemyBase != null ? enemyBase.Data : null;
-    public float MaxHealth => enemyBase != null ? enemyBase.MaxHealth : 0f;
-    public float MoveSpeed => enemyBase != null ? enemyBase.MoveSpeed : 0f;
-    public float Damage => enemyBase != null ? enemyBase.Damage : 0f;
-    public float AttackRange => enemyBase != null ? enemyBase.AttackRange : 0f;
-    public float DetectionRange => enemyBase != null ? enemyBase.DetectionRange : 0f;
-    public float ExperienceReward => EnemyData != null ? EnemyData.experienceReward : 0f;
+    // 1. NETWORKED STATE
+    // This is the only thing that changes, so it's the only thing that's [Networked].
+    [Networked] public float CurrentHP { get; set; }
 
-    /// <summary>
-    /// Событие смерти в формате EnemyStats для обратной совместимости.
-    /// </summary>
+    // 2. READ-ONLY SHORTCUTS (From Scriptable Object)
+    public float ExperienceReward => enemyData != null ? enemyData.experienceReward : 20f;
+    public float MaxHP => enemyData != null ? enemyData.maxHealth : 100f;
+    public float Damage => enemyData != null ? enemyData.damage : 10f;
+    public float MoveSpeed => enemyData != null ? enemyData.moveSpeed : 3f;
+    public float AttackRange => enemyData != null ? enemyData.attackRange : 1.5f;
+
+    // 3. IDAMAGEABLE IMPLEMENTATION
+    public bool IsDead => CurrentHP <= 0;
+
     public event Action<EnemyStats> OnDied;
 
     public override void Spawned()
     {
-        // EnemyStats — компонент “обвязки”.
-        // Чтобы префабы были устойчивыми, стараемся автоматически найти EnemyBase на том же объекте.
-        if (enemyBase == null)
-            enemyBase = GetComponent<EnemyBase>();
-
-        if (enemyBase == null)
-            Debug.LogError("EnemyStats: отсутствует EnemyBase на объекте.", this);
+        // Only the Server/Host initializes the HP to prevent client desyncs
+        if (Object.HasStateAuthority && CurrentHP == 0)
+        {
+            CurrentHP = MaxHP;
+        }
     }
 
-    private void OnEnable()
-    {
-        // Важно: подписки на события делаем в OnEnable,
-        // чтобы при Disable/Enable компонента не оставались “висячие” подписки.
-        if (enemyBase != null)
-            enemyBase.OnDied += HandleEnemyBaseDied;
-    }
-
-    private void OnDisable()
-    {
-        // И симметрично отписываемся в OnDisable.
-        if (enemyBase != null)
-            enemyBase.OnDied -= HandleEnemyBaseDied;
-    }
-
-    /// <summary>
-    /// Совместимый метод инициализации из EnemyData.
-    /// </summary>
+    // This method is called by the RoomEncounterHandler
     public void Setup(EnemyData data)
     {
-        // В большинстве случаев EnemyData назначается не в инспекторе, а “снаружи”:
-        // спавнер создаёт префаб и передаёт конфиг врага методом Setup(data).
-        if (enemyBase == null)
-        {
-            Debug.LogWarning("EnemyStats.Setup: EnemyBase не назначен.", this);
-            return;
-        }
+        if (!Object.HasStateAuthority) return;
 
-        enemyBase.Setup(data);
+        enemyData = data;
+        CurrentHP = MaxHP;
     }
 
-    /// <summary>
-    /// Совместимый метод получения урона.
-    /// </summary>
+    // 4. NETWORKED COMBAT LOGIC
     public void TakeDamage(float damage)
     {
-        // EnemyStats не хранит здоровье сам — он только прокидывает вызов в EnemyBase.
-        if (enemyBase == null)
-        {
-            Debug.LogWarning("EnemyStats.TakeDamage: EnemyBase не назначен.", this);
-            return;
-        }
+        // Only the server actually deducts health to prevent cheating
+        if (!Object.HasStateAuthority) return;
 
-        enemyBase.TakeDamage(damage);
+        if (IsDead) return;
+
+        CurrentHP -= damage;
+        Debug.Log($"{name} took {damage} damage. HP remaining: {CurrentHP}");
+
+        if (IsDead)
+        {
+            Die();
+        }
     }
 
-    /// <summary>
-    /// Совместимый метод смерти.
-    /// </summary>
-    public virtual void Die()
+    public void Die()
     {
-        // Аналогично: смерть хранится в EnemyBase, а EnemyStats оставлен для совместимости API.
-        if (enemyBase == null)
-        {
-            Debug.LogWarning("EnemyStats.Die: EnemyBase не назначен.", this);
-            return;
-        }
+        if (!Object.HasStateAuthority) return;
 
-        enemyBase.Die();
-    }
+        Debug.Log($"{name} has died.");
 
-    private void HandleEnemyBaseDied()
-    {
-        // Переводим событие “умер EnemyBase” в событие “умер EnemyStats”.
-        // Так системам наград/спавна/пула удобнее работать с одним типом события.
+        // Notify any local systems (like a UI stats panel)
         OnDied?.Invoke(this);
+
+        // Despawn deletes the object across the network for everyone
+        Runner.Despawn(Object);
     }
 }

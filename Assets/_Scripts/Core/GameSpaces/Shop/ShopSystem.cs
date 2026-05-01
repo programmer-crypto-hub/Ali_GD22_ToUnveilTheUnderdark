@@ -9,8 +9,9 @@ public class ShopSystem : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_RequestPurchase(int itemID)
     {
+        if (!HasStateAuthority) return;
         // 1. Turn Check
-        //if (Object.InputAuthority != GameSession.Instance.CurrentTurnPlayer) return;
+        if (Object.InputAuthority != GameSession.Instance.CurrentTurnPlayer) return;
 
         // 2. Lookup item data from the SO Database
         ShopItem item = masterDatabase.GetItemByID(itemID);

@@ -47,13 +47,13 @@ public class PlayerMovement : NetworkBehaviour
     public void OnDiceRolled()
     {
         if (!HasStateAuthority) return;
-        currentDiceValue = DiceManager.Instance.diceRollResult;
-        DiceManager.Instance.DisplayDice(currentDiceValue);
+        currentDiceValue = DiceRoller.Instance.DiceRollResult;
+        DiceUI.Instance.HandleDiceRolled(currentDiceValue);
 
         if (GameManager.Instance.CurrentState == GameState.Playing)
         {
             // Конвертируем результат броска кубика в количество шагов для перемещения игрока
-            DiceManager.Instance.ConvertDiceToMovement();
+            DiceRoller.Instance.ConvertDiceToMovement();
             playerController.HandleMovement();
             // Здесь можно добавить логику для перемещения игрока на основе результата броска кубика
             Debug.Log($"Игрок может переместиться на {currentDiceValue} шагов.");
@@ -62,7 +62,7 @@ public class PlayerMovement : NetworkBehaviour
         if (GameManager.Instance.CurrentState == GameState.Combat)
         {
             float damage = 0;
-            DiceManager.Instance.ConvertDiceToCombat(damage);
+            DiceRoller.Instance.ConvertDiceToCombat();
             currentDamage *= damage;
             // Логика для боя, если игрок находится в боевом состоянии
             Debug.Log($"Игрок атакует с силой {currentDamage} и броском кубика {currentDiceValue}.");

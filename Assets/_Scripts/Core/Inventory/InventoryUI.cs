@@ -4,36 +4,133 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
-    public GameObject iconPrefab; // A simple UI Image prefab
-    public Transform container;
+    [Header("Data References")]
     public ItemDatabase database;
 
-    public void OpenInventory()
+    [Header("UI Panels")]
+    public GameObject upperGridPanel;  // Your 30-slot background
+    public GameObject lowerBarPanel;   // Your 10-slot hotbar at the bottom
+
+    [Header("Prefabs & Parents")]
+    public GameObject slotPrefab; // A simple blank UI image prefab
+    public Transform gridContainer; // The GameObject with the Grid Layout Group
+
+    [Header("Static References")]
+    [Tooltip("Keep manually dragging your 10 lower hotbar images here!")]
+    public Image[] lowerBarSlots;
+
+    // This array will hold the 30 spawned upper images automatically
+    private Image[] _upperGridSlots = new Image[30];
+    private bool _hasGeneratedGrid = false;
+
+    public enum InventoryVisualState
     {
-        gameObject.SetActive(true);
+        DefaultLower,
+        Expanded
+    }
+    public InventoryVisualState currentState = InventoryVisualState.DefaultLower;
+
+    private bool _isExpanded = false;
+    private void Start()
+    {
+        GenerateUpperGrid();
+    }
+
+    private void GenerateUpperGrid()
+    {
+        if (_hasGeneratedGrid) return;
+
+        for (int i = 0; i < 30; i++)
+        {
+            // 1. Instantiate the blank icon
+            GameObject newSlot = Instantiate(slotPrefab, gridContainer);
+
+            // 2. Name it nicely for debugging
+            newSlot.name = $"Slot_{i}";
+
+            // 3. Grab the Image component and save it to our array
+            _upperGridSlots[i] = newSlot.GetComponent<Image>();
+        }
+
+        _hasGeneratedGrid = true;
+    }
+
+    public void ToggleInventoryExpansion()
+    {
+        // Simple toggle switch
+        currentState = (currentState == InventoryVisualState.DefaultLower)
+            ? InventoryVisualState.Expanded
+            : InventoryVisualState.DefaultLower;
+
         RefreshUI();
     }
 
     private void RefreshUI()
     {
-        // 1. Clear old icons
-        foreach (Transform child in container) Destroy(child.gameObject);
-
-        // 2. Get the local player
         var runner = FindFirstObjectByType<NetworkRunner>();
-        var localPlayer = runner.GetPlayerObject(runner.LocalPlayer).GetComponent<PlayerStats>();
+        if (runner == null) return;
 
-        // 3. Loop through your [Networked] Array
-        foreach (int id in localPlayer.InventoryItemIDs)
+        var playerObj = runner.GetPlayerObject(runner.LocalPlayer);
+        if (playerObj == null) return;
+
+        var localPlayerStats = playerObj.GetComponent<PlayerStats>();
+
+        // CLEAN SWITCH CASE: Managing UI displays and index mappings
+        switch (currentState)
         {
-            if (id == 0) continue; // Skip empty slots
+            case InventoryVisualState.DefaultLower:
+                upperGridPanel.SetActive(false);
+                lowerBarPanel.SetActive(true);
 
-            // 4. Create the icon using the Database
-            ShopItem item = database.GetItemByID(id);
-            GameObject iconObj = Instantiate(iconPrefab, container);
-            iconObj.GetComponent<Image>().sprite = item.icon;
+                for (int i = 0; i < lowerBarSlots.Length; i++)
+                {
+                    // Pulls strictly from network indices 20 to 29
+                    int itemID = localPlayerStats.InventoryItemIDs[20 + i];
+                    UpdateSlotVisual(lowerBarSlots[i], itemID);
+                }
+                break;
 
-            // Optional: Add a button to the icon to show tooltips!
+            case InventoryVisualState.Expanded:
+                upperGridPanel.SetActive(true);
+                lowerBarPanel.SetActive(false);
+
+                for (int i = 0; i < _upperGridSlots.Length; i++)
+                {
+                    int itemID;
+
+                    // Classic shift: The first 10 slots of the upper grid 
+                    // grab data from the hotbar's network indices (20-29)
+                    if (i < 10)
+                    {
+                        itemID = localPlayerStats.InventoryItemIDs[20 + i];
+                    }
+                    else
+                    {
+                        // The remaining 20 slots pull from indices 0-19
+                        itemID = localPlayerStats.InventoryItemIDs[i - 10];
+                    }
+
+                    UpdateSlotVisual(_upperGridSlots[i], itemID);
+                }
+                break;
+        }
+    }
+
+    private void UpdateSlotVisual(Image slotImage, int itemID)
+    {
+        if (itemID == 0)
+        {
+            slotImage.enabled = false;
+            slotImage.sprite = null;
+        }
+        else
+        {
+            ShopItem item = database.GetItemByID(itemID);
+            if (item != null)
+            {
+                slotImage.sprite = item.icon;
+                slotImage.enabled = true;
+            }
         }
     }
 }

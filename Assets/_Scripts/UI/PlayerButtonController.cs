@@ -44,7 +44,7 @@ public class PlayerButtonController : MonoBehaviour
     }
     public void BindToPlayer()
     {
-        rollDiceButton.onClick.AddListener(DiceManager.Instance.RPC_RequestRollDice);
+        rollDiceButton.onClick.AddListener(DiceRoller.Instance.RPC_RequestRollDice);
         endTurnButton.onClick.AddListener(GameSession.Instance.RPC_RequestEndTurn);
         shopButton.onClick.AddListener(() => ShopUIManager.Instance.ToggleShop(true));
 

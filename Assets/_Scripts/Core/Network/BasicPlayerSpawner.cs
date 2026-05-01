@@ -138,7 +138,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 
     async void StartGame(GameMode mode)
     {
-        var _runner = FindFirstObjectByType<NetworkRunner>();
+        _runner = FindFirstObjectByType<NetworkRunner>();
         GameObject go = new GameObject("Fusion_Network_Runner");
         if (_runner == null)
             _runner = go.AddComponent<NetworkRunner>();

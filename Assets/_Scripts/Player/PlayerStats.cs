@@ -29,7 +29,7 @@ public class PlayerStats : NetworkBehaviour
     public int currentPlayerLevel { get; set; }
     public int maxLevel = 20;
 
-    [Networked, Capacity(20)] // Max 20 items
+    [Networked, Capacity(30)] // Max 30 items
     public NetworkArray<int> InventoryItemIDs => default;
 
     [Networked]
@@ -117,14 +117,8 @@ public class PlayerStats : NetworkBehaviour
         {
             OnDeath?.Invoke();
             // Since Animator isn't networked by default, use an RPC for the animation
-            RPC_PlayDeathAnimation();
+            playerAnim.SetInteger("health", -1);
         }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayDeathAnimation()
-    {
-        playerAnim.SetInteger("health", -1);
     }
 
     public void Heal(int amount)

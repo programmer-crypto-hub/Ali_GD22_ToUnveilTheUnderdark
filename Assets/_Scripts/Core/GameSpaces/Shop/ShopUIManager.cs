@@ -74,7 +74,7 @@ public class ShopUIManager : NetworkBehaviour
             slot.buyButton.interactable = canAfford && roleMatch && levelMatch;
             slot.lockOverlay.SetActive(!levelMatch);
 
-            if (localPlayer.currentPlayerLevel < item.requiredLevel)
+            if (localPlayer.currentPlayerLevel < item.requiredLevel && !levelMatch)
             {
                 slot.lockOverlay.SetActive(true);
                 slot.lockLevelText.text = $"Reach Level {item.requiredLevel}";
@@ -85,28 +85,13 @@ public class ShopUIManager : NetworkBehaviour
                 slot.lockOverlay.SetActive(false);
             }
 
-            bool levelMet = localPlayer.currentPlayerLevel >= item.requiredLevel;
-            slot.lockOverlay.SetActive(!levelMet);
-            if (!levelMet) slot.lockLevelText.text = $"Level {item.requiredLevel}";
             slot.Setup(item, canAfford, roleMatch);
 
             slot.buyButton.onClick.AddListener(() => {
                 localPlayer.GetComponent<ShopSystem>().RPC_RequestPurchase(item.itemID);
                 ToggleShop(false); // Close shop after buying
             });
-        }
-        foreach (int id in localPlayer.InventoryItemIDs)
-        {
-            if (id == 0) continue; // Skip empty slots
-
-            // Get the visual data from your Master Database
-            ShopItem item = masterDatabase.GetItemByID(id);
-
-            // Instantiate a simple icon prefab
-            GameObject icon = Instantiate(itemPrefab, itemContainer);
-            icon.GetComponent<Image>().sprite = item.icon;
-
-            // Add a tooltip trigger here so you can see the description!
+            slot.buyButton.onClick.RemoveAllListeners();
         }
     }
 }
