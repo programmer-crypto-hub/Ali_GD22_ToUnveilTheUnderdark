@@ -44,9 +44,24 @@ public class PlayerButtonController : MonoBehaviour
     }
     public void BindToPlayer()
     {
-        rollDiceButton.onClick.AddListener(DiceRoller.Instance.RPC_RequestRollDice);
-        endTurnButton.onClick.AddListener(GameSession.Instance.RPC_RequestEndTurn);
-        shopButton.onClick.AddListener(() => ShopUIManager.Instance.ToggleShop(true));
+        rollDiceButton.onClick.AddListener(() => {
+            if (DiceRoller.Instance != null)
+            {
+                DiceRoller.Instance.RPC_RequestRollDice();
+            }
+        });
+        endTurnButton.onClick.AddListener(() => {
+            if (GameSession.Instance != null)
+            {
+                GameSession.Instance.RPC_RequestEndTurn();
+            }
+        });
+        shopButton.onClick.AddListener(() => {
+            if (ShopUIManager.Instance != null)
+            {
+                ShopUIManager.Instance.ToggleShop(true);
+            }
+        });
 
         Debug.Log("UI Bound to local player after Edgar generation.");
     }

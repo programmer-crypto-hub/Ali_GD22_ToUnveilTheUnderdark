@@ -92,7 +92,7 @@ public class PlayerController : NetworkBehaviour
             if (move.magnitude > 0.1f)
             {
                 transform.position += move.normalized * speed * Runner.DeltaTime;
-                if (GameManager.Instance.CurrentState == GameState.Playing)
+                if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
                     playerStats.playerAnim.SetTrigger("walk_trig");
             }
         }

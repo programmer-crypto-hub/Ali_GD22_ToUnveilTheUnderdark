@@ -3,10 +3,9 @@ using UnityEngine;
 
 /*
  * LevelSequenceData
- * Назначение: хранит порядок игровых сцен для vertical slice прохождения.
- * Зачем нужен: мы не хардкодим порядок уровней в GameManager, а выносим его в данные.
- * Как реализовано: ScriptableObject со строковыми именами сцен в том порядке,
- * в котором игрок должен проходить уровни.
+ * Usage: contains the ordered list of level scene names for the vertical slice run.
+ * Reason for usage: to have a single source of truth for the level progression order, which can be easily edited in the Unity Editor.
+ * As an SO with string references, it avoids hardcoding scene names in multiple places and allows designers to change the level order without code changes.
  */
 [CreateAssetMenu(
     fileName = "LevelSequenceData",
@@ -17,14 +16,10 @@ public class LevelSequenceData : ScriptableObject
     [Tooltip("Ordered list of gameplay scenes for the vertical slice run.")]
     [SerializeField] private string[] levelSceneNames = { SceneNames.GameScene };
 
-    /// <summary>
-    /// Количество уровней в последовательности.
-    /// </summary>
     public int LevelCount => levelSceneNames != null ? levelSceneNames.Length : 0;
 
     /// <summary>
-    /// Безопасно возвращает имя сцены по индексу.
-    /// Возвращает false, если индекс выходит за границы или имя пустое.
+    /// Safely tries to get the scene name for a given level index.
     /// </summary>
     public bool TryGetLevelSceneName(int index, out string sceneName)
     {
@@ -42,8 +37,7 @@ public class LevelSequenceData : ScriptableObject
     }
 
     /// <summary>
-    /// Находит индекс уровня по имени сцены.
-    /// Нужен GameManager, чтобы понять, какой уровень активен сейчас.
+    /// Finds the index of a given scene name in the level sequence. Returns -1 if not found or if input is invalid.
     /// </summary>
     public int FindLevelIndex(string sceneName)
     {

@@ -155,7 +155,7 @@ public class GameLoopFlowController : NetworkBehaviour
         if (GameManager.Instance == null)
             return false;
 
-        return GameManager.Instance.CurrentState == GameState.Playing;
+        return GameManager.Instance.CurrentState == GameManager.GameState.Playing;
     }
 
     private void HandlePlayerDeath()
@@ -170,7 +170,7 @@ public class GameLoopFlowController : NetworkBehaviour
 
         flowFinished = true;
         if (GameManager.Instance != null)
-            GameManager.Instance.EnterLoseState();
+            GameManager.Instance.HandleGameOver(GameManager.GameState.Lost);
 
         if (isUiSetupValid && losePanel != null)
             losePanel.SetActive(true);
@@ -189,7 +189,7 @@ public class GameLoopFlowController : NetworkBehaviour
         flowFinished = true;
 
         if (GameManager.Instance != null)
-            GameManager.Instance.EnterWinState();
+            GameManager.Instance.HandleGameOver(GameManager.GameState.Won);
 
         if (isUiSetupValid && winPanel != null)
             winPanel.SetActive(true);
@@ -212,6 +212,6 @@ public class GameLoopFlowController : NetworkBehaviour
     private void HandleMenuClicked()
     {
         if (GameManager.Instance != null)
-            GameManager.Instance.GoToMenu();
+            GameManager.Instance.HandleGameOver(GameManager.GameState.MainMenu);
     }
 }

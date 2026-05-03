@@ -35,7 +35,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (collision.CompareTag("SpaceTrigger"))
         {
-            if (GameManager.Instance.CurrentState == GameState.Playing && currentDiceValue > 0)
+            if (GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
             {
                 currentDiceValue--;
                 collision.enabled = false;
@@ -50,7 +50,7 @@ public class PlayerMovement : NetworkBehaviour
         currentDiceValue = DiceRoller.Instance.DiceRollResult;
         DiceUI.Instance.HandleDiceRolled(currentDiceValue);
 
-        if (GameManager.Instance.CurrentState == GameState.Playing)
+        if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
             // Конвертируем результат броска кубика в количество шагов для перемещения игрока
             DiceRoller.Instance.ConvertDiceToMovement();
@@ -59,7 +59,7 @@ public class PlayerMovement : NetworkBehaviour
             Debug.Log($"Игрок может переместиться на {currentDiceValue} шагов.");
         }
 
-        if (GameManager.Instance.CurrentState == GameState.Combat)
+        if (GameManager.Instance.CurrentState == GameManager.GameState.Combat)
         {
             float damage = 0;
             DiceRoller.Instance.ConvertDiceToCombat();
@@ -76,7 +76,7 @@ public class PlayerMovement : NetworkBehaviour
             Debug.Log("Player has used all movement steps for this turn.");
             return;
         }
-        if (other.gameObject.CompareTag("Enemy") && GameManager.Instance.CurrentState == GameState.Playing && currentDiceValue > 0)
+        if (other.gameObject.CompareTag("Enemy") && GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
         {
             currentDiceValue--; // Decrease remaining steps left to move
             new WaitForEndOfFrame(); // Delay to prevent immediate retriggering

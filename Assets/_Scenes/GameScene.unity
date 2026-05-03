@@ -698,7 +698,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &169223440
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3266,8 +3266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba9d283975c2354ea4e6db04a9aa211, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  levelSequenceResourcePath: Levels/LevelSequence_Default
-  levelSequenceOverride: {fileID: 11400000, guid: 8fc5a613950922a4d835463fb74ec1f3, type: 2}
+  _CurrentState: 0
 --- !u!4 &856115431
 Transform:
   m_ObjectHideFlags: 0
@@ -3574,6 +3573,7 @@ GameObject:
   - component: {fileID: 937395934}
   - component: {fileID: 937395933}
   - component: {fileID: 937395932}
+  - component: {fileID: 937395935}
   m_Layer: 0
   m_Name: NetworkMapManager
   m_TagString: Untagged
@@ -3613,7 +3613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkMapManager
   _MapSeed: 0
-  generator: {fileID: 0}
+  generator: {fileID: 937395935}
 --- !u!4 &937395934
 Transform:
   m_ObjectHideFlags: 0
@@ -3629,6 +3629,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &937395935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937395931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11725bdbb93631241b38951f78cae60c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Edgar.Unity::Edgar.Unity.DungeonGeneratorGrid2D
+  version: 4
+  EnableDiagnostics: 0
+  FixedLevelGraphConfig:
+    LevelGraph: {fileID: 11400000, guid: 80aaf299eac4b8a4fb2112dfaf0f5580, type: 2}
+    UseCorridors: 1
+  GeneratorConfig:
+    RootGameObject: {fileID: 0}
+    Timeout: 10000
+    RepeatModeOverride: 0
+    MinimumRoomDistance: 1
+    RoomTemplatePrefabMode: 0
+  PostProcessConfig:
+    InitializeSharedTilemaps: 1
+    TilemapLayersStructure: 0
+    TilemapLayersHandler: {fileID: 0}
+    TilemapLayersExample: {fileID: 0}
+    TilemapMaterial: {fileID: 0}
+    CopyTilesToSharedTilemaps: 1
+    CenterGrid: 1
+    DisableRoomTemplatesRenderers: 1
+    DisableRoomTemplatesColliders: 1
+    AnalyzeLevelStructure: 1
+  CustomPostProcessTasks: []
+  OtherConfig:
+    UseRandomSeed: 1
+    RandomGeneratorSeed: 0
+    GenerateOnStart: 1
+  AdvancedConfig:
+    ThrowExceptionsImmediately: 0
+  UseRandomSeed: 1
+  RandomGeneratorSeed: 0
+  GenerateOn: 2
+  ThrowExceptionsImmediately: 0
+  DisableCustomPostProcessing: 0
 --- !u!1 &988774499
 GameObject:
   m_ObjectHideFlags: 0
@@ -5854,7 +5900,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1719266315
 RectTransform:
   m_ObjectHideFlags: 0

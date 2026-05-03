@@ -115,7 +115,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
                 runner.SetPlayerObject(player, networkPlayer);
 
                 // 4. Now that the player exists, start the game logic
-                if (GameManager.Instance != null) GameManager.Instance.StartGame();
+                if (GameManager.Instance != null) GameManager.Instance.HandleExploration();
 
                 Debug.Log($"Spawned and assigned player {player}");
             }

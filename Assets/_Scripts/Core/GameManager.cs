@@ -1,238 +1,109 @@
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem.XR.Haptics;
 
-public enum GameState
-{
-    MainMenu = 0,
-    Playing = 1,
-    Combat = 2,
-    Lost = 3,
-    Won = 4,
-}
 public class GameManager : NetworkBehaviour
 {
-    // Singleton instance
     public static GameManager Instance { get; private set; }
+
+    public enum GameState
+    {
+        MainMenu = 0,
+        Playing = 1,
+        Combat = 2, // Useful for when a player lands on an encounter
+        Paused = 3,
+        Lost = 4,
+        Won = 5,
+    }
+
+    [Networked, OnChangedRender(nameof(OnStateChanged))] 
     public GameState CurrentState { get; private set; }
-
-    [Header("Level Sequence")]
-    [Tooltip("Путь в Resources до LevelSequenceData без расширения .asset.")]
-    [SerializeField] private string levelSequenceResourcePath = "Levels/LevelSequence_Default";
-    [SerializeField] private LevelSequenceData levelSequenceOverride;
-
-    /// Индекс текущего уровня из LevelSequenceData.
-    /// -1 означает "не определён или fallback режим".
-    /// </summary>
-    public int CurrentLevelIndex => currentLevelIndex;
-
-    private LevelSequenceData levelSequenceData;
-    private int currentLevelIndex = -1;
 
     public override void Spawned()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-        LoadLevelSequenceData();
+        DontDestroyOnLoad(gameObject);
+
+        if (HasStateAuthority) CurrentState = GameState.MainMenu;
     }
 
-    public void StartGame()
+    // This is the "Brain" of your state machine
+    void OnStateChanged()
     {
-        CurrentState = GameState.Playing;
+        switch (CurrentState)
+        {
+            case GameState.MainMenu:
+                HandleMainMenu();
+                break;
+
+            case GameState.Playing:
+                HandleExploration();
+                break;
+
+            case GameState.Combat:
+                HandleCombat();
+                break;
+
+            case GameState.Lost:
+            case GameState.Won:
+                HandleGameOver(CurrentState);
+                break;
+        }
+    }
+
+    public void HandleExploration()
+    {
         Time.timeScale = 1f;
-        if (InputManager.Instance != null)
+        InputManager.Instance?.EnablePlayerInput();
+        // Close Shop/Inventory if they were open from another state
+        ShopUIManager.Instance?.ToggleShop(false);
+        Debug.Log("Switched to Exploration Mode.");
+    }
+
+    public void HandleCombat()
+    {
+        // For your D&D slice: Disable movement but keep UI active for attacks
+        if (InputManager.Instance.playerActionMap.enabled == false)
         {
             InputManager.Instance.EnablePlayerInput();
-        }
-        Debug.Log("Game Started");
-        if (PlayerRolesController.Instance != null)
-        {
-            PlayerRolesController.Instance.ApplyRole();
-        }
-        currentLevelIndex = 0;
-
-        if (!TryGetLevelSceneName(currentLevelIndex, out string firstLevelScene))
-        {
-            firstLevelScene = SceneNames.GameScene;
-            currentLevelIndex = -1;
-        }
-
-        LoadGameplayScene(firstLevelScene);
-    }
-
-    public void GoToMenu()
-    {
-        CurrentState = GameState.MainMenu;
-        Time.timeScale = 1f;
-        SceneLoader.Instance.LoadScene();
-        if (InputManager.Instance != null)
-        {
             InputManager.Instance.EnableUIInput();
         }
-        Debug.Log("Got to Main Menu");
+        Debug.Log("Combat Initialized. Board movement frozen.");
     }
 
-    public void RestartGameScene()
+    public void HandleGameOver(GameState state)
     {
-        string sceneToReload = ResolveCurrentGameplayScene();
-        LoadGameplayScene(sceneToReload);
-    }
-    /// <summary>
-    /// Переводит игру в состояние поражения и включает UI-ввод.
-    /// </summary>
-    public void EnterLoseState()
-    {
-        if (CurrentState != GameState.Playing)
-            return;
-
-        CurrentState = GameState.Lost;
         Time.timeScale = 0f;
-        if (InputManager.Instance != null)
-            InputManager.Instance.EnableUIInput();
-        Debug.Log("Game lost");
-    }
-
-    /// <summary>
-    /// Переводит игру в состояние победы и включает UI-ввод.
-    /// </summary>
-    public void EnterWinState()
-    {
-        if (CurrentState != GameState.Playing)
-            return;
-
-        CurrentState = GameState.Won;
-        Time.timeScale = 0f;
-        if (InputManager.Instance != null)
-            InputManager.Instance.EnableUIInput();
-        Debug.Log("Game won");
-    }
-
-    public bool TryLoadNextLevel()
-    {
-        UpdateCurrentLevelIndexFromActiveScene();
-
-        int nextLevelIndex = currentLevelIndex + 1;
-        if (!TryGetLevelSceneName(nextLevelIndex, out string nextScene))
-            return false;
-
-        currentLevelIndex = nextLevelIndex;
-        LoadGameplayScene(nextScene);
-        return true;
-    }
-    /// <summary>
-    /// Загружает sequence asset из Resources.
-    /// Если не найден, система всё равно работает в fallback режиме через GameScene.
-    /// </summary>
-    private void LoadLevelSequenceData()
-    {
-        if (levelSequenceOverride != null)
+        InputManager.Instance?.EnableUIInput();
+        // Trigger your Win/Loss UI screens here
+        if (InputManager.Instance != null && state == GameState.Won)
         {
-            levelSequenceData = levelSequenceOverride;
-            return;
+            Debug.Log("Congratulations! You've won the game!");
+            // Show win screen
+            InputManager.Instance.DisablePlayerInput(); // Prevent further actions after winning
         }
-
-#if UNITY_EDITOR
-        // В Editor приоритет у учебного ассета в _ScriptableObjects,
-        // чтобы брались именно те данные, которые вы редактируете вручную.
-        if (TryLoadLevelSequenceFromEditorAssetPath())
-            return;
-#endif
-
-        if (string.IsNullOrWhiteSpace(levelSequenceResourcePath))
+        else if (InputManager.Instance != null && state == GameState.Lost)
         {
-#if UNITY_EDITOR
-            TryLoadLevelSequenceFromEditorAssetPath();
-#endif
-            return;
-        }
-
-        levelSequenceData = Resources.Load<LevelSequenceData>(levelSequenceResourcePath);
-
-#if UNITY_EDITOR
-        if (levelSequenceData == null)
-            TryLoadLevelSequenceFromEditorAssetPath();
-#endif
-
-        if (levelSequenceData == null)
-        {
-            Debug.LogWarning(
-                $"GameManager: LevelSequenceData not found at Resources/{levelSequenceResourcePath}. " +
-                "Fallback to SceneNames.GameScene will be used.");
+            Debug.Log("Game Over! Better luck next time.");
+            // Show loss screen
         }
     }
 
-#if UNITY_EDITOR
-    private bool TryLoadLevelSequenceFromEditorAssetPath()
+    private void HandleMainMenu()
     {
-        const string editorAssetPath = "Assets/_ScriptableObjects/Scenes/LevelSequenceData.asset";
-        levelSequenceData = UnityEditor.AssetDatabase.LoadAssetAtPath<LevelSequenceData>(editorAssetPath);
-        return levelSequenceData != null;
-    }
-#endif
-
-    /// <summary>
-    /// Единая точка перехода в игровую сцену:
-    /// переводит state в Playing, возвращает timeScale и включает player input.
-    /// </summary>
-    private void LoadGameplayScene(string sceneName)
-    {
-        CurrentState = GameState.Playing;
         Time.timeScale = 1f;
-        SceneLoader.Instance.LoadScene();
-
-        if (InputManager.Instance != null)
-            InputManager.Instance.EnablePlayerInput();
+        InputManager.Instance?.EnableUIInput();
     }
 
-    /// <summary>
-    /// Безопасный доступ к имени сцены уровня из sequence.
-    /// </summary>
-    private bool TryGetLevelSceneName(int levelIndex, out string sceneName)
+    // --- State Change Requests (Server Only) ---
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestStateChange(GameState newState)
     {
-        sceneName = null;
-
-        if (levelSequenceData == null)
-            return false;
-
-        return levelSequenceData.TryGetLevelSceneName(levelIndex, out sceneName);
-    }
-
-    /// <summary>
-    /// Синхронизирует currentLevelIndex с реально активной сценой.
-    /// Нужен перед вычислением "следующего" уровня.
-    /// </summary>
-    private void UpdateCurrentLevelIndexFromActiveScene()
-    {
-        if (levelSequenceData == null)
-            return;
-
-        string activeSceneName = SceneManager.GetActiveScene().name;
-        int sceneIndex = levelSequenceData.FindLevelIndex(activeSceneName);
-        if (sceneIndex >= 0)
-            currentLevelIndex = sceneIndex;
-    }
-
-    /// <summary>
-    /// Определяет, какую сцену перезапускать на Restart:
-    /// 1) текущую сцену из sequence
-    /// 2) если sequence не знает сцену - активную сцену
-    /// 3) если активна MainMenu - fallback на GameScene
-    /// </summary>
-    private string ResolveCurrentGameplayScene()
-    {
-        UpdateCurrentLevelIndexFromActiveScene();
-
-        if (TryGetLevelSceneName(currentLevelIndex, out string sceneName))
-            return sceneName;
-
-        return SceneManager.GetActiveScene().name == SceneNames.MainMenu
-            ? SceneNames.GameScene
-            : SceneManager.GetActiveScene().name;
+        if (HasStateAuthority)
+        {
+            CurrentState = newState;
+        }
     }
 }
