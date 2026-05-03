@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 869ef05a88ca9864795c3ba743cbec54, type: 3}
+  m_Name: Zeus' Trident
+  m_EditorClassIdentifier: Assembly-CSharp::ShopItem
+  itemID: 19
+  itemName: Zeus' Trident
+  description: Take the Godly Power and deal triple damage to the ungodly.
+  cost: 300
+  icon: {fileID: 625480778395568090, guid: de267c089aab8e04f9973b37351fe6eb, type: 3}
+  requiredRole: 0
+  requiredLevel: 20

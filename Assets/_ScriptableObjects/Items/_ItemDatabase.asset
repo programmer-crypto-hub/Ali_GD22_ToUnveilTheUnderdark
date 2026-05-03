@@ -14,3 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDatabase
   allItems:
   - {fileID: 11400000, guid: 313b080627ef58347944e12055c71d1e, type: 2}
+  - {fileID: 11400000, guid: cc177dfa9dec62c4e87a0fa400fc4599, type: 2}
+  - {fileID: 11400000, guid: dedc9113db7b09347a7ae6548d007fb8, type: 2}
+  - {fileID: 11400000, guid: 5085fd4971077114b96f26d60305eba3, type: 2}
+  - {fileID: 11400000, guid: 04695e3841749dd4e8f738a65a2cecbc, type: 2}
+  - {fileID: 11400000, guid: 2698bfb2572e06c40abb3a5c06a1f857, type: 2}
+  - {fileID: 11400000, guid: 2afb7f12793197f41b3e49381b398c6f, type: 2}
+  - {fileID: 11400000, guid: bb756cabed513a948b611c2ab54e9e2e, type: 2}
+  - {fileID: 11400000, guid: 6c40a04e47b2a774fb651dd210bb1a53, type: 2}
+  - {fileID: 11400000, guid: 0692a39ff200c0648a7ac956f5e901a2, type: 2}
+  - {fileID: 11400000, guid: 2da6ddcd9b3614a45b37d924a7d46b36, type: 2}
+  - {fileID: 11400000, guid: 07f0f68e95e707b44aebddc412693a86, type: 2}
+  - {fileID: 11400000, guid: e85e020465697694abecdb71a60180e5, type: 2}

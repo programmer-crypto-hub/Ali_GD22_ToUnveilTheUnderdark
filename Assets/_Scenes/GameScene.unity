@@ -1134,6 +1134,7 @@ GameObject:
   - component: {fileID: 318765119}
   - component: {fileID: 318765121}
   - component: {fileID: 318765120}
+  - component: {fileID: 318765122}
   m_Layer: 5
   m_Name: StatsMenu
   m_TagString: Untagged
@@ -1200,6 +1201,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 318765118}
   m_CullTransparentMesh: 1
+--- !u!114 &318765122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318765118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7926c4b795eb50344a717c7e86a864ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIStatsController
+  statRowPrefab: {fileID: 8728640057604945392, guid: a7d8bc71dea03d348b2908cc0284fac7, type: 3}
+  container: {fileID: 1828042347}
 --- !u!1 &336048001
 GameObject:
   m_ObjectHideFlags: 0
@@ -3252,7 +3267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   levelSequenceResourcePath: Levels/LevelSequence_Default
-  levelSequenceOverride: {fileID: 0}
+  levelSequenceOverride: {fileID: 11400000, guid: 8fc5a613950922a4d835463fb74ec1f3, type: 2}
 --- !u!4 &856115431
 Transform:
   m_ObjectHideFlags: 0
@@ -4536,6 +4551,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 313b080627ef58347944e12055c71d1e, type: 2}
   - {fileID: 11400000, guid: cc177dfa9dec62c4e87a0fa400fc4599, type: 2}
   - {fileID: 11400000, guid: dedc9113db7b09347a7ae6548d007fb8, type: 2}
+  - {fileID: 11400000, guid: 5085fd4971077114b96f26d60305eba3, type: 2}
+  - {fileID: 11400000, guid: 04695e3841749dd4e8f738a65a2cecbc, type: 2}
+  - {fileID: 11400000, guid: 2698bfb2572e06c40abb3a5c06a1f857, type: 2}
+  - {fileID: 11400000, guid: 2afb7f12793197f41b3e49381b398c6f, type: 2}
+  - {fileID: 11400000, guid: bb756cabed513a948b611c2ab54e9e2e, type: 2}
+  - {fileID: 11400000, guid: 6c40a04e47b2a774fb651dd210bb1a53, type: 2}
+  - {fileID: 11400000, guid: 0692a39ff200c0648a7ac956f5e901a2, type: 2}
+  - {fileID: 11400000, guid: 2da6ddcd9b3614a45b37d924a7d46b36, type: 2}
+  - {fileID: 11400000, guid: 07f0f68e95e707b44aebddc412693a86, type: 2}
+  - {fileID: 11400000, guid: e85e020465697694abecdb71a60180e5, type: 2}
 --- !u!1 &1298920408
 GameObject:
   m_ObjectHideFlags: 0
@@ -4622,7 +4647,6 @@ GameObject:
   - component: {fileID: 1328819527}
   - component: {fileID: 1328819529}
   - component: {fileID: 1328819528}
-  - component: {fileID: 1328819530}
   m_Layer: 0
   m_Name: GameLoopFlowController
   m_TagString: Untagged
@@ -4663,7 +4687,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1328819529}
-  - {fileID: 1328819530}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1328819529
 MonoBehaviour:
@@ -4683,20 +4706,6 @@ MonoBehaviour:
   winMenuButton: {fileID: 1041321131}
   exitActivationObjectOverride: {fileID: 0}
   showDebugLogs: 1
---- !u!114 &1328819530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1328819526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aba9d283975c2354ea4e6db04a9aa211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  levelSequenceResourcePath: Levels/LevelSequence_Default
-  levelSequenceOverride: {fileID: 0}
 --- !u!1 &1344206181
 GameObject:
   m_ObjectHideFlags: 0
@@ -7206,7 +7215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameSession
   endTurnBTN: {fileID: 886835846}
-  movementPanel: {fileID: 0}
+  movementPanel: {fileID: 1413596746}
   _PlayerOrder: []
   _PlayerCount: 0
 --- !u!4 &1965876082
@@ -7585,85 +7594,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 7.05, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2035182366
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2035182368}
-  - component: {fileID: 2035182367}
-  m_Layer: 0
-  m_Name: DiceManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2035182367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2035182366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4a7fd4fc6e8161489cabd869f2f75a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DiceManager
-  _runner: {fileID: 0}
-  _object: {fileID: 0}
-  InvokeRpc: 0
-  ObjectIndex: 0
-  WordOffset: 0
-  WordCount: 0
-  DefaultReplicated: 1
-  playerMovement: {fileID: 7449045413762910529, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
-  playerAnim: {fileID: 7953576579434099920, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
-  rollDiceButton: {fileID: 1719266316}
-  diceImage: {fileID: 0}
-  dicePanel: {fileID: 0}
-  _diceRollResult: 0
-  spaceLength: 0
-  diceSprites:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
---- !u!4 &2035182368
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2035182366}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 936.725, y: 497.66162, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8531,7 +8461,6 @@ SceneRoots:
   - {fileID: 2032608227}
   - {fileID: 1144210347}
   - {fileID: 1745092957}
-  - {fileID: 2035182368}
   - {fileID: 1232717392}
   - {fileID: 474214729}
   - {fileID: 1708801222}
