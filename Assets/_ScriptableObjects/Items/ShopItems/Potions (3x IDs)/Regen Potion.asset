@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 869ef05a88ca9864795c3ba743cbec54, type: 3}
-  m_Name: Damage Potion
+  m_Name: Regen Potion
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
-  itemID: 31
-  itemName: Damage Potion
-  description: A Potion in a bottle with magic of enpowerment.
+  itemID: 32
+  itemName: Regen Potion
+  description: A potion with special magic of healing, when truly needed.
   cost: 10
-  icon: {fileID: 1018383391595562092, guid: de267c089aab8e04f9973b37351fe6eb, type: 3}
+  icon: {fileID: 7763498119798118100, guid: de267c089aab8e04f9973b37351fe6eb, type: 3}
   requiredRole: 1
-  requiredLevel: 3
+  requiredLevel: 4
