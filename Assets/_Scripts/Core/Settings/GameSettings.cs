@@ -26,11 +26,18 @@ public static class GameSettings
     public const float DefaultMusic = 1f;
     public const int DefaultFullscreen = 1;
 
+    public const string PlayerNamePrefKey = "settings_player_name";
+    public const string GameCodePrefKey = "settings_game_code";
+    public const string DefaultPlayerName = "Player";
+    public const int DefaultGameCode = 000000;
+
     public struct Data
     {
         public float Sound;
         public float Music;
         public bool Fullscreen;
+        public string PlayerName;
+        public int GameCode;
     }
 
     /// <summary>
@@ -42,7 +49,9 @@ public static class GameSettings
         {
             Sound = Mathf.Clamp01(PlayerPrefs.GetFloat(SoundPrefKey, DefaultSound)),
             Music = Mathf.Clamp01(PlayerPrefs.GetFloat(MusicPrefKey, DefaultMusic)),
-            Fullscreen = PlayerPrefs.GetInt(FullscreenPrefKey, DefaultFullscreen) == 1
+            Fullscreen = PlayerPrefs.GetInt(FullscreenPrefKey, DefaultFullscreen) == 1,
+            PlayerName = PlayerPrefs.GetString(PlayerNamePrefKey, DefaultPlayerName),
+            GameCode = PlayerPrefs.GetInt(GameCodePrefKey, DefaultGameCode)
         };
     }
 
@@ -97,11 +106,29 @@ public static class GameSettings
         ApplyFullscreen(data.Fullscreen);
     }
 
+    public static void SetPlayerName(string playerName)
+    {
+        Data data = Load();
+        data.PlayerName = playerName;
+        Save(data);
+        ApplyPlayerName(data.PlayerName);
+    }
+
+    public static void SetGameCode(int gameCode)
+    {
+        Data data = Load();
+        data.GameCode = gameCode;
+        Save(data);
+        // Здесь нет прямого применения в рантайме, так что Apply не вызываем
+    }
+
     private static void Save(Data data)
     {
         PlayerPrefs.SetFloat(SoundPrefKey, Mathf.Clamp01(data.Sound));
         PlayerPrefs.SetFloat(MusicPrefKey, Mathf.Clamp01(data.Music));
         PlayerPrefs.SetInt(FullscreenPrefKey, data.Fullscreen ? 1 : 0);
+        PlayerPrefs.SetString(PlayerNamePrefKey, data.PlayerName);
+        PlayerPrefs.SetInt(GameCodePrefKey, data.GameCode);
         PlayerPrefs.Save();
     }
 
@@ -144,5 +171,10 @@ public static class GameSettings
     private static void ApplyFullscreen(bool isFullscreen)
     {
         Screen.fullScreen = isFullscreen;
+    }
+    private static void ApplyPlayerName(string playerName)
+    {
+        PlayerStats.Instance.PlayerName = playerName;
+        // Здесь можно добавить логику для обновления UI или других компонентов, если нужно
     }
 }

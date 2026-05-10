@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 public class PlayerStats : NetworkBehaviour
 {
+    public static PlayerStats Instance { get; private set; }
     public PlayerData playerData;
     public PlayerStatRow playerStatRow;
     public PlayerProgression playerProgression;

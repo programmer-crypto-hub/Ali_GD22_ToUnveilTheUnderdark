@@ -22,14 +22,13 @@ public class SettingsPanelController : MonoBehaviour
     [Tooltip("Корневой объект отдельной панели настроек. Если не задан, используется текущий объект как резервный путь.")]
     [SerializeField] private GameObject settingsPanel;
 
-    [Header("UI-контролы")]
-    [Tooltip("Слайдер громкости звуковых эффектов (sound).")]
-    [SerializeField] private Slider soundSlider;
+    [Header("UI-controls")]
+    [Tooltip("Player Name input field.")]
+    [SerializeField] private InputField playerName;
 
-    [Tooltip("Слайдер громкости музыки (music).")]
-    [SerializeField] private Slider musicSlider;
+    [Tooltip("Game Code input field.")]
+    [SerializeField] private InputField gameCode;
 
-    [Tooltip("Тоггл полноэкранного режима.")]
     [SerializeField] private Toggle fullscreenToggle;
 
     [Tooltip("Кнопка \"Назад\" для закрытия панели.")]
@@ -97,14 +96,11 @@ public class SettingsPanelController : MonoBehaviour
 
     private void BindUiHandlers()
     {
-        if (soundSlider != null)
-            soundSlider.onValueChanged.AddListener(HandleSoundSliderChanged);
+        if (playerName != null)
+            playerName.onValueChanged.AddListener(HandlePlayerNameChanged);
 
-        if (musicSlider != null)
-            musicSlider.onValueChanged.AddListener(HandleMusicSliderChanged);
-
-        if (fullscreenToggle != null)
-            fullscreenToggle.onValueChanged.AddListener(HandleFullscreenToggleChanged);
+        if (gameCode != null)
+            gameCode.onValueChanged.AddListener(HandleGameCodeChanged);
 
         if (backButton != null)
             backButton.onClick.AddListener(ClosePanel);
@@ -112,14 +108,11 @@ public class SettingsPanelController : MonoBehaviour
 
     private void UnbindUiHandlers()
     {
-        if (soundSlider != null)
-            soundSlider.onValueChanged.RemoveListener(HandleSoundSliderChanged);
+        if (playerName != null)
+            playerName.onValueChanged.RemoveListener(HandlePlayerNameChanged);
 
-        if (musicSlider != null)
-            musicSlider.onValueChanged.RemoveListener(HandleMusicSliderChanged);
-
-        if (fullscreenToggle != null)
-            fullscreenToggle.onValueChanged.RemoveListener(HandleFullscreenToggleChanged);
+        if (gameCode != null)
+            gameCode.onValueChanged.RemoveListener(HandleGameCodeChanged);
 
         if (backButton != null)
             backButton.onClick.RemoveListener(ClosePanel);
@@ -135,11 +128,11 @@ public class SettingsPanelController : MonoBehaviour
         GameSettings.Data data = GameSettings.Load();
         suppressCallbacks = true;
 
-        if (soundSlider != null)
-            soundSlider.SetValueWithoutNotify(data.Sound);
+        if (playerName != null)
+            playerName.text = data.PlayerName;
 
-        if (musicSlider != null)
-            musicSlider.SetValueWithoutNotify(data.Music);
+        if (gameCode != null)
+            gameCode.text = data.GameCode.ToString();
 
         if (fullscreenToggle != null)
             fullscreenToggle.SetIsOnWithoutNotify(data.Fullscreen);
@@ -147,20 +140,20 @@ public class SettingsPanelController : MonoBehaviour
         suppressCallbacks = false;
     }
 
-    private void HandleSoundSliderChanged(float value)
+    private void HandlePlayerNameChanged(string value)
     {
         if (suppressCallbacks)
             return;
 
-        GameSettings.SetSound(value, soundSources);
+        GameSettings.SetPlayerName(value);
     }
 
-    private void HandleMusicSliderChanged(float value)
+    private void HandleGameCodeChanged(string value)
     {
         if (suppressCallbacks)
             return;
 
-        GameSettings.SetMusic(value, musicSources);
+        GameSettings.SetGameCode(int.Parse(value));
     }
 
     private void HandleFullscreenToggleChanged(bool isFullscreen)
@@ -180,18 +173,18 @@ public class SettingsPanelController : MonoBehaviour
         if (settingsPanel == null)
             return;
 
-        if (soundSlider != null && musicSlider != null && fullscreenToggle != null && backButton != null)
+        if (playerName != null && gameCode != null)
             return;
 
         Debug.LogWarning($"{name}: ссылки окна настроек назначены не полностью. Выполняю резервный автопоиск.", this);
 
-        if (soundSlider == null || musicSlider == null)
+        if (playerName == null || gameCode == null)
         {
-            Slider[] sliders = settingsPanel.GetComponentsInChildren<Slider>(true);
-            if (soundSlider == null && sliders.Length > 0)
-                soundSlider = sliders[0];
-            if (musicSlider == null && sliders.Length > 1)
-                musicSlider = sliders[1];
+            InputField[] inputFields = settingsPanel.GetComponentsInChildren<InputField>(true);
+            if (playerName == null && inputFields.Length > 0)
+                playerName = inputFields[0];
+            if (gameCode == null && inputFields.Length > 1)
+                gameCode = inputFields[1];
         }
 
         if (fullscreenToggle == null)
@@ -214,8 +207,8 @@ public class SettingsPanelController : MonoBehaviour
             }
         }
 
-        if (soundSlider == null || musicSlider == null || fullscreenToggle == null)
-            Debug.LogError($"{name}: не удалось автоматически найти все обязательные контролы (sound/music/fullscreen). Назначьте ссылки в Inspector.", this);
+        if (playerName == null || gameCode == null)
+            Debug.LogError($"{name}: не удалось автоматически найти все обязательные контролы (playerName/gameCode). Назначьте ссылки в Inspector.", this);
 
         if (backButton == null)
             Debug.LogWarning($"{name}: backButton не найден. Панель будет открываться, но закрытие кнопкой \"Назад\" не сработает.", this);
