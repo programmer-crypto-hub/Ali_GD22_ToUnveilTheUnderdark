@@ -3,11 +3,6 @@ using Fusion;
 
 public class PlayerAnimationController : NetworkBehaviour
 {
-    /// <summary>
-    /// “ип анимации атаки, который будет выставлен в параметр AttackType у Animator.
-    /// «начени€ enum специально совпадают с числами, которые удобно использовать в переходах Animator:
-    /// 0 = ближн€€ атака, 1 = дальн€€ атака.
-    /// </summary>
     public enum AttackAnimationType
     {
         Melee = 0,
@@ -69,34 +64,20 @@ public class PlayerAnimationController : NetworkBehaviour
         if (InputManager.Instance == null)
             return;
 
-        // ƒл€ урока берЄм самую простую и наблюдаемую метрику:
-        // если игрок двигает стик/клавиши сильнее, MoveSpeed становитс€ больше,
-        // и Animator сам переключает Idle <-> Move по услови€м переходов.
         float moveSpeed = InputManager.Instance.MoveInput.magnitude;
         animator.SetFloat(moveSpeedParameter, moveSpeed);
     }
 
-    /// <summary>
-    /// «апускает анимацию атаки выбранного типа.
-    /// —начала выставл€ет параметр AttackType, чтобы Animator выбрал правильный state,
-    /// и только потом дЄргает общий trigger Attack.
-    /// </summary>
     public void PlayAttack(AttackAnimationType attackAnimationType)
     {
         if (animator == null)
             return;
 
-        // ¬ажно дл€ вашей схемы Animator:
-        // AttackType решает, в какой state идти (Attack_Melee или Attack_Ranged),
-        // а trigger Attack отвечает только за сам факт запуска атаки.
         animator.SetInteger(attackTypeParameter, (int)attackAnimationType);
         animator.ResetTrigger(attackTriggerParameter);
         animator.SetTrigger(attackTriggerParameter);
     }
 
-    /// <summary>
-    /// «апускает состо€ние смерти в Animator.
-    /// </summary>
     public void PlayDeath()
     {
         if (animator == null)

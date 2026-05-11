@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using UnityEngine;
 
 public class WeaponManager : NetworkBehaviour
@@ -10,11 +11,11 @@ public class WeaponManager : NetworkBehaviour
     [Networked] public int UnlockedWeaponMask { get; set; }
     [Networked] public int CurrentWeaponIndex { get; set; }
 
-    // This is your inspector array (not networked, just the data source)
     [SerializeField] public WeaponBase[] weaponPrefabs;
 
     private ChangeDetector _changes;
 
+    public Action<WeaponBase> OnWeaponChanged;
     public WeaponBase CurrentWeapon
     {
         get

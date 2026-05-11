@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Данные для оружия (урон, скорость, дальность и т.п.).
-/// Используется разными системами: игрок, инвентарь, лут.
-/// </summary>
 [CreateAssetMenu(
     fileName = "WeaponData",
     menuName = "Game Data/Weapon Data",

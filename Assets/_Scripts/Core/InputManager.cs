@@ -51,7 +51,6 @@ public class InputManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         if (inputActions != null)
         {
-            // This finds the map named "Player" inside your blue asset file
             playerActionMap = inputActions.FindActionMap("Player");
             playerActionMap.Enable();
         }
@@ -121,7 +120,6 @@ public class InputManager : MonoBehaviour
 
         if (EventBus.Instance != null)
         {
-            EventBus.Instance.OnGamePaused += HandleGamePaused;
             EventBus.Instance.OnGameResumed += HandleGameResumed;
         }
     }
@@ -133,7 +131,6 @@ public class InputManager : MonoBehaviour
 
         if (EventBus.Instance != null)
         {
-            EventBus.Instance.OnGamePaused -= HandleGamePaused;
             EventBus.Instance.OnGameResumed -= HandleGameResumed;
         }
     }
@@ -245,18 +242,12 @@ public class InputManager : MonoBehaviour
             uiActionMap.Enable();
     }
 
-    private void HandleGamePaused()
-    {
-        if (playerActionMap != null)
-            playerActionMap.Disable();
-
-        Debug.Log("InputManager: Player input disabled (game paused)");
-    }
-
-    private void HandleGameResumed()
+    public void HandleGameResumed()
     {
         if (playerActionMap != null)
             playerActionMap.Enable();
+        if (uiActionMap != null)
+            uiActionMap.Enable();
 
         Debug.Log("InputManager: Player input enabled (game resumed)");
     }

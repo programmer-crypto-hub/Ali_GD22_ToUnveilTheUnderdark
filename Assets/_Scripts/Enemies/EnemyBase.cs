@@ -15,7 +15,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     [Networked] private EnemyState CurrentState { get; set; }
     [Networked] private TickTimer AttackCooldown { get; set; }
 
-    private Transform _target;
+    [SerializeField] private Transform _target;
     private ChangeDetector _changes;
 
     // Read-only property for IDamageable
@@ -26,17 +26,17 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     {
         _changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
-        if (HasStateAuthority)
-        {
-            CurrentHP = enemyData != null ? enemyData.maxHealth : 100f;
+        //if (HasStateAuthority)
+        //{
+            CurrentHP = enemyData != null ? enemyData.maxHealth : 10f;
             CurrentState = EnemyState.Chase;
-        }
+        //}
     }
 
     public override void FixedUpdateNetwork()
     {
         // 2. SERVER ONLY: Only the host runs AI calculations
-        if (!HasStateAuthority || IsDead) return;
+        //if (!HasStateAuthority || IsDead) return;
 
         if (_target == null)
         {

@@ -13,7 +13,7 @@ public class CameraTarget : NetworkBehaviour
     [SerializeField] private float currentYaw = 0f;    // Y
     [SerializeField] private float currentPitch = 0f; // X
 
-    public Transform target; // Drag your Player Root here (at runtime)
+    public Transform target;
     [SerializeField] private Vector3 offset = new Vector3(0, 0, -10);
     [SerializeField] private float smoothSpeed = 10f;
 

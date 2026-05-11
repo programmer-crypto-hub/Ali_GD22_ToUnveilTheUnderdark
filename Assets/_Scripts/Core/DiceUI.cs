@@ -43,7 +43,6 @@ public class DiceUI : MonoBehaviour
         diceImage.enabled = false;
         dicePanel.SetActive(false);
 
-        // Tell your separate Movement script to go!
         int spacesToMove = DiceRoller.Instance.ConvertDiceToMovement();
         // playerMovement.MoveSpaces(spacesToMove);
     }

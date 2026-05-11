@@ -19,7 +19,6 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         Debug.Log("BasicPlayerSpawner Spawned: " + this.gameObject.name);
         if (HasStateAuthority)
         {
-            // Find the GameSession (which should be on your NetworkRunner or global object)
             var session = FindFirstObjectByType<GameSession>();
             if (session != null)
             {
@@ -165,6 +164,8 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         var spawner = FindFirstObjectByType<BasicPlayerSpawner>();
         _runner.AddCallbacks(spawner);
         var mapManager = FindFirstObjectByType<NetworkMapManager>();
+        var inputManager = FindFirstObjectByType<InputManager>();
+        if (inputManager != null) inputManager.HandleGameResumed();
         //sceneManager.IsMultiplePeer = false;
         // Start or join (depends on gamemode) a session with a specific name
         try

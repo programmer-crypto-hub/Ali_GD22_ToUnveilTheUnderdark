@@ -2,11 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion; 
 
-/// <summary>
-/// Player movement controller for 3D top-down.
-/// Reads input from InputManager, moves a CharacterController
-/// relative to the camera and rotates the visual model to face movement direction.
-/// </summary>
 public class PlayerController : NetworkBehaviour
 {
     [Header("References")]
@@ -22,9 +17,6 @@ public class PlayerController : NetworkBehaviour
     private Rigidbody rb;
     private Vector2 _moveContext; // Stores the WASD/Joystick value
 
-    /// <summary>
-    /// Инициализирует ссылки на CharacterController, PlayerStats и камеру.
-    /// </summary>
     public override void Spawned()
     {
         Debug.Log($"[SPAWN CHECK] {gameObject.name} has appeared! Is it active? {gameObject.activeInHierarchy}", gameObject);
@@ -46,9 +38,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Главный игровой цикл контроллера.
-    /// </summary>
     public void HandleMovement()
     {
         if (InputManager.Instance == null)
@@ -58,11 +47,6 @@ public class PlayerController : NetworkBehaviour
 
         InputManager.Instance.ResetButtonFlags();
     }
-
-    /// <summary>
-    /// Считает движение относительно камеры и двигает CharacterController.
-    /// Вращает визуальную модель по направлению движения.
-    /// </summary>
 
     public void OnMove(InputValue value)
     {

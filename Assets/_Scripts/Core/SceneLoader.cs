@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 public class SceneLoader : MonoBehaviour
 {
-    [SerializeField] private GameObject loadingScreen; // Your placeholder UI panel
+    [SerializeField] private GameObject loadingScreen; 
     public static SceneLoader Instance { get; private set; }
 
     private void Awake()

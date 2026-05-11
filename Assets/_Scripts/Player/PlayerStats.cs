@@ -41,7 +41,6 @@ public class PlayerStats : NetworkBehaviour
 
     public void OnStatsChanged()
 {
-    // These ensure your existing UI listeners still work!
     OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
     OnGoldChanged?.Invoke(Gold, 9999); // Max gold
     OnDiceRolled?.Invoke(CurrentDiceValue, 20f); // D20
@@ -62,7 +61,10 @@ public class PlayerStats : NetworkBehaviour
     // This runs every time CaveCoins or Health changes on the network
     // Tell the Stats UI to refresh the display for this player
     //public override void Render() => UIStatsController.Instance.UpdateDisplay(this);
-    private void UpdateUI() => playerStatRow.SetStats(PlayerName, CurrentHealth, Gold, XP);
+    private void UpdateUI()
+    {
+        playerStatRow.SetStats(PlayerName, CurrentHealth, Gold, XP);
+    }
 
     public int CurrentRoleId => currentRoleId;
     public string CurrentRole => currentRole;
@@ -83,7 +85,7 @@ public class PlayerStats : NetworkBehaviour
             Gold = (int)playerData.caveCoins;
         }
 
-        // Subscribe to Role changes (Keep your existing logic here)
+        // Subscribe to Role changes
         if (PlayerRolesController.Instance != null)
         {
             PlayerRolesController.Instance.OnRoleGiven += () =>

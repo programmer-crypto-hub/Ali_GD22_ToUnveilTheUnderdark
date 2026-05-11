@@ -2,12 +2,6 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Collections.Unicode;
-
-/// <summary>
-/// ”прощЄнный спавнер врагов дл€ базового обучени€.
-/// Ќе использует сложный пул и словари Ч только Instantiate и простой список.
-/// </summary>
 public class SimpleEnemySpawner : NetworkBehaviour
 {
     [Header("“ип врага")]
@@ -159,8 +153,8 @@ public class SimpleEnemySpawner : NetworkBehaviour
 
          private void CleanupInactiveEnemies()
          {
-        activeEnemies.RemoveAll(e => e == null || !e.gameObject.activeInHierarchy);
-    }
+            activeEnemies.RemoveAll(e => e == null || !e.gameObject.activeInHierarchy);
+         }
 
     private void OnDestroy()
     {

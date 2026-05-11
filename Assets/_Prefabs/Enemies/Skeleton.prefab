@@ -162,13 +162,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBase
   enemyData: {fileID: 11400000, guid: da1bb4829e21bee418ed33348c3687a9, type: 2}
-  currentHealth: 0
-  target: {fileID: 2118434399438094922, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
-  autoResolveTargetOnStart: 1
-  attackCooldown: 1
-  destroyOnDeath: 1
-  destroyDelayAfterDeath: 0.15
   enemyAnim: {fileID: 8685985672078748888}
+  _CurrentHP: 0
+  _target: {fileID: 2118434399438094922, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
 --- !u!114 &9024157781782353514
 MonoBehaviour:
   m_ObjectHideFlags: 0

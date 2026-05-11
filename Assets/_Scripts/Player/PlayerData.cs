@@ -1,11 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Player Data", menuName = "Game Data/Player Data", order = 0)]
-/// <summary>
-/// ScriptableObject с базовыми параметрами игрока.
-/// Хранит стартовые значения здоровья, маны и настроек движения,
-/// которые затем читают PlayerStats и PlayerController.
-/// </summary>
+
 public class PlayerData : ScriptableObject
 {
     [Header("Main Characteristics")]

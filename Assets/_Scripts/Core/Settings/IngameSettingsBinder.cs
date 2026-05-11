@@ -1,52 +1,39 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
-/*
- * PauseSettingsBinder
- * Назначение: связать существующие контролы в Pause с общей системой настроек.
- * Роль в игре: реализует встроенные настройки в паузе без отдельного окна и без кнопки Back.
- * Связи: слайдеры/тоггл в Pause, GameSettings, опционально явные массивы AudioSource.
- * Как используется: вешается на объект Pause (или дочерний Settings) в UIRootCanvas, ссылки задаются в Inspector.
- * Идеи расширения:
- * - Добавить отображение числовых значений громкости рядом со слайдерами.
- * - Добавить кнопку "Сбросить по умолчанию" внутри Pause.
- * Практические советы:
- * - Канонический путь: все ссылки назначены вручную; автопоиск нужен только как страховка.
- * - Если звук реагирует не так, назначьте soundSources/musicSources явно, не полагайтесь на резервный путь.
- */
 [DisallowMultipleComponent]
-public class IngameSettingsBinder : MonoBehaviour
+public class IngameSettingsBinder : NetworkBehaviour
 {
-    [Header("Контролы настроек в паузе")]
-    [Tooltip("Слайдер громкости звуковых эффектов (sound).")]
+    [Header("Settings")]
     [SerializeField] private Slider soundSlider;
-
-    [Tooltip("Слайдер громкости музыки (music).")]
     [SerializeField] private Slider musicSlider;
-
-    [Tooltip("Тоггл полноэкранного режима.")]
     [SerializeField] private Toggle fullscreenToggle;
 
-    [Header("Аудио-источники (опционально)")]
-    [Tooltip("Явные источники для канала sound. Рекомендуется назначать вручную; иначе используется резервный путь по loop=false.")]
-    [SerializeField] private AudioSource[] soundSources;
+    [Header("Ui States")]
+    [Networked] private float networkedSound { get; set; }
+    [Networked] private float networkedMusic { get; set; }
+    [Networked] private bool networkedFullscreen { get; set; }
 
-    [Tooltip("Явные источники для канала music. Рекомендуется назначать вручную; иначе используется резервный путь по loop=true.")]
+    [Header("Аудио-источники (опционально)")]
+    [SerializeField] private AudioSource[] soundSources;
     [SerializeField] private AudioSource[] musicSources;
 
     private bool suppressCallbacks;
     private bool duplicateWarningLogged;
 
-    private void Awake()
+    public override void Spawned()
     {
-        ResolveReferencesIfMissing();
+        if (soundSlider == null || musicSlider == null || fullscreenToggle == null)
+        {
+            Debug.LogWarning($"{name}: Some Pause settings are not assigned. Using fallback references.", this);
+            soundSlider = FindFirstObjectByType<Slider>();
+            musicSlider = FindFirstObjectByType<Slider>();
+            fullscreenToggle = FindFirstObjectByType<Toggle>();
+            ResolveReferencesIfMissing();
+        }
     }
 
-    /// <summary>
-    /// Контракт: порядок строго sync -> apply -> bind listeners.
-    /// Почему так: сначала безопасно выставляем UI без рекурсии, затем применяем значения в сцену, и только потом слушаем ввод игрока.
-    /// Как дебажить: если при открытии паузы значения "прыгают", проверьте suppressCallbacks и дубли биндеров.
-    /// </summary>
     private void OnEnable()
     {
         WarnIfDuplicateBinders();
@@ -125,10 +112,6 @@ public class IngameSettingsBinder : MonoBehaviour
         GameSettings.SetFullscreen(value);
     }
 
-    /// <summary>
-    /// Резервный путь: пробует найти ссылки в дочерних объектах, если их забыли назначить в Inspector.
-    /// Основной путь в teacher-repo: ссылки выставляются вручную.
-    /// </summary>
     private void ResolveReferencesIfMissing()
     {
         if (soundSlider != null && musicSlider != null && fullscreenToggle != null)

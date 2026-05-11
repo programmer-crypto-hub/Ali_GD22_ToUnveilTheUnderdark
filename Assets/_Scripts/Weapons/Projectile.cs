@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Простой снаряд: летит вперёд и уничтожается при столкновении или по достижении дальности.
-/// Пока просто логирует попадания.
-/// </summary>
 public class Projectile : MonoBehaviour
 {
     [Tooltip("Скорость полёта снаряда (единиц в секунду).")]
@@ -22,9 +18,6 @@ public class Projectile : MonoBehaviour
     [SerializeField]
     private LayerMask hitLayers;
 
-    /// <summary>
-    /// Настраивает снаряд перед полётом. Вызывается оружием при создании снаряда.
-    /// </summary>
     public void Setup(float damage, float maxDistance, float speed, LayerMask hitLayers)
     {
         this.damage = damage;
@@ -42,7 +35,6 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        // Движемся вперёд по локальному forward
         transform.position += transform.forward * (speed * Time.deltaTime);
 
         // Проверяем пройденную дистанцию
@@ -55,13 +47,6 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Проверка: слой объекта есть в маске hitLayers?
-        // hitLayers.value  - целое число, где каждый бит = один слой (LayerMask)
-        // other.gameObject.layer - номер слоя (0..31) у объекта, в который мы врезались
-        // (1 << other.gameObject.layer) - двигаем 1 влево на номер слоя и получаем маску "только этот слой"
-        // Операция & (один амперсанд) — это ПОБИТОВОЕ И, оно оставляет только те биты,
-        // которые одновременно =1 и в hitLayers.value, и в (1 << layer).
-        // Если результат == 0, значит ни один бит не совпал — этот слой НЕ входит в маску, выходим.
         if ((hitLayers.value & (1 << other.gameObject.layer)) == 0)
             return;
 

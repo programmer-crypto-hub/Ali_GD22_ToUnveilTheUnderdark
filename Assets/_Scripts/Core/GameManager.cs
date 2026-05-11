@@ -28,7 +28,7 @@ public class GameManager : NetworkBehaviour
         if (HasStateAuthority) CurrentState = GameState.MainMenu;
     }
 
-    // This is the "Brain" of your state machine
+    // This is the Brain
     void OnStateChanged()
     {
         switch (CurrentState)
@@ -63,7 +63,7 @@ public class GameManager : NetworkBehaviour
 
     public void HandleCombat()
     {
-        // For your D&D slice: Disable movement but keep UI active for attacks
+        // Disable movement but keep UI active for attacks
         if (InputManager.Instance.playerActionMap.enabled == false)
         {
             InputManager.Instance.EnablePlayerInput();
@@ -76,7 +76,7 @@ public class GameManager : NetworkBehaviour
     {
         Time.timeScale = 0f;
         InputManager.Instance?.EnableUIInput();
-        // Trigger your Win/Loss UI screens here
+        // Trigger Win/Loss UI screens here
         if (InputManager.Instance != null && state == GameState.Won)
         {
             Debug.Log("Congratulations! You've won the game!");

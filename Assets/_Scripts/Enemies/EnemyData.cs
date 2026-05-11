@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// ƒанные дл€ врага (здоровье, скорость, урон и т.п.).
-/// »спользуетс€ EnemyFactory дл€ создани€ врагов и EnemyBase дл€ чтени€ параметров.
-/// </summary>
 [CreateAssetMenu(
     fileName = "EnemyData",
     menuName = "Game Data/Enemy Data",

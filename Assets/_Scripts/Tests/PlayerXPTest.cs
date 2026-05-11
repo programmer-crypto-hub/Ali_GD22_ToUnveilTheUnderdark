@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Временный скрипт для проверки работы PlayerProgression.
-/// </summary>
 public class PlayerExperienceTest : MonoBehaviour
 {
     public PlayerProgression progression;

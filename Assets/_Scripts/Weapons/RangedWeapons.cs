@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Оружие дальнего боя.
-/// Создаёт снаряд, который летит вперёд.
-/// </summary>
+
 public class RangedWeapon : WeaponBase
 {
     [Header("Параметры дальнего боя")]

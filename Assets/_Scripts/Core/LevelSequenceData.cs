@@ -18,9 +18,6 @@ public class LevelSequenceData : ScriptableObject
 
     public int LevelCount => levelSceneNames != null ? levelSceneNames.Length : 0;
 
-    /// <summary>
-    /// Safely tries to get the scene name for a given level index.
-    /// </summary>
     public bool TryGetLevelSceneName(int index, out string sceneName)
     {
         sceneName = null;
@@ -36,9 +33,6 @@ public class LevelSequenceData : ScriptableObject
         return true;
     }
 
-    /// <summary>
-    /// Finds the index of a given scene name in the level sequence. Returns -1 if not found or if input is invalid.
-    /// </summary>
     public int FindLevelIndex(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName) || levelSceneNames == null)

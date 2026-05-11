@@ -55,6 +55,7 @@ GameObject:
   - component: {fileID: 6747959071256591159}
   - component: {fileID: 7662427363872413756}
   - component: {fileID: -6294055781264973135}
+  - component: {fileID: -3800889513700864881}
   m_Layer: 6
   m_Name: PlayerUpdated
   m_TagString: Player
@@ -262,7 +263,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 60
   m_LinearDamping: 5
-  m_AngularDamping: 0.05
+  m_AngularDamping: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -275,7 +276,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 1
@@ -386,6 +387,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopSystem
   masterDatabase: {fileID: 11400000, guid: f668c37ce5783d24cbd1c635d02ac459, type: 2}
+--- !u!114 &-3800889513700864881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5a1ff9dee264bfd829a39e6542dcbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Addons.Physics::Fusion.Addons.Physics.RunnerSimulatePhysics3D
+  _physicsAuthority: 2
+  _physicsTiming: 3
+  ClientPhysicsSimulation: 0
+  DeltaTimeMultiplier: 1
+  SetUnityFixedTimestep: 0
 --- !u!1 &4121463555556301857
 GameObject:
   m_ObjectHideFlags: 0

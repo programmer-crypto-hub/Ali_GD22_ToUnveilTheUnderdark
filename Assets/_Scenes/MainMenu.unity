@@ -465,9 +465,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SettingsPanelController
   settingsPanel: {fileID: 146528183}
-  soundSlider: {fileID: 0}
-  musicSlider: {fileID: 0}
-  fullscreenToggle: {fileID: 791675790}
+  mainMenuPanel: {fileID: 862546441}
+  playerName: {fileID: 2089922199}
+  gameCode: {fileID: 91483989}
   backButton: {fileID: 419205928}
   soundSources: []
   musicSources: []
@@ -1361,9 +1361,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1585282489}
-        m_TargetAssemblyTypeName: BasicPlayerSpawner, Assembly-CSharp
-        m_MethodName: StartHostFromButton
+      - m_Target: {fileID: 146528184}
+        m_TargetAssemblyTypeName: SettingsPanelController, Assembly-CSharp
+        m_MethodName: OpenPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1428,7 +1428,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &564545490
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2515,7 +2515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &862546442
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2652,6 +2652,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 876802846}
   m_CullTransparentMesh: 1
+--- !u!1 &1002149390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1002149392}
+  - component: {fileID: 1002149391}
+  m_Layer: 0
+  m_Name: RuntimeStateController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1002149391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002149390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0272357983462c4c8381a7383f3064b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RuntimeStateController
+  settingsBinder: {fileID: 0}
+  inputManager: {fileID: 0}
+  playerSpawner: {fileID: 1585282489}
+  playerController: {fileID: 0}
+  playerStats: {fileID: 0}
+  gameplayHUDController: {fileID: 0}
+  weaponManager: {fileID: 0}
+  gameManager: {fileID: 0}
+  roomEncounterHandler: {fileID: 0}
+  cameraTarget: {fileID: 0}
+  eventBus: {fileID: 0}
+  gameSession: {fileID: 0}
+  shopUIManager: {fileID: 0}
+  playerProgression: {fileID: 0}
+  playerData: {fileID: 0}
+--- !u!4 &1002149392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002149390}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 313.23236, y: 178.71198, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1002344435
 GameObject:
   m_ObjectHideFlags: 0
@@ -5331,3 +5390,4 @@ SceneRoots:
   - {fileID: 1026213966}
   - {fileID: 652040190}
   - {fileID: 146528185}
+  - {fileID: 1002149392}

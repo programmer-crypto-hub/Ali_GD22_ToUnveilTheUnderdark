@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fusion;
+using System.Collections;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -39,9 +40,14 @@ public class PlayerMovement : NetworkBehaviour
             {
                 currentDiceValue--;
                 collision.enabled = false;
-                new WaitForSeconds(0.5f); // Задержка для предотвращения мгновенного повторного срабатывания
+                StartCoroutine(SpaceEnterDelay());
+                collision.enabled = true;
             }
         }
+    }
+    public IEnumerator SpaceEnterDelay()
+    {
+        yield return new WaitForSeconds(0.5f); // Adjust the delay as needed
     }
 
     public void OnDiceRolled()

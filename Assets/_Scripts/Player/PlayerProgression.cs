@@ -3,10 +3,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Fusion;
 
-/// <summary>
-/// Отвечает за прогрессию игрока:
-/// уровень, опыт и повышение уровня.
-/// </summary>
 public class PlayerProgression : NetworkBehaviour
 {
     [Header("Связи")]
@@ -37,16 +33,8 @@ public class PlayerProgression : NetworkBehaviour
     [Tooltip("Максимальный уровень здоровья, который может быть достигнут.")]
     private int maxLevel = 200;
 
-    /// <summary>
-    /// Текущий уровень игрока (только для чтения).
-    /// Для изменения уровня используйте метод AddXP().
-    /// </summary>
     public int CurrentLevel => currentLevel;
 
-    /// <summary>
-    /// Текущее количество опыта игрока (только для чтения).
-    /// Для добавления опыта используйте метод AddXP().
-    /// </summary>
     public float CurrentXP => currentXP;
 
     [Tooltip("Базовое количество опыта для перехода с 1 на 2 уровень.")]
@@ -71,9 +59,6 @@ public class PlayerProgression : NetworkBehaviour
         OnXPChanged?.Invoke(currentXP, required);
     }
 
-    /// <summary>
-    /// Сколько опыта нужно для перехода на следующий уровень.
-    /// </summary>
     private float GetRequiredXPForNextLevel()
     {
         // Например: baseExp * factor^(level-1)
@@ -86,10 +71,6 @@ public class PlayerProgression : NetworkBehaviour
         return required;
     }
 
-    /// <summary>
-    /// Добавление опыта. Можно вызывать из других систем
-    /// (убийство врага, выполнение квеста и т.д.).
-    /// </summary>
     public void AddXP(float amount)
     {
         if (amount <= 0f || currentLevel >= maxLevel)
@@ -121,9 +102,6 @@ public class PlayerProgression : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Внутренняя логика повышения уровня.
-    /// </summary>
     private void LevelUpInternal()
     {
         currentLevel++;

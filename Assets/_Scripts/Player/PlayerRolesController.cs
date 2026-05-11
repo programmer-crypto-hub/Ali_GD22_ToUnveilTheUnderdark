@@ -2,6 +2,7 @@ using System;
 using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerRolesController : NetworkBehaviour
 {
@@ -44,6 +45,7 @@ public class PlayerRolesController : NetworkBehaviour
         rolePanel.SetActive(false);
 
         ApplyRole();
+        StartCoroutine(DisplayRoleUICoroutine());
     }
 
     public void SpawnItemsForRole(PlayerRoles.RoleType roleType)
@@ -89,10 +91,10 @@ public class PlayerRolesController : NetworkBehaviour
         roleImage.sprite = playerRoles.roleSprite;
     }
 
-    public void DisplayRoleUI()
+    public IEnumerator DisplayRoleUICoroutine()
     {
         rolePanel.SetActive(true);
-        new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
+        yield return new WaitForSeconds(2f); // Задержка для отображения роли (можно настроить по необходимости)
         roleImage.enabled = true;
         // Здесь можно добавить логику для отображения конкретного изображения или текста в зависимости от роли
         // Например:

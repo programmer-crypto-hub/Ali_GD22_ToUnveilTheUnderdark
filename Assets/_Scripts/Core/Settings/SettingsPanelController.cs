@@ -1,35 +1,22 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using Fusion;
 
-/*
- * SettingsPanelController
- * Назначение: контроллер отдельного окна настроек (MainMenu-сценарий: Open/Close/Back).
- * Роль в игре: даёт игроку доступ к sound/music/fullscreen в формате отдельной панели.
- * Связи: объект панели, UI-контролы, GameSettings, опционально явные массивы AudioSource.
- * Как используется: вешается на объект окна настроек, все ссылки задаются в Inspector.
- * Идеи расширения:
- * - Добавить кнопку "Сброс по умолчанию".
- * - Добавить режим "Apply/Cancel" для отложенного применения.
- * - Добавить локализацию подписей внутри окна.
- * Практические советы:
- * - Канонический путь: ссылки назначены вручную; автопоиск — только запасной сценарий.
- * - Если Back не работает, сначала проверьте ссылку backButton и active state settingsPanel.
- */
 public class SettingsPanelController : MonoBehaviour
 {
-    [Header("Окно настроек")]
-    [Tooltip("Корневой объект отдельной панели настроек. Если не задан, используется текущий объект как резервный путь.")]
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject mainMenuPanel;
 
     [Header("UI-controls")]
     [Tooltip("Player Name input field.")]
-    [SerializeField] private InputField playerName;
+    [SerializeField] private TMP_InputField playerName;
 
     [Tooltip("Game Code input field.")]
-    [SerializeField] private InputField gameCode;
+    [SerializeField] private TMP_InputField gameCode;
 
-    [SerializeField] private Toggle fullscreenToggle;
+    [Networked] private Toggle fullscreenToggle { get; set; }
 
     [Tooltip("Кнопка \"Назад\" для закрытия панели.")]
     [SerializeField] private Button backButton;
@@ -58,19 +45,12 @@ public class SettingsPanelController : MonoBehaviour
         ResolveReferencesIfMissing();
     }
 
-    /// <summary>
-    /// Контракт: при активации окна синхронизирует UI из сохранённых значений,
-    /// применяет значения в текущую сцену и только потом подписывает обработчики.
-    /// Почему так: предотвращаем рекурсивные callback'и и гарантируем актуальные значения в UI.
-    /// Как дебажить: если при открытии окна слайдеры показывают не то, проверьте PlayerPrefs и suppressCallbacks.
-    /// </summary>
     private void OnEnable()
     {
         SyncUiFromSavedSettings();
         GameSettings.Apply(GameSettings.Load(), soundSources, musicSources);
         BindUiHandlers();
     }
-
     private void OnDisable()
     {
         UnbindUiHandlers();
@@ -92,6 +72,7 @@ public class SettingsPanelController : MonoBehaviour
 
         settingsPanel.SetActive(false);
         OnSettingsClosed?.Invoke();
+        mainMenuPanel.SetActive(false);
     }
 
     private void BindUiHandlers()
@@ -104,25 +85,23 @@ public class SettingsPanelController : MonoBehaviour
 
         if (backButton != null)
             backButton.onClick.AddListener(ClosePanel);
+        if (fullscreenToggle != null)
+            fullscreenToggle.onValueChanged.AddListener(HandleFullscreenToggleChanged);
     }
 
     private void UnbindUiHandlers()
     {
         if (playerName != null)
             playerName.onValueChanged.RemoveListener(HandlePlayerNameChanged);
-
         if (gameCode != null)
             gameCode.onValueChanged.RemoveListener(HandleGameCodeChanged);
 
         if (backButton != null)
             backButton.onClick.RemoveListener(ClosePanel);
+        if (fullscreenToggle != null)
+            fullscreenToggle.onValueChanged.RemoveListener(HandleFullscreenToggleChanged);
     }
 
-    /// <summary>
-    /// Контракт: выставляет значения UI без вызова слушателей и без повторного сохранения в PlayerPrefs.
-    /// Почему так: это исключает зацикливание "загрузка -> callback -> сохранение".
-    /// Как дебажить: если callback всё равно стреляет, проверьте, что используются SetValueWithoutNotify/SetIsOnWithoutNotify.
-    /// </summary>
     private void SyncUiFromSavedSettings()
     {
         GameSettings.Data data = GameSettings.Load();
@@ -164,10 +143,6 @@ public class SettingsPanelController : MonoBehaviour
         GameSettings.SetFullscreen(isFullscreen);
     }
 
-    /// <summary>
-    /// Резервный путь: восстанавливает ссылки, если их забыли назначить в Inspector.
-    /// В учебном каноне это не основной путь, а страховка от падения сцены.
-    /// </summary>
     private void ResolveReferencesIfMissing()
     {
         if (settingsPanel == null)
@@ -180,7 +155,7 @@ public class SettingsPanelController : MonoBehaviour
 
         if (playerName == null || gameCode == null)
         {
-            InputField[] inputFields = settingsPanel.GetComponentsInChildren<InputField>(true);
+            TMP_InputField[] inputFields = settingsPanel.GetComponentsInChildren<TMP_InputField>(true);
             if (playerName == null && inputFields.Length > 0)
                 playerName = inputFields[0];
             if (gameCode == null && inputFields.Length > 1)
