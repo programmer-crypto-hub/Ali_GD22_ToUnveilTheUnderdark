@@ -84,6 +84,20 @@ public class WeaponManager : NetworkBehaviour
             }
         }
     }
+
+    public void SwitchToPrevWeapon()
+    {
+        if (!Object.HasInputAuthority) return;
+        for (int i = 1; i <= weaponPrefabs.Length; i++)
+        {
+            int prev = (CurrentWeaponIndex - i + weaponPrefabs.Length) % weaponPrefabs.Length;
+            if (IsWeaponUnlocked(prev))
+            {
+                CurrentWeaponIndex = prev;
+                break;
+            }
+        }
+    }
     public void PerformCurrentWeaponAttack()
     { 
         // CRITICAL: Only the Server/Host calculates damage to prevent cheating

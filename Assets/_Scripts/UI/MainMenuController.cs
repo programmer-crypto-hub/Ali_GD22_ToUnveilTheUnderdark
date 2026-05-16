@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
+    public static MainMenuController Instance { get; private set; }
+
     [SerializeField] private Button buttonNewGame;
     [SerializeField] private Button buttonQuitGame;
     [SerializeField] private Button buttonSettings;
@@ -36,7 +38,7 @@ public class MainMenuController : MonoBehaviour
         if (settingsPanelController == null)
             Debug.LogError($"{name}: settingsPanelController не назначен в Inspector.", this);
     }
-    private void HandleSettingsClicked()
+    public void HandleSettingsClicked()
     {
         if (settingsPanelController == null)
         {

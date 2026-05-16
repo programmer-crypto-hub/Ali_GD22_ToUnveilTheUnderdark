@@ -166,7 +166,9 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
         var mapManager = FindFirstObjectByType<NetworkMapManager>();
         var inputManager = FindFirstObjectByType<InputManager>();
         if (inputManager != null) inputManager.HandleGameResumed();
-        //sceneManager.IsMultiplePeer = false;
+        // Load the loading screen to prevent player confusion
+        // As it takes around 3 seconds to load the main scene
+        if (SceneLoader.Instance != null) SceneLoader.Instance.LoadScene();
         // Start or join (depends on gamemode) a session with a specific name
         try
         {
@@ -174,7 +176,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
             var result = await _runner.StartGame(new StartGameArgs()
             {
                 GameMode = mode,
-                SessionName = "TestRoom",
+                SessionName = "GameRoom",
                 Scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath("Assets/_Scenes/GameScene.unity")),   // This tells Photon: "Move everyone here once connected"
                 SceneManager = sceneManager 
             });
@@ -191,7 +193,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
             }
 
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"Fatal Error during StartGame: {e.Message}");
         }

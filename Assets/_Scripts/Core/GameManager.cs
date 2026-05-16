@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using UnityEngine.InputSystem.XR.Haptics;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -16,7 +17,7 @@ public class GameManager : NetworkBehaviour
         Won = 5,
     }
 
-    [Networked, OnChangedRender(nameof(OnStateChanged))] 
+    [Networked, OnChangedRender(nameof(OnStateChanged))]
     public GameState CurrentState { get; private set; }
 
     public override void Spawned()

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GameLoopFlowController : NetworkBehaviour
 {
+    public static GameLoopFlowController Instance { get; private set; }
     [Header("Lose UI (scene canvas or prefab)")]
     [SerializeField] private GameObject losePanel;
     [SerializeField] private Button loseMenuButton;
@@ -209,7 +210,7 @@ public class GameLoopFlowController : NetworkBehaviour
             winPanel.SetActive(false);
     }
 
-    private void HandleMenuClicked()
+    public void HandleMenuClicked()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.HandleGameOver(GameManager.GameState.MainMenu);

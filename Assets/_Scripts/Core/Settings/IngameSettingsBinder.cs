@@ -5,7 +5,10 @@ using Fusion;
 [DisallowMultipleComponent]
 public class IngameSettingsBinder : NetworkBehaviour
 {
+    public static IngameSettingsBinder Instance { get; private set; }
     [Header("Settings")]
+    [SerializeField] private Button openSettingsButton;
+    [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Slider soundSlider;
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Toggle fullscreenToggle;
@@ -49,6 +52,8 @@ public class IngameSettingsBinder : NetworkBehaviour
 
     private void BindUiHandlers()
     {
+        if (openSettingsButton != null)
+            openSettingsButton.onClick.AddListener(OpenSettingsMenu);
         if (soundSlider != null)
             soundSlider.onValueChanged.AddListener(HandleSoundChanged);
 
@@ -69,6 +74,11 @@ public class IngameSettingsBinder : NetworkBehaviour
 
         if (fullscreenToggle != null)
             fullscreenToggle.onValueChanged.RemoveListener(HandleFullscreenChanged);
+    }
+
+    public void OpenSettingsMenu()
+    {
+        settingsPanel.SetActive(true);
     }
 
     private void SyncUiFromSavedSettings()

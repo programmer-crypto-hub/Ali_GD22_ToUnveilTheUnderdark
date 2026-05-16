@@ -1,68 +1,120 @@
 using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
-using static Unity.Collections.Unicode;
 
-public class PlayerButtonController : MonoBehaviour
+/* 
+ * Central Script for applying functions to buttons.
+ * Reason of Usage: Fusion-inherited buttons' OnClick() cannot directly call functions that require parameters, so we use this script to bind them together.
+ */
+public class PlayerButtonController : NetworkBehaviour
 {
-    [Header("Buttons")]
-    public Button rollDiceButton;
-    public Button shopButton;
-    public Button endTurnButton;
+    [Header("Player")]
+    public NetworkObject playerNetworkObject;
 
+    [SerializeField] public Button rollDiceButton;
+    [SerializeField] public Button shopButton;
+    [SerializeField] public Button endTurnButton;
+    [SerializeField] public Button nextWeapon;
+    [SerializeField] public Button prevButton;
+    [SerializeField] public Button winMenuButton;
+    [SerializeField] public Button loseMenuButton;
+    [SerializeField] public Button menuQuitButton;
+    [SerializeField] public Button menuSettingsButton;
+    [SerializeField] public Button quitButton;
+    [SerializeField] public Button settingsButton;
+
+    public override void Spawned()
+    {
+        if (playerNetworkObject == null)
+        {
+            Debug.LogError("Player NetworkObject reference is missing!");
+            return;
+        }
+        else
+        {
+            // Optionally disable buttons for non-local players to avoid confusion
+            rollDiceButton.interactable = false;
+            shopButton.interactable = false;
+            endTurnButton.interactable = false;
+            nextWeapon.interactable = false;
+            prevButton.interactable = false;
+        }
+        BindToPlayer();
+    }
     private void OnEnable()
     {
-        // Listen for the event we created earlier in the EventBus
-        if (EventBus.Instance != null)
-            EventBus.Instance.OnMapGenerated += HandleMapReady;
-    }
-
-    private void HandleMapReady()
-    {
-        // The map is generated! Now find the local player.
-        // In Fusion 2, the local player is the one with InputAuthority.
-        var runner = FindFirstObjectByType<NetworkRunner>();
-        var localPlayer = runner.GetPlayerObject(runner.LocalPlayer).GetComponent<PlayerStats>();
-
-        if (localPlayer != null)
-        {
-            RemoveListeners(); // Clear any old listeners to prevent duplicates
-            BindToPlayer();
-        }
-    }
-    private void OnDisable()
-    {
-        // Unsubscribe to prevent memory leaks
-        if (EventBus.Instance != null)
-            EventBus.Instance.OnMapGenerated -= HandleMapReady;
+        RemoveListeners();
     }
     private void RemoveListeners()
     {
         rollDiceButton.onClick.RemoveAllListeners();
         endTurnButton.onClick.RemoveAllListeners();
         shopButton.onClick.RemoveAllListeners();
+        nextWeapon.onClick.RemoveAllListeners();
+        prevButton.onClick.RemoveAllListeners();
     }
     public void BindToPlayer()
     {
-        rollDiceButton.onClick.AddListener(() => {
+        rollDiceButton.onClick.AddListener(() =>
+        {
             if (DiceRoller.Instance != null)
             {
                 DiceRoller.Instance.RPC_RequestRollDice();
             }
         });
-        endTurnButton.onClick.AddListener(() => {
+        endTurnButton.onClick.AddListener(() =>
+        {
             if (GameSession.Instance != null)
             {
                 GameSession.Instance.RPC_RequestEndTurn();
             }
         });
-        shopButton.onClick.AddListener(() => {
+        shopButton.onClick.AddListener(() =>
+        {
             if (ShopUIManager.Instance != null)
             {
                 ShopUIManager.Instance.ToggleShop(true);
             }
         });
-
-        Debug.Log("UI Bound to local player after Edgar generation.");
+        nextWeapon.onClick.AddListener(() =>
+        {
+            if (playerNetworkObject != null)
+                playerNetworkObject.GetComponent<WeaponManager>()?.SwitchToNextWeapon();
+        });
+        prevButton.onClick.AddListener(() =>
+        {
+            if (playerNetworkObject != null)
+                playerNetworkObject.GetComponent<WeaponManager>()?.SwitchToPrevWeapon();
+        });
+        winMenuButton.onClick.AddListener(() =>
+        {
+            if (GameLoopFlowController.Instance != null)
+            {
+                GameLoopFlowController.Instance.HandleMenuClicked();
+            }
+        });
+        loseMenuButton.onClick.AddListener(() =>
+        {
+            if (GameLoopFlowController.Instance != null)
+            {
+                GameLoopFlowController.Instance.HandleMenuClicked();
+            }
+        });
+        menuQuitButton.onClick.AddListener(() => Application.Quit());
+        quitButton.onClick.AddListener(() => Application.Quit());
+        menuSettingsButton.onClick.AddListener(() =>
+        {
+            if (MainMenuController.Instance != null)
+            {
+                MainMenuController.Instance.HandleSettingsClicked();
+            }
+        });
+        settingsButton.onClick.AddListener(() =>
+        {
+            if (IngameSettingsBinder.Instance != null)
+            {
+                IngameSettingsBinder.Instance.OpenSettingsMenu();
+            }
+        });
     }
 }
