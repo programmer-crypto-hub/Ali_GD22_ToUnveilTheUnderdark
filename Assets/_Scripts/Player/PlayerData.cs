@@ -12,7 +12,7 @@ public class PlayerData : ScriptableObject
     [Header("Movement")]
     [Min(0f)]
     [Tooltip("Default Speed Value, used by PlayerController.")]
-    public int moveSpeed = 5;
+    public int moveSpeed = 50;
 
     [Min(0f)]
     [Tooltip("Default Jump Force, affecting Vertical Axis.")]

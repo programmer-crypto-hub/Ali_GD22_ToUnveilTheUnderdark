@@ -1,8 +1,9 @@
 using UnityEngine;
 using System;
+using Fusion;
 using UnityEngine.UIElements;
 
-public class EnemyEncounter : MonoBehaviour
+public class EnemyEncounter : NetworkBehaviour
 {
     [Header("Encounter Spawns")]
     [Tooltip("Array of Platforms, where Encounters spawn")]
@@ -14,13 +15,16 @@ public class EnemyEncounter : MonoBehaviour
     public Sprite[] enemySprites;
 
     [Header("UI Settings")]
-    [Tooltip("UI Element to display encounter info")]
+    [Tooltip("UI Element to display enemy info")]
     public GameObject encounterPanel;
 
-    [Header("Encounter Settings")]
-    [Tooltip("Multiple configurations of Enemy Spawning")]
-    public bool canSpawnHere = false;
-    public bool isEnemySpawned = false;
+    [Header("State")]
+    [Networked] public NetworkBool canSpawnHere { get; set; }
+    [Networked] public NetworkBool isEnemySpawned { get; set; }
+    [Networked] public NetworkBool isEnemyTriggered { get; set; }
+    // 0 = Basic, 1 = Medium, 2 = Boss.
+    // Used to determine if an enemy can spawn at a given spawn point (via CanEnemySpawnHere())
+    [Networked] public int spawnHierarchy { get; set; }
 
     public int spawnIndex;
     public int enemyIndex = 0; // Index to select enemy type from EnemyData array
@@ -28,33 +32,117 @@ public class EnemyEncounter : MonoBehaviour
 
     public Action OnEnemySpawnTriggered;
 
+    public override void Spawned()
+    {
+        if (HasStateAuthority)
+        {
+            InitEnemySpawn();
+            DefEnemyIndex(EnemyHierarchy.Instance.hierarchyIndex);
+            CanEnemySpawnHere();
+            SpawnEnemy();
+        }
+    }
     public void InitEnemySpawn()
     {
         spawnIndex = UnityEngine.Random.Range(0, spawnPlatforms.Length);
         Debug.Log($"EnemyEncounter: InitEnemySpawn called. Enemy spawning at {spawnIndex}");
     }
-    public void DefEnemyIndex(EnemyData.EnemyTypeByHealth enemyType)
+    public int DefEnemyIndex(int enemyType)
     {
         if (EnemyData == null)
         {
             Debug.LogError("EnemyData is not assigned in EnemyEncounter.");
-            return;
         }
-        if (enemyType == EnemyData.EnemyTypeByHealth.Basic)
+        if (enemyType == 0)
+        {
+            EnemyHierarchy.Instance.hierarchyIndex = 0; // Basic enemy is at index 0 in hierarchy
             Index = 0;
-        else if (enemyType == EnemyData.EnemyTypeByHealth.Medium)
+            return 0;
+        }
+        else if (enemyType == 1)
+        {
+            EnemyHierarchy.Instance.hierarchyIndex = 1; // Medium enemy is at index 1 in hierarchy
             Index = 1;
-        else if (enemyType == EnemyData.EnemyTypeByHealth.Boss)
+            return 1;
+        }
+        else if (enemyType == 2)
+        {
+            EnemyHierarchy.Instance.hierarchyIndex = 2; // Boss enemy is at index 2 in hierarchy
             Index = 2;
+            return 2;
+        }
+        else
+        {
+            Debug.LogError("Invalid enemy type provided to DefEnemyIndex.");
+            return -1; // Return -1 to indicate an error
+        }
     }
 
     public bool CanEnemySpawnHere()
     {
-        if (spawnIndex == spawnPlatforms.Length && Index < 2)
-            return false;
-        else if (spawnIndex == spawnPlatforms.Length - 1 && Index == 2)
-            return false;
-        else
+        if (spawnHierarchy == 0 && Index == 0) // Basic enemy can spawn at Basic spawn point
+        {
+            canSpawnHere = true;
             return true;
+        }
+        else if (spawnHierarchy == 1 && Index <= 1) // Medium enemy can spawn at Basic and Medium spawn points
+        {
+            canSpawnHere = true;
+            return true;
+        }
+        else if (spawnHierarchy == 2 && Index == 2) // Boss enemy can spawn at his own spawn
+        {
+            canSpawnHere = true;
+            return true;
+        }
+        else
+        {
+            canSpawnHere = false;
+            return false;
+        }
     }
+
+    public void SpawnEnemy()
+    {
+        if (canSpawnHere && !isEnemySpawned)
+        {
+            GameObject enemyPrefab = EnemyData.prefab; 
+            if (enemyPrefab != null)
+            {
+                Runner.Spawn(enemyPrefab, spawnPlatforms[spawnIndex].transform.position, Quaternion.identity);
+                isEnemySpawned = true;
+                Debug.Log($"EnemyEncounter: Spawned {EnemyData.enemyName} at {spawnPlatforms[spawnIndex].name}");
+                OnEnemySpawnTriggered?.Invoke();
+            }
+            else
+            {
+                Debug.LogError("Enemy prefab is not assigned in EnemyData.");
+            }
+        }
+    }
+
+    // TODO: Add UI logic (separate script)
+    // To display enemy info (name, health, type)
+    // Akin to gizmos, above the enemy sprite
+    public void DisplayEnemyData()
+    {
+        if (encounterPanel != null && EnemyData != null)
+        {
+            
+        }
+        else
+        {
+            Debug.LogError("Encounter panel or EnemyData is not assigned in EnemyEncounter.");
+        }
+    }
+}
+
+/* Usage: Defy enemy type from manual input
+ * Used by it's parent class EnemyHierarchy
+ */
+public class EnemyHierarchy : EnemyEncounter
+{
+    public static EnemyHierarchy Instance { get; private set; }
+    [SerializeField] private EnemyData.EnemyTypeByHealth hierarchyType;
+    [SerializeField] public int hierarchyIndex; // 0 = Basic, 1 = Medium, 2 = Boss
 }
