@@ -8,6 +8,7 @@ public class ShopSpaceTrigger : MonoBehaviour
 
     private void OnEnable()
     {
+        if (InputManager.Instance == null) Debug.LogError("InputManager instance not found! Make sure it is in the scene and properly initialized.");
         // Subscribe to the event
         if (InputManager.Instance != null)
             InputManager.Instance.OnInteractPressed += TryOpenShop;
@@ -37,6 +38,7 @@ public class ShopSpaceTrigger : MonoBehaviour
         if (networkObj != null && networkObj.HasInputAuthority)
         {
             _isPlayerInZone = false;
+            if (ShopUIManager.Instance == null) Debug.LogError("ShopUIManager instance not found! Make sure it is in the scene and properly initialized.");
             ShopUIManager.Instance.ToggleShop(false);
         }
     }
@@ -44,7 +46,8 @@ public class ShopSpaceTrigger : MonoBehaviour
     private void TryOpenShop()
     {
         if (!_isPlayerInZone) return;
-        var Runner = GameSession.Instance.Runner;
+        var Runner = FindFirstObjectByType<NetworkRunner>();
+        if (GameSession.Instance == null) Debug.LogError("GameSession instance not found! Make sure it is in the scene and properly initialized.");
         // Fusion 2 uses Runner.LocalPlayer to identify 'you'
         if (GameSession.Instance.CurrentTurnPlayer != Runner.LocalPlayer)
         {
@@ -54,6 +57,7 @@ public class ShopSpaceTrigger : MonoBehaviour
         }
 
         // If both pass, open the UI
+        if (ShopUIManager.Instance == null) Debug.LogError("ShopUIManager instance not found! Make sure it is in the scene and properly initialized.");
         ShopUIManager.Instance.ToggleShop(true);
     }
 }

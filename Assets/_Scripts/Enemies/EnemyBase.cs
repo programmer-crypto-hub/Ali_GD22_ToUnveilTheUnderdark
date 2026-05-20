@@ -15,7 +15,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     [Networked] private EnemyState CurrentState { get; set; }
     [Networked] private TickTimer AttackCooldown { get; set; }
 
-    [SerializeField] private Transform _target;
+    private Transform _target;
     private ChangeDetector _changes;
 
     // Read-only property for IDamageable
@@ -140,7 +140,8 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     private void FindClosestPlayer()
     {
         GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
+        var netObj = player != null ? player.GetComponent<NetworkObject>() : null;
+        if (player != null && netObj.IsValid)
         {
             _target = player.transform;
         }

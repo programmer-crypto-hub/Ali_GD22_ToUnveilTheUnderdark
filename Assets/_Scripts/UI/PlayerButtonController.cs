@@ -47,74 +47,84 @@ public class PlayerButtonController : NetworkBehaviour
     }
     private void RemoveListeners()
     {
-        rollDiceButton.onClick.RemoveAllListeners();
-        endTurnButton.onClick.RemoveAllListeners();
-        shopButton.onClick.RemoveAllListeners();
-        nextWeapon.onClick.RemoveAllListeners();
-        prevButton.onClick.RemoveAllListeners();
+        if (rollDiceButton != null) rollDiceButton.onClick.RemoveAllListeners();
+        if (endTurnButton != null) endTurnButton.onClick.RemoveAllListeners();
+        if (shopButton != null) shopButton.onClick.RemoveAllListeners();
+        if (nextWeapon != null) nextWeapon.onClick.RemoveAllListeners();
+        if (prevButton != null) prevButton.onClick.RemoveAllListeners();
     }
     public void BindToPlayer()
     {
-        rollDiceButton.onClick.AddListener(() =>
+        if (rollDiceButton != null && DiceRoller.Instance != null)
         {
-            if (DiceRoller.Instance != null)
+            rollDiceButton.onClick.AddListener(() =>
             {
                 DiceRoller.Instance.RPC_RequestRollDice();
-            }
-        });
-        endTurnButton.onClick.AddListener(() =>
+            });
+        }
+        if (endTurnButton != null && GameSession.Instance != null)
         {
-            if (GameSession.Instance != null)
+            endTurnButton.onClick.AddListener(() =>
             {
                 GameSession.Instance.RPC_RequestEndTurn();
-            }
-        });
-        shopButton.onClick.AddListener(() =>
+            });
+        }
+        if (shopButton != null && ShopUIManager.Instance != null)
         {
-            if (ShopUIManager.Instance != null)
+            shopButton.onClick.AddListener(() =>
             {
                 ShopUIManager.Instance.ToggleShop(true);
-            }
-        });
-        nextWeapon.onClick.AddListener(() =>
+            });
+        }
+        if (nextWeapon != null && playerNetworkObject != null)
         {
-            if (playerNetworkObject != null)
+            nextWeapon.onClick.AddListener(() =>
+            {
                 playerNetworkObject.GetComponent<WeaponManager>()?.SwitchToNextWeapon();
-        });
-        prevButton.onClick.AddListener(() =>
+            });
+        }
+        if (prevButton != null && playerNetworkObject != null)
         {
-            if (playerNetworkObject != null)
+            prevButton.onClick.AddListener(() =>
+            {
                 playerNetworkObject.GetComponent<WeaponManager>()?.SwitchToPrevWeapon();
-        });
-        winMenuButton.onClick.AddListener(() =>
+            });
+        }
+        if (winMenuButton != null && GameLoopFlowController.Instance != null)
         {
-            if (GameLoopFlowController.Instance != null)
+            winMenuButton.onClick.AddListener(() =>
             {
                 GameLoopFlowController.Instance.HandleMenuClicked();
-            }
-        });
-        loseMenuButton.onClick.AddListener(() =>
+            });
+        }
+        if (loseMenuButton != null && GameLoopFlowController.Instance != null)
         {
-            if (GameLoopFlowController.Instance != null)
+            loseMenuButton.onClick.AddListener(() =>
             {
                 GameLoopFlowController.Instance.HandleMenuClicked();
-            }
-        });
-        menuQuitButton.onClick.AddListener(() => Application.Quit());
-        quitButton.onClick.AddListener(() => Application.Quit());
-        menuSettingsButton.onClick.AddListener(() =>
+            });
+        }
+        if (menuQuitButton != null)
         {
-            if (MainMenuController.Instance != null)
+            menuQuitButton.onClick.AddListener(() => Application.Quit());
+        }
+        if (quitButton != null)
+        {
+            quitButton.onClick.AddListener(() => Application.Quit());
+        }
+        if (menuSettingsButton != null && MainMenuController.Instance != null)
+        {
+            menuSettingsButton.onClick.AddListener(() =>
             {
                 MainMenuController.Instance.HandleSettingsClicked();
-            }
-        });
-        settingsButton.onClick.AddListener(() =>
+            });
+        }
+        if (settingsButton != null && IngameSettingsBinder.Instance != null)
         {
-            if (IngameSettingsBinder.Instance != null)
+            settingsButton.onClick.AddListener(() =>
             {
                 IngameSettingsBinder.Instance.OpenSettingsMenu();
-            }
-        });
+            });
+        }
     }
 }

@@ -4,89 +4,65 @@ using System.Collections;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [Header("Player Stats to Obtain Data")]
-    [SerializeField]
-    [Tooltip("Reference to PlayerStats component to access player data and events.")]
+    [Header("References")]
     public PlayerStats playerStats;
-    [SerializeField]
     public PlayerData playerData;
-    [SerializeField]
     public PlayerController playerController;
 
-    public static PlayerMovement Instance { get; private set; }
+    // REMOVED: public static PlayerMovement Instance (Singletons break multiple client prefabs!)
 
-    [Networked]
-    public float currentDamage { get; set; }
-    [Networked]
-    private int currentDiceValue { get; set; }
+    [Networked] public float currentDamage { get; set; }
+    [Networked] private int currentDiceValue { get; set; }
 
-    public override void Spawned()
-    {
-        Instance = this;
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject); // Prevents duplicate managers
-        }
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("SpaceTrigger"))
         {
-            if (GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
             {
                 currentDiceValue--;
                 collision.enabled = false;
-                StartCoroutine(SpaceEnterDelay());
-                collision.enabled = true;
+                StartCoroutine(SpaceEnterDelay(collision));
             }
         }
     }
-    public IEnumerator SpaceEnterDelay()
+
+    public IEnumerator SpaceEnterDelay(Collider2D collision)
     {
-        yield return new WaitForSeconds(0.5f); // Adjust the delay as needed
+        yield return new WaitForSeconds(0.5f);
+        if (collision != null) collision.enabled = true;
     }
 
     public void OnDiceRolled()
     {
+        // Only allow the owner of this piece to process the roll logic
         if (!HasStateAuthority) return;
+
         currentDiceValue = DiceRoller.Instance.DiceRollResult;
-        DiceUI.Instance.HandleDiceRolled(currentDiceValue);
 
-        if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
+        if (DiceUI.Instance != null)
+            DiceUI.Instance.HandleDiceRolled(currentDiceValue);
+
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
-            // Конвертируем результат броска кубика в количество шагов для перемещения игрока
             DiceRoller.Instance.ConvertDiceToMovement();
-            playerController.HandleMovement();
-            // Здесь можно добавить логику для перемещения игрока на основе результата броска кубика
-            Debug.Log($"Игрок может переместиться на {currentDiceValue} шагов.");
-        }
 
-        if (GameManager.Instance.CurrentState == GameManager.GameState.Combat)
-        {
-            float damage = 0;
-            DiceRoller.Instance.ConvertDiceToCombat();
-            currentDamage *= damage;
-            // Логика для боя, если игрок находится в боевом состоянии
-            Debug.Log($"Игрок атакует с силой {currentDamage} и броском кубика {currentDiceValue}.");
+            // FIX: Instead of trying to force movement calculations instantly via code,
+            // your PlayerController will naturally start moving inside its own FixedUpdateNetwork() loop
+            // now that currentDiceValue is updated.
+
+            Debug.Log($"Player can move: remaining steps = {currentDiceValue}");
         }
     }
 
     public void OnCollisionEnter2D(Collision2D other)
     {
-        if (currentDiceValue <= 0)
+        if (currentDiceValue <= 0) return;
+
+        if (other.gameObject.CompareTag("Enemy") && GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
-            Debug.Log("Player has used all movement steps for this turn.");
-            return;
-        }
-        if (other.gameObject.CompareTag("Enemy") && GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
-        {
-            currentDiceValue--; // Decrease remaining steps left to move
-            new WaitForEndOfFrame(); // Delay to prevent immediate retriggering
-            Debug.Log(other + " triggered! Remaining steps: " + currentDiceValue);
+            currentDiceValue--;
+            Debug.Log($"{other.gameObject.name} hit! Steps remaining: {currentDiceValue}");
         }
     }
 }

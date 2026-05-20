@@ -1,87 +1,87 @@
-using Fusion;
-using UnityEngine;
+//using Fusion;
+//using UnityEngine;
 
-public class Player : NetworkBehaviour
-{
-    [SerializeField] private Ball _prefabBall;
-    [SerializeField] private PhysxBall _prefabPhysxBall;
+//public class Player : NetworkBehaviour
+//{
+//    [SerializeField] private Ball _prefabBall;
+//    [SerializeField] private PhysxBall _prefabPhysxBall;
 
-    [Networked]
-    public bool spawnedProjectile { get; set; }
+//    [Networked]
+//    public bool spawnedProjectile { get; set; }
 
-    [Networked] private TickTimer delay { get; set; }
+//    [Networked] private TickTimer delay { get; set; }
 
-    private Vector3 _forward;
+//    private Vector3 _forward;
 
-    public Material _material;
-    private ChangeDetector _changeDetector;
-    private Rigidbody _rb;
-    public override void Spawned()
-    {
-        _rb = GetComponent<Rigidbody>();
-        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-        _material = GetComponentInChildren<SpriteRenderer>().material;
-    }
+//    public Material _material;
+//    private ChangeDetector _changeDetector;
+//    private Rigidbody _rb;
+//    public override void Spawned()
+//    {
+//        _rb = GetComponent<Rigidbody>();
+//        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+//        _material = GetComponentInChildren<SpriteRenderer>().material;
+//    }
 
-    private void Awake()
-    {
-        _forward = transform.forward;
-    }
+//    private void Awake()
+//    {
+//        _forward = transform.forward;
+//    }
 
-    public override void FixedUpdateNetwork()
-    {
-        if (GetInput(out NetworkInputData data))
-        {
-            data.direction.Normalize();
-            transform.position += data.direction * 5f * Runner.DeltaTime;
+//    public override void FixedUpdateNetwork()
+//    {
+//        if (GetInput(out NetworkInputData data))
+//        {
+//            data.direction.Normalize();
+//            transform.position += data.direction * 5f * Runner.DeltaTime;
 
-            if (data.direction.sqrMagnitude > 0)
-                _forward = data.direction;
+//            if (data.direction.sqrMagnitude > 0)
+//                _forward = data.direction;
 
-            if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
-            {
-                if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-                {
-                    Debug.Log("Spawn Ball");
-                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    Vector3 spawnPosition = transform.position + (transform.right * 4f);
-                    Runner.Spawn(_prefabBall, spawnPosition, Quaternion.identity, Object.InputAuthority,
-                  (runner, o) =>
-                  {
-                      o.GetComponent<Ball>().Spawned();
-                  });
-                    spawnedProjectile = !spawnedProjectile;
-                }
-            }
+//            if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+//            {
+//                if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+//                {
+//                    Debug.Log("Spawn Ball");
+//                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+//                    Vector3 spawnPosition = transform.position + (transform.right * 4f);
+//                    Runner.Spawn(_prefabBall, spawnPosition, Quaternion.identity, Object.InputAuthority,
+//                  (runner, o) =>
+//                  {
+//                      o.GetComponent<Ball>().Spawned();
+//                  });
+//                    spawnedProjectile = !spawnedProjectile;
+//                }
+//            }
 
-            else if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
-            {
-                Debug.Log("Spawn PhysxBall");
-                Vector3 spawnPosition = transform.position + (transform.right * 4f);
-                delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                // Fusion version of Instantiate for networked objects. It will be spawned on all clients and the server
-                Runner.Spawn(_prefabPhysxBall, spawnPosition, Quaternion.identity, Object.InputAuthority,
-                  (runner, o) =>
-                  {
-                      o.GetComponent<PhysxBall>().Init(10 * _forward);
-                  });
-                spawnedProjectile = !spawnedProjectile;
-            }
-        }
-    }
+//            else if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+//            {
+//                Debug.Log("Spawn PhysxBall");
+//                Vector3 spawnPosition = transform.position + (transform.right * 4f);
+//                delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+//                // Fusion version of Instantiate for networked objects. It will be spawned on all clients and the server
+//                Runner.Spawn(_prefabPhysxBall, spawnPosition, Quaternion.identity, Object.InputAuthority,
+//                  (runner, o) =>
+//                  {
+//                      o.GetComponent<PhysxBall>().Init(10 * _forward);
+//                  });
+//                spawnedProjectile = !spawnedProjectile;
+//            }
+//        }
+//    }
 
-    public override void Render()
-    {
-        foreach (var change in _changeDetector.DetectChanges(this))
-        {
-            switch (change)
-            {
-                case nameof(spawnedProjectile):
-                    _material.color = Color.white;
-                    break;
+//    public override void Render()
+//    {
+//        foreach (var change in _changeDetector.DetectChanges(this))
+//        {
+//            switch (change)
+//            {
+//                case nameof(spawnedProjectile):
+//                    _material.color = Color.white;
+//                    break;
 
-            }
-        }
-        _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
-    }
-}
+//            }
+//        }
+//        _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
+//    }
+//}

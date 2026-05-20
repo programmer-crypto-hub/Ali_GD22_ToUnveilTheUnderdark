@@ -1,42 +1,53 @@
+using Fusion;
+using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using System.Collections;
+using static Unity.Collections.Unicode;
 
-public class SceneLoader : MonoBehaviour
+public class SceneLoader : NetworkBehaviour
 {
     public static SceneLoader Instance { get; private set; }
     [SerializeField] private GameObject loadingScreen;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
         Debug.Log("Scene Loader script active");
-        LoadScene();
     }
 
     public async void LoadScene()
     {
-        Debug.Log("LoadScene method active");
-        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+        if (Runner == null || !Runner.IsRunning)
         {
-            // Start the load
-            Debug.Log("Scene started loading");
-            var op = SceneManager.LoadSceneAsync(nextSceneIndex);
-            StartCoroutine(LoadingScreenCoroutine(op));
-
-            // Wait for it to finish
-            while (!op.isDone)
-            {
-                Debug.Log("Loading hasn't finished yet");
-                await Task.Yield();
-            }
+            Debug.LogError("Runner isn't running yet! Can't load scene - SceneLoader");
         }
         else
         {
-            Debug.LogError("No more scenes in Build Settings!");
-            if (loadingScreen != null) loadingScreen.SetActive(false);
+            Debug.Log("LoadScene method active");
+            int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+            if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+            {
+                // Start the load
+                Debug.Log("Scene started loading");
+                var op = SceneManager.LoadSceneAsync(nextSceneIndex);
+                StartCoroutine(LoadingScreenCoroutine(op));
+
+                // Wait for it to finish
+                while (!op.isDone)
+                {
+                    Debug.Log("Loading hasn't finished yet");
+                    await Task.Yield();
+                }
+            }
+            else
+            {
+                Debug.LogError("No more scenes in Build Settings!");
+                if (loadingScreen != null) loadingScreen.SetActive(false);
+            }
         }
     }
 

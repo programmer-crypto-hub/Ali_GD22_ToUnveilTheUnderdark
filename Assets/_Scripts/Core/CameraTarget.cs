@@ -1,81 +1,16 @@
-using Fusion;
-using Unity.Cinemachine;
 using UnityEngine;
+using Fusion;
 
-public class CameraTarget : NetworkBehaviour
+public class CameraTarget : MonoBehaviour
 {
-    [Header("Mouse Settings")]
-    [SerializeField] private float mouseSensitivity = 0.3f;
-    [SerializeField] private float minVerticalAngle = -30f;
-    [SerializeField] private float maxVerticalAngle = 60f;
-
-    [Header("State")]
-    [SerializeField] private float currentYaw = 0f;    // Y
-    [SerializeField] private float currentPitch = 0f; // X
-
     public Transform target;
-    [SerializeField] private Vector3 offset = new Vector3(0, 0, -10);
-    [SerializeField] private float smoothSpeed = 10f;
+    public Vector3 offset = new Vector3(0f, 10f, -10f); // Настройка для Top-Down X/Z plane
+    [Range(0.5f, 20f)] public float smoothSpeed = 5f;
 
-    public CinemachineCamera vcam;
-
-    public void AssignPlayer(GameObject player)
+    public void Render()
     {
-        vcam.Target.TrackingTarget = player.transform;
-    }
-
-    public override void Spawned() 
-    {
-        if (vcam == null) vcam = FindFirstObjectByType<CinemachineCamera>();
-        Vector3 euler = transform.localRotation.eulerAngles;
-        currentYaw = euler.y;
-        currentPitch = NormalizeAngle(euler.x);
-        currentPitch = Mathf.Clamp(currentPitch, minVerticalAngle, maxVerticalAngle);
-        transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
-        if (HasInputAuthority)
-        {
-            AssignPlayer(this.gameObject);
-            var camScript = Camera.main.GetComponent<CameraTarget>();
-            if (camScript != null)
-            {
-                camScript.target = this.transform;
-                Debug.Log("Camera successfully linked to Player!");
-            }
-            else Debug.LogError("CameraTarget script not found on Main Camera!");
-        }
-    }
-
-    public void SetTarget(Transform newTarget) => target = newTarget; 
-
-    private void LateUpdate()
-    {
-        if (Runner == null || !Runner.IsRunning)
-        {
-            Debug.LogError("Runner isn't running yet! Can't execute LateUpdate() - CameraTarget");
-            return;
-        }
-        if (target == null)
-        {
-            Debug.LogError("Target not set for CameraTarget! Please assign a target transform.");
-            return; 
-        }
-
-        // Smoothly follow the player's position
+        if (target == null) return;
         Vector3 desiredPosition = target.position + offset;
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
-    }
-
-    public void SetMouseSensitivity(float sensitivity)
-    {
-        mouseSensitivity = Mathf.Clamp(sensitivity, 0.1f, 10f);
-    }
-
-    public float GetMouseSensitivity() => mouseSensitivity;
-
-    private static float NormalizeAngle(float angle)
-    {
-        while (angle > 180f) angle -= 360f;
-        while (angle < -180f) angle += 360f;
-        return angle; 
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.unscaledDeltaTime);
     }
 }

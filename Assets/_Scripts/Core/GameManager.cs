@@ -1,7 +1,5 @@
 using Fusion;
 using UnityEngine;
-using UnityEngine.InputSystem.XR.Haptics;
-using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -20,12 +18,14 @@ public class GameManager : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnStateChanged))]
     public GameState CurrentState { get; private set; }
 
-    public override void Spawned()
+    public void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
+    }
+    public override void Spawned()
+    {
         if (HasStateAuthority) CurrentState = GameState.MainMenu;
     }
 
@@ -55,6 +55,7 @@ public class GameManager : NetworkBehaviour
 
     public void HandleExploration()
     {
+        if (HasStateAuthority) CurrentState = GameState.Playing;
         Time.timeScale = 1f;
         InputManager.Instance?.EnablePlayerInput();
         // Close Shop/Inventory if they were open from another state
@@ -64,6 +65,7 @@ public class GameManager : NetworkBehaviour
 
     public void HandleCombat()
     {
+        if (HasStateAuthority) CurrentState = GameState.Combat;
         // Disable movement but keep UI active for attacks
         if (InputManager.Instance.playerActionMap.enabled == false)
         {
@@ -91,7 +93,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void HandleMainMenu()
+    public void HandleMainMenu()
     {
         Time.timeScale = 1f;
         InputManager.Instance?.EnableUIInput();

@@ -33,18 +33,15 @@ public class GameplayHUDController : NetworkBehaviour
 
     public override void Spawned()
     {
-        currentHealth = playerStats != null ? Mathf.CeilToInt(playerStats.CurrentHealth) : 0;
-        gold = playerStats != null && playerStats.playerData != null ? playerStats.playerData.caveCoins : 0;
-        xp = playerProgression != null ? playerProgression.CurrentXP : 0f;
-        currentLevel = playerProgression != null ? playerProgression.CurrentLevel : 1;
-
-        if (playerStats != null && playerStats.playerData != null)
+        if (Runner != null && playerStats != null && playerStats.playerData != null)
         {
+            currentHealth = playerStats != null ? Mathf.CeilToInt(playerStats.CurrentHealth) : 0;
+            gold = playerStats != null && playerStats.playerData != null ? playerStats.playerData.caveCoins : 0;
+            xp = playerProgression != null ? playerProgression.CurrentXP : 0f;
+            currentLevel = playerProgression != null ? playerProgression.CurrentLevel : 1;
             HandleHealthChanged(playerStats.CurrentHealth, playerStats.playerData.maxHealth);
             HandleGoldChanged(playerStats.playerData.caveCoins, playerStats.playerData.maxCaveCoins);
         }
-        RefreshAll();
-
         ResolveSourcesIfNeeded();
     }
 
@@ -97,7 +94,6 @@ public class GameplayHUDController : NetworkBehaviour
             playerProgression.OnXPChanged += HandleExperienceChanged;
             playerProgression.OnLevelUp += HandleLevelUp;
         }
-
         if (weaponManager != null)
             weaponManager.OnWeaponChanged += HandleWeaponChanged;
     }

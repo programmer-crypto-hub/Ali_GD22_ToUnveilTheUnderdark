@@ -213,6 +213,6 @@ public class GameLoopFlowController : NetworkBehaviour
     public void HandleMenuClicked()
     {
         if (GameManager.Instance != null)
-            GameManager.Instance.HandleGameOver(GameManager.GameState.MainMenu);
+            GameManager.Instance.HandleMainMenu();
     }
 }
