@@ -17,7 +17,6 @@ public class InputManager : MonoBehaviour
     private InputAction jumpAction;
     private InputAction attackAction;
     private InputAction interactAction;
-    private InputAction crouchAction;
     private InputAction cancelAction;
     private InputAction weaponNextAction;
     private InputAction weaponPrevAction;
@@ -28,7 +27,6 @@ public class InputManager : MonoBehaviour
     public bool TurnEndPressed { get; private set; }
     public bool RollDicePressed { get; private set; }
     public bool InteractPressed { get; private set; }
-    public bool CrouchHeld { get; private set; }
 
     public Action OnJumpPressed;
     public Action OnAttackPressed;
@@ -80,7 +78,6 @@ public class InputManager : MonoBehaviour
         jumpAction = playerActionMap.FindAction("Jump");
         attackAction = playerActionMap.FindAction("Attack");
         interactAction = playerActionMap.FindAction("Interact");
-        crouchAction = playerActionMap.FindAction("Crouch");
         weaponNextAction = playerActionMap.FindAction("Next");
         weaponPrevAction = playerActionMap.FindAction("Previous");
         if (jumpAction != null)
@@ -164,7 +161,6 @@ public class InputManager : MonoBehaviour
     private void UpdateInputValues()
     {
         MoveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
-        CrouchHeld = crouchAction != null && crouchAction.IsPressed();
     }
 
     private void OnJumpPerformed()
@@ -224,8 +220,6 @@ public class InputManager : MonoBehaviour
     {
         if (playerActionMap != null)
             playerActionMap.Enable();
-        if (uiActionMap != null)
-            uiActionMap.Disable();
     }
 
     public void DisablePlayerInput()
@@ -236,8 +230,6 @@ public class InputManager : MonoBehaviour
 
     public void EnableUIInput()
     {
-        if (playerActionMap != null)
-            playerActionMap.Disable();
         if (uiActionMap != null)
             uiActionMap.Enable();
     }
@@ -281,9 +273,4 @@ public class InputManager : MonoBehaviour
     {
         return InteractPressed;
     } 
-
-    public bool IsCrouchHeld()
-    {
-        return CrouchHeld;
-    }
 }

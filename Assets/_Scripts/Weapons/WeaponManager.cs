@@ -7,6 +7,12 @@ public class WeaponManager : NetworkBehaviour
     [Header("Combat Settings")]
     [SerializeField] private LayerMask enemyLayer;
 
+    /*
+     * Usage: Only execute methods, or use variables
+     * For other scripts, while not firing an Exception error
+     */
+    public bool isNetworkReady = false;
+
     private PlayerStats playerStats;
     [Networked] public int UnlockedWeaponMask { get; set; }
     [Networked] public int CurrentWeaponIndex { get; set; }
@@ -35,6 +41,8 @@ public class WeaponManager : NetworkBehaviour
             UnlockWeapon(0);
         }
         _changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        // Notify other script about it's Fusion readiness
+        isNetworkReady = true;
     }
 
     public override void Render()
@@ -98,23 +106,27 @@ public class WeaponManager : NetworkBehaviour
             }
         }
     }
+    public void CheckAttackInput()
+    {
+        if (!Object.HasInputAuthority) return;
+        if (InputManager.Instance.AttackPressed == true && InputManager.Instance != null)
+        {
+            InputManager.Instance.OnAttackPressed?.Invoke();
+            PerformCurrentWeaponAttack();
+        }
+    }
     public void PerformCurrentWeaponAttack()
-    { 
-        // CRITICAL: Only the Server/Host calculates damage to prevent cheating
-        if (!Object.HasStateAuthority) return;
-
+    {
         if (CurrentWeapon == null) return;
 
-        var weapon = CurrentWeapon;
-
         // Logic check: What kind of attack are we doing?
-        if (weapon is RangedWeapon ranged)
+        if (CurrentWeapon is RangedWeapon ranged)
         {
             ExecuteRangedAttack(ranged);
         }
         else
         {
-            ExecuteMeleeAttack(weapon);
+            ExecuteMeleeAttack(CurrentWeapon);
         }
     }
     private void ExecuteMeleeAttack(WeaponBase weapon)

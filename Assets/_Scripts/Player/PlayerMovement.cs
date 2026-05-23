@@ -1,6 +1,7 @@
 using UnityEngine;
 using Fusion;
 using System.Collections;
+using System;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -9,8 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     public PlayerData playerData;
     public PlayerController playerController;
 
-    // REMOVED: public static PlayerMovement Instance (Singletons break multiple client prefabs!)
-
+    public static PlayerMovement Instance { get; private set; }
     [Networked] public float currentDamage { get; set; }
     [Networked] private int currentDiceValue { get; set; }
 
@@ -20,6 +20,7 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
             {
+                // Decrease dice value after being triggered
                 currentDiceValue--;
                 collision.enabled = false;
                 StartCoroutine(SpaceEnterDelay(collision));
@@ -27,6 +28,8 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    // Ensure the player doesn't hit the same trigger twice
+    // To not cut in half his movement
     public IEnumerator SpaceEnterDelay(Collider2D collision)
     {
         yield return new WaitForSeconds(0.5f);
@@ -37,26 +40,33 @@ public class PlayerMovement : NetworkBehaviour
     {
         // Only allow the owner of this piece to process the roll logic
         if (!HasStateAuthority) return;
-
+        if (DiceUI.Instance == null && GameManager.Instance == null && DiceRoller.Instance == null) return;
+        // Obtain rolled value
         currentDiceValue = DiceRoller.Instance.DiceRollResult;
+        DiceUI.Instance.HandleDiceRolled(currentDiceValue);
+        // Invoke a C# event (fires an error)
+        DiceRoller.Instance.OnDiceRollCompleted?.Invoke(currentDiceValue); 
 
-        if (DiceUI.Instance != null)
-            DiceUI.Instance.HandleDiceRolled(currentDiceValue);
-
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing)
+        if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
+            // Use dice to convert to movement steps 
+            // If is playing
             DiceRoller.Instance.ConvertDiceToMovement();
-
-            // FIX: Instead of trying to force movement calculations instantly via code,
-            // your PlayerController will naturally start moving inside its own FixedUpdateNetwork() loop
-            // now that currentDiceValue is updated.
-
             Debug.Log($"Player can move: remaining steps = {currentDiceValue}");
+        }
+        else if (GameManager.Instance.CurrentState == GameManager.GameState.Combat)
+        {
+            // Use dice to convert to combat damage
+            // If is in an encounter
+            DiceRoller.Instance.ConvertDiceToCombat();
+            Debug.Log($"Player can attack.");
         }
     }
 
+    // Questionable to use both OnTriggerEnter2D and OnCollisionEnter2D, but for now we can use collision to detect enemies and trigger to detect space tiles
     public void OnCollisionEnter2D(Collision2D other)
     {
+        // Duplicate logic for no valid reason
         if (currentDiceValue <= 0) return;
 
         if (other.gameObject.CompareTag("Enemy") && GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing)

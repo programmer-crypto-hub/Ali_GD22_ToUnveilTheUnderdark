@@ -13,6 +13,8 @@ public class PlayerStats : NetworkBehaviour
     private string currentRole;
     private int currentRoleId;
 
+    public bool isNetworkReady = false;
+
     [Networked, OnChangedRender(nameof(OnStatsChanged))]
     public int CurrentHealth { get; set; }
     public bool IsDead => CurrentHealth <= 0;
@@ -37,7 +39,6 @@ public class PlayerStats : NetworkBehaviour
     [OnChangedRender(nameof(OnStatsChanged))]
     public float XP { get; set; }
     [Networked] public string PlayerName { get; set; }
-
 
     public void OnStatsChanged()
 {
@@ -95,6 +96,7 @@ public class PlayerStats : NetworkBehaviour
                 OnRoleApplied?.Invoke(currentRole, currentRoleId);
             };
         }
+        isNetworkReady = true;
     }
 
     public void ApplyLevelUpBonuses(int healthBonus, float caveCoinsBonus)

@@ -48,8 +48,7 @@ public class PlayerCombatController : NetworkBehaviour
         var type = ResolveAttackAnimationType();
         playerAnimationController.PlayAttack(type);
 
-        // Play local-only "wind up" effects
-        PlayAttackStartEffects();
+        RPC_PlayActionEffects();
     }
 
     // Called by Unity Animation Event
@@ -91,14 +90,8 @@ public class PlayerCombatController : NetworkBehaviour
     private PlayerAnimationController.AttackAnimationType ResolveAttackAnimationType()
     {
         var weapon = weaponManager.CurrentWeapon;
-        if (weapon is RangedWeapon) // Assuming RangedWeapon exists
+        if (weapon is RangedWeapon)
             return PlayerAnimationController.AttackAnimationType.Ranged;
         return PlayerAnimationController.AttackAnimationType.Melee;
-    }
-
-    private void PlayAttackStartEffects()
-    {
-        if (attackStartEffectPrefab != null && attackEffectPoint != null)
-            Instantiate(attackStartEffectPrefab, attackEffectPoint.position, attackEffectPoint.rotation);
     }
 }

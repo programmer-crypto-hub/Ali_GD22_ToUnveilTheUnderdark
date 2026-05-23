@@ -50,20 +50,9 @@ public class PlayerAnimationController : NetworkBehaviour
             playerStats.OnDeath -= HandleDeath;
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
-        if (animator == null)
-            return;
-
-        if (playerStats != null && playerStats.CurrentHealth < 0)
-        {
-            animator.SetFloat(moveSpeedParameter, 0f);
-            return;
-        }
-
-        if (InputManager.Instance == null)
-            return;
-
+        if (animator == null || InputManager.Instance == null) return;
         float moveSpeed = InputManager.Instance.MoveInput.magnitude;
         animator.SetFloat(moveSpeedParameter, moveSpeed);
     }

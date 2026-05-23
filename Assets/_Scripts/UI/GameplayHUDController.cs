@@ -1,175 +1,209 @@
-using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class GameplayHUDController : NetworkBehaviour
+public class GameplayHUDController : MonoBehaviour
 {
     [Header("Data Sources")]
     [SerializeField] private PlayerStats playerStats;
     [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private WeaponManager weaponManager;
 
-    [Header("HP")]
+    [Header("HP UI Components")]
+    [Tooltip("Иконка сердца. Должна иметь Image Type = Filled, Fill Method = Vertical, Fill Origin = Bottom")]
     [SerializeField] private Image hpFillImage;
-    [Networked, OnChangedRender(nameof(OnStatsChanged))] 
-    private int currentHealth { get; set; }
-    private Text hpValueText;
 
-    [Header("Gold")]
-    [Networked, OnChangedRender(nameof(OnStatsChanged))] 
-    private int gold { get; set; }
-    private Text goldValueText;
+    [Header("Gold UI Components")]
+    [SerializeField] private TextMeshProUGUI goldValueText;
 
-    [Header("XP + Level")]
-    [Networked, OnChangedRender(nameof(OnStatsChanged))] 
-    private float xp { get; set; }
-    private Image xpFillImage;
-    [Networked, OnChangedRender(nameof(OnStatsChanged))] 
-    private int currentLevel { get; set; }
-    private Text levelValueText;
+    [Header("XP + Level UI Components")]
+    [Tooltip("Полоса опыта. Должна иметь Image Type = Filled, Fill Method = Horizontal")]
+    [SerializeField] private Image xpFillImage;
+    [SerializeField] private TextMeshProUGUI levelValueText;
 
-    [Header("Weapon HUD")]
+    [Header("Weapon HUD Components")]
     [SerializeField] private Image weaponIconImage;
 
-    public override void Spawned()
+    private bool _isBound = false;
+
+    private void Start()
     {
-        if (Runner != null && playerStats != null && playerStats.playerData != null)
-        {
-            currentHealth = playerStats != null ? Mathf.CeilToInt(playerStats.CurrentHealth) : 0;
-            gold = playerStats != null && playerStats.playerData != null ? playerStats.playerData.caveCoins : 0;
-            xp = playerProgression != null ? playerProgression.CurrentXP : 0f;
-            currentLevel = playerProgression != null ? playerProgression.CurrentLevel : 1;
-            HandleHealthChanged(playerStats.CurrentHealth, playerStats.playerData.maxHealth);
-            HandleGoldChanged(playerStats.playerData.caveCoins, playerStats.playerData.maxCaveCoins);
-        }
         ResolveSourcesIfNeeded();
     }
 
     private void OnEnable()
     {
-        Bind();
-        RefreshAll();
+        BindEvents();
     }
 
     private void OnDisable()
     {
-        Unbind();
+        UnbindEvents();
     }
 
-    private void OnStatsChanged()
+    // Единственный метод для безопасного покадрового обновления UI во Fusion 2
+    private void Render()
     {
-        RefreshAll();
-        playerStats.OnStatsChanged();
-    }   
+        ResolveSourcesIfNeeded();
+
+        // Если сетевой клон игрока еще не готов или это фантом — не трогаем UI
+        if (playerStats == null || playerStats.Object == null || !playerStats.Object.IsValid) return;
+
+        // Как только сеть готова, лениво подписываемся на события изменения статов
+        if (!_isBound)
+        {
+            BindEvents();
+        }
+
+        // БЕЗОПАСНЫЙ НАКАДРОВЫЙ REFRESH (Обновление без падения консоли)
+        float maxHp = playerStats.playerData != null ? playerStats.playerData.maxHealth : 100f;
+        UpdateHealthUI(playerStats.CurrentHealth, maxHp);
+
+        // Обновляем золото (в вашем старом коде ивенты передавали только текущее золото)
+        if (playerStats.playerData != null)
+        {
+            UpdateGoldUI(playerStats.playerData.caveCoins, playerStats.playerData.maxCaveCoins);
+        }
+
+        if (playerProgression != null)
+        {
+            UpdateLevelUI(playerProgression.CurrentLevel);
+            UpdateExperienceUI(playerProgression.CurrentXP, playerProgression.baseXPToNextLevel);
+        }
+
+        if (weaponManager != null && weaponManager.isNetworkReady)
+        {
+            UpdateWeaponUI(weaponManager.CurrentWeapon);
+        }
+    }
+
     private void ResolveSourcesIfNeeded()
     {
         if (playerStats == null)
-            playerStats = FindFirstObjectByType<PlayerStats>();
+        {
+            foreach (var stats in FindObjectsByType<PlayerStats>(FindObjectsSortMode.None))
+            {
+                if (stats.Object != null && stats.Object.HasInputAuthority)
+                {
+                    playerStats = stats;
+                    break;
+                }
+            }
+        }
 
-        if (playerProgression == null && playerStats != null)
-            playerProgression = playerStats.GetComponent<PlayerProgression>();
-
-        if (playerProgression == null)
-            playerProgression = FindFirstObjectByType<PlayerProgression>();
-
-        if (weaponManager == null && playerStats != null)
-            weaponManager = playerStats.GetComponent<WeaponManager>();
-
-        if (weaponManager == null)
-            weaponManager = FindFirstObjectByType<WeaponManager>();
+        if (playerStats != null)
+        {
+            if (playerProgression == null) playerProgression = playerStats.GetComponent<PlayerProgression>();
+            if (weaponManager == null) weaponManager = playerStats.GetComponent<WeaponManager>();
+        }
     }
 
-    private void Bind()
+    private void BindEvents()
     {
+        if (_isBound) return;
         ResolveSourcesIfNeeded();
 
         if (playerStats != null)
         {
-            playerStats.OnHealthChanged += HandleHealthChanged;
-            playerStats.OnGoldChanged += HandleGoldChanged;
+            playerStats.OnHealthChanged += UpdateHealthUI;
+            playerStats.OnGoldChanged += UpdateGoldUI;
+            _isBound = true;
         }
 
         if (playerProgression != null)
         {
-            playerProgression.OnXPChanged += HandleExperienceChanged;
-            playerProgression.OnLevelUp += HandleLevelUp;
+            playerProgression.OnXPChanged += UpdateExperienceUI;
+            playerProgression.OnLevelUp += UpdateLevelUI;
         }
+
         if (weaponManager != null)
-            weaponManager.OnWeaponChanged += HandleWeaponChanged;
+            weaponManager.OnWeaponChanged += UpdateWeaponUI;
     }
 
-    private void Unbind()
+    private void UnbindEvents()
     {
+        if (!_isBound) return;
+
         if (playerStats != null)
         {
-            playerStats.OnHealthChanged -= HandleHealthChanged;
-            playerStats.OnGoldChanged -= HandleGoldChanged;
+            playerStats.OnHealthChanged -= UpdateHealthUI;
+            playerStats.OnGoldChanged -= UpdateGoldUI;
         }
 
         if (playerProgression != null)
         {
-            playerProgression.OnXPChanged -= HandleExperienceChanged;
-            playerProgression.OnLevelUp -= HandleLevelUp;
+            playerProgression.OnXPChanged -= UpdateExperienceUI;
+            playerProgression.OnLevelUp -= UpdateLevelUI;
         }
 
         if (weaponManager != null)
-            weaponManager.OnWeaponChanged -= HandleWeaponChanged;
+            weaponManager.OnWeaponChanged -= UpdateWeaponUI;
+
+        _isBound = false;
     }
 
-    private void RefreshAll()
+    private void UpdateHealthUI(float current, float max)
     {
-        if (playerProgression != null)
+        if (hpFillImage == null) return;
+
+        // Заполняем картинку-сердце вертикально (значение от 0f до 1f)
+        hpFillImage.fillAmount = max > 0.01f ? Mathf.Clamp01(current / max) : 0f;
+    }
+
+    private void UpdateExperienceUI(float current, float required)
+    {
+        if (xpFillImage == null) return;
+
+        // Заполняем полоску опыта горизонтально (значение от 0f до 1f)
+        xpFillImage.fillAmount = required > 0.01f ? Mathf.Clamp01(current / required) : 0f;
+    }
+
+    private void UpdateGoldUI(int currentGold, int maxGold)
+    {
+        if (currentGold > maxGold) currentGold = maxGold;
+        if (goldValueText != null) goldValueText.text = currentGold.ToString();
+    }
+
+    private void UpdateLevelUI(int level)
+    {
+        if (playerProgression == null) return;
+        /* 
+         * Usage: Manage level text 
+         */
+
+        int displayLevel = playerProgression.CurrentLevel;
+        if (displayLevel >= playerProgression.maxLevel)
         {
-            HandleLevelUp(playerProgression.CurrentLevel);
-            float requiredXp = playerProgression.baseXPToNextLevel;
-            HandleExperienceChanged(playerProgression.CurrentXP, requiredXp);
-            Spawned(); // Refresh gold and health as well
+            displayLevel = playerProgression.maxLevel;
         }
 
-        if (weaponManager != null)
-            HandleWeaponChanged(weaponManager.CurrentWeapon);
-    }
-
-    private void HandleHealthChanged(float current, float max)
-    {
-        if (hpFillImage != null)
-            hpFillImage.fillAmount = max > 0.01f ? Mathf.Clamp01(current / max) : 0f;
-
-        if (hpValueText != null)
-            hpValueText.text = Mathf.CeilToInt(current).ToString();
-    }
-
-    private void HandleExperienceChanged(float current, float required)
-    {
-        if (xpFillImage != null)
-            xpFillImage.fillAmount = required > 0.01f ? Mathf.Clamp01(current / required) : 0f;
-    }
-
-    private void HandleGoldChanged(int gold, int maxGold)
-    {
-        if (gold > maxGold)
-        {
-            gold = maxGold;
-            return;
-        }
-        if (goldValueText != null)
-            goldValueText.text = gold.ToString();
-    }
-
-    private void HandleLevelUp(int level)
-    {
         if (levelValueText != null)
-            levelValueText.text = level.ToString();
+        {
+            levelValueText.text = $"Level: {displayLevel.ToString()}";
+        }
+
+        /* 
+         * Usage: Manage XP Bar 
+         * Identifying Current Index / XpToNextLevel 
+         */
+        if (xpFillImage != null)
+        {
+            float requiredXP = playerProgression.GetRequiredXPForNextLevel();
+            float xpValue = requiredXP > 0.01f ? Mathf.Clamp01(playerProgression.CurrentXP / requiredXP) : 0f;
+
+            if (playerProgression.CurrentLevel >= playerProgression.maxLevel)
+            {
+                xpValue = 1f;
+            }
+
+            xpFillImage.fillAmount = xpValue;
+        }
     }
 
-    private void HandleWeaponChanged(WeaponBase weapon)
+private void UpdateWeaponUI(WeaponBase weapon)
     {
-        if (weaponIconImage == null)
-            return;
-
-        Sprite icon = weapon != null && weapon.weaponData != null
-            ? weapon.weaponData.icon
-            : null;
+        if (weaponIconImage == null) return;
+        Sprite icon = weapon != null && weapon.weaponData != null ? weapon.weaponData.icon : null;
         weaponIconImage.enabled = icon != null;
         weaponIconImage.sprite = icon;
     }

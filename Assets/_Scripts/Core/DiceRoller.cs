@@ -24,6 +24,7 @@ public class DiceRoller : NetworkBehaviour
 
         // Server rolls the random number (1 to 20)
         DiceRollResult = UnityEngine.Random.Range(1, 21);
+        OnDiceRollCompleted?.Invoke(DiceRollResult);
         Debug.Log($"Server rolled: {DiceRollResult}");
     }
 

@@ -30,8 +30,7 @@ public class PlayerProgression : NetworkBehaviour
 
     [Header("Максимальный уровень ХП")]
     [SerializeField]
-    [Tooltip("Максимальный уровень здоровья, который может быть достигнут.")]
-    private int maxLevel = 200;
+    public int maxLevel = 20;
 
     public int CurrentLevel => currentLevel;
 
@@ -59,7 +58,7 @@ public class PlayerProgression : NetworkBehaviour
         OnXPChanged?.Invoke(currentXP, required);
     }
 
-    private float GetRequiredXPForNextLevel()
+    public float GetRequiredXPForNextLevel()
     {
         // Например: baseExp * factor^(level-1)
         float required = baseXPToNextLevel;

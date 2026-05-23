@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 public class MeleeWeapon : WeaponBase
 {
@@ -18,56 +19,76 @@ public class MeleeWeapon : WeaponBase
 
     public override void Attack()
     {
-        if (!CanAttack())
+        if (!CanAttack() || owner != null && !owner.GetComponent<NetworkObject>().HasInputAuthority) 
             return;
 
         StartAttackCooldown();
 
         if (weaponData == null)
         {
-            Debug.LogWarning($"{name}: WeaponData не назначен, ближняя атака невозможна.", this);
+            Debug.LogWarning($"{name}: WeaponData isn't assigned.", this);
             return;
         }
 
-        // Важно для урока 7.2 (урон через IDamageable):
-        // правило “игрок бьёт только врагов” обеспечивается настройкой hitLayers в инспекторе (обычно только слой Enemy).
-        // Если не указан радиус, используем Range из WeaponData
         float radius = hitRadius > 0f ? hitRadius : Range;
+        Vector3 origin = attackOrigin != null ? attackOrigin.position : (owner != null ? owner.position : transform.position);
 
-        // Если attackOrigin не задан, используем позицию owner или самого оружия
-        Vector3 origin = attackOrigin != null
-            ? attackOrigin.position
-            : (owner != null ? owner.position : transform.position);
-
-        // Простой поиск попаданий.
-        // OverlapSphere может вернуть несколько коллайдеров одного и того же врага,
-        // поэтому HashSet защищает от нанесения урона несколько раз за одну атаку.
-        Collider[] hits = Physics.OverlapSphere(origin, radius, hitLayers);
-
-        if (hits.Length == 0)
+        var animator = owner != null ? owner.GetComponentInChildren<Animator>() : null;
+        if (animator != null)
         {
-            Debug.Log($"{name}: ближняя атака — никого не задели.");
+            animator.SetTrigger("attack_trig");
         }
-        else
+
+        Collider[] hits = new Collider[10]; // Create a fixed size array to store hits.
+
+        PhysicsScene networkPhysics = default;
+        if (owner != null)
         {
-            Debug.Log($"{name}: ближняя атака, задели {hits.Length} объект(ов).");
-            HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
-
-            foreach (Collider collider in hits)
+            var networkObject = owner.GetComponent<NetworkObject>();
+            if (networkObject != null && networkObject.Runner != null)
             {
-                Debug.Log($"Попали по объекту: {collider.name}");
-
-                IDamageable damageable = collider.GetComponent<IDamageable>();
-                if (damageable == null)
-                    damageable = collider.GetComponentInParent<IDamageable>();
-
-                if (damageable != null && damagedTargets.Add(damageable))
-                    damageable.TakeDamage(Damage);
+                networkPhysics = networkObject.Runner.GetPhysicsScene();
             }
         }
 
-        // Здесь же в будущем можно запускать анимацию атаки и звук удара.
+        int hitCount = 0;
+        if (networkPhysics != null)
+        {
+            hitCount = networkPhysics.OverlapSphere(origin, radius, hits, hitLayers, QueryTriggerInteraction.UseGlobal);
+        }
+        else
+        {
+            hitCount = Physics.OverlapSphereNonAlloc(origin, radius, hits, hitLayers);
+        }
+
+        if (hitCount == 0)
+        {
+            Debug.Log($"{name}: melee attack — nobody was hit.");
+        }
+        else
+        {
+            Debug.Log($"{name}: close-range attack, hit {hitCount} object(s).");
+            HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                Collider collider = hits[i];
+                if (collider == null) continue;
+
+                Debug.Log($"Hit network object: {collider.name}");
+
+                IDamageable damageable = collider.GetComponent<IDamageable>();
+                if (damageable == null) damageable = collider.GetComponentInParent<IDamageable>();
+
+                if (damageable != null && damagedTargets.Add(damageable))
+                {
+                    // EnemyBase on the server will instantly reduce the boss's HP
+                    damageable.TakeDamage(Damage);
+                }
+            }
+        }
     }
+
 
     private void OnDrawGizmosSelected()
     {

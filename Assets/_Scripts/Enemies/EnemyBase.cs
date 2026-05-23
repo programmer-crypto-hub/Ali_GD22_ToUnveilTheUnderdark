@@ -26,17 +26,17 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     {
         _changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
-        //if (HasStateAuthority)
-        //{
+        if (HasStateAuthority)
+        {
             CurrentHP = enemyData != null ? enemyData.maxHealth : 10f;
             CurrentState = EnemyState.Chase;
-        //}
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
         // 2. SERVER ONLY: Only the host runs AI calculations
-        //if (!HasStateAuthority || IsDead) return;
+        if (!HasStateAuthority || IsDead) return;
 
         if (_target == null)
         {
@@ -134,16 +134,36 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         OnDied?.Invoke();
 
         // 4. NETWORK DELETE: Safely remove from network for all players
-        Runner.Despawn(Object);
+        Invoke(nameof(DespawnBoss), 2f);
+    }
+
+    private void DespawnBoss()
+    {
+        if (Object != null && Runner != null)
+        {
+            Runner.Despawn(Object);
+        }
     }
 
     private void FindClosestPlayer()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        var netObj = player != null ? player.GetComponent<NetworkObject>() : null;
-        if (player != null && netObj.IsValid)
+        float closestDistance = float.MaxValue;
+        PlayerController closestPlayer = null;
+
+        // Безопасный сетевой поиск ближайшего живого игрока по компоненту
+        foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
         {
-            _target = player.transform;
+            float dist = Vector3.Distance(transform.position, player.transform.position);
+            if (dist < closestDistance)
+            {
+                closestDistance = dist;
+                closestPlayer = player;
+            }
+        }
+
+        if (closestPlayer != null)
+        {
+            _target = closestPlayer.transform;
         }
     }
 }

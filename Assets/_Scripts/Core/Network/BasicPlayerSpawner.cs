@@ -91,7 +91,8 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (_spawnedCharacters.ContainsKey(player)) return; // Prevent duplicate spawns
 
         Vector3 spawnPos = new Vector3((player.RawEncoded % 5) * 2f, 0f, 0f);
-        var networkPlayer = runner.Spawn(_playerPrefab, spawnPos, Quaternion.identity, player);
+        Quaternion spawnRotation = Quaternion.Euler(-90f, 0f, 0f);
+        var networkPlayer = runner.Spawn(_playerPrefab, spawnPos, spawnRotation, player);
 
         if (networkPlayer != null)
         {

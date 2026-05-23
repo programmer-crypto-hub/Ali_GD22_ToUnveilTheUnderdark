@@ -144,6 +144,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  isNetworkReady: 0
   _UnlockedWeaponMask: 0
   _CurrentWeaponIndex: 0
   weaponPrefabs: []
@@ -185,6 +186,7 @@ MonoBehaviour:
   playerStatRow: {fileID: 2078577506607821414, guid: a7d8bc71dea03d348b2908cc0284fac7, type: 3}
   playerProgression: {fileID: 2268690765001546277}
   playerAnim: {fileID: 4078633969993388044}
+  isNetworkReady: 0
   _CurrentHealth: 0
   _MaxHealth: 0
   _Gold: 0
