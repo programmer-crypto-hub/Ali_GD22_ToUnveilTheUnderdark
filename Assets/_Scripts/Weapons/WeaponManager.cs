@@ -120,11 +120,10 @@ public class WeaponManager : NetworkBehaviour
         if (CurrentWeapon == null) return;
 
         // Logic check: What kind of attack are we doing?
-        if (CurrentWeapon is RangedWeapon ranged)
-        {
-            ExecuteRangedAttack(ranged);
-        }
-        else
+        //if (CurrentWeapon is RangedWeapon ranged)
+        //{
+        //    ExecuteRangedAttack(ranged);
+        //}
         {
             ExecuteMeleeAttack(CurrentWeapon);
         }

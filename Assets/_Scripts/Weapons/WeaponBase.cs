@@ -28,6 +28,8 @@ public abstract class WeaponBase : NetworkBehaviour
         }
         if (weaponData == null) return false;
 
+        Debug.Log($"Check: Can Attack? Cooldown expired: {AttackCooldown.ExpiredOrNotRunning(Runner)}" +
+            $"WeaponData is null?: {weaponData != null}");
         // Check if the timer has expired (works across all clients)
         return AttackCooldown.ExpiredOrNotRunning(Runner);
     }

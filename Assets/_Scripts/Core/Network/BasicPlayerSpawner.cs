@@ -100,6 +100,7 @@ public class BasicPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             runner.SetPlayerObject(player, networkPlayer);
 
             if (GameManager.Instance != null) GameManager.Instance.HandleExploration();
+            if (GameSession.Instance != null) GameSession.Instance.RegisterPlayer(player);
         }
     }
 

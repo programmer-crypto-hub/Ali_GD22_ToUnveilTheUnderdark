@@ -8,6 +8,8 @@ public class PlayerController : NetworkBehaviour
     [Header("References")]
     [SerializeField] private PlayerStats playerStats;
 
+    private bool _canActThisTurn = false;
+
     public override void Spawned()
     {
         if (playerStats == null) playerStats = GetComponent<PlayerStats>();
@@ -40,7 +42,11 @@ public class PlayerController : NetworkBehaviour
         return true;
     }
 
-    public override void FixedUpdateNetwork() => MovePlayer(0);
+    public override void FixedUpdateNetwork()
+    {
+        MovePlayer(0);
+        if (!_canActThisTurn) return;
+    }
 
     public void MovePlayer(int diceValue)
     {

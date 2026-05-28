@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2890785345439946975}
   - component: {fileID: 1363696523636361361}
-  m_Layer: 9
+  m_Layer: 6
   m_Name: Staff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 5904596328791115508}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 85.40001, y: 26.2, z: -1.5}
+  m_LocalPosition: {x: 0, y: 0, z: -1.5}
   m_LocalScale: {x: 130.29608, y: 111.4689, z: 130.296}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3708810521315736879, guid: 4245b310f5c6fe54a868d3f0e6c7f0cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -101,7 +101,8 @@ GameObject:
   m_Component:
   - component: {fileID: 387098509009462350}
   - component: {fileID: 1284403691326376794}
-  m_Layer: 9
+  - component: {fileID: 4877329622238582715}
+  m_Layer: 6
   m_Name: Staff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,14 +117,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6943905652683798794}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 64.8, z: -31.2}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2890785345439946975}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!114 &1284403691326376794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,9 +138,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangedWeapons
   weaponData: {fileID: 11400000, guid: 0d3ef4cea92713c47a05a5e945301344, type: 2}
-  owner: {fileID: 7668859065092257100, guid: eb48a3c6d9bff2d41a152d782eae550e, type: 3}
+  owner: {fileID: 0}
   shootOrigin: {fileID: 0}
   projectileSpeedOverride: 0
   projectileHitLayers:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &4877329622238582715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6943905652683798794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 3433159595
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1284403691326376794}
+  ForceRemoteRenderTimeframe: 0

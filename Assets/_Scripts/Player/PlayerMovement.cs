@@ -1,7 +1,7 @@
 using UnityEngine;
 using Fusion;
-using System.Collections;
 using System;
+using ExitGames.Client.Photon;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -10,69 +10,73 @@ public class PlayerMovement : NetworkBehaviour
     public PlayerData playerData;
     public PlayerController playerController;
 
-    public static PlayerMovement Instance { get; private set; }
+    public static PlayerMovement Instance;
     [Networked] public float currentDamage { get; set; }
     [Networked] private int currentDiceValue { get; set; }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    // Networked Timer to prevent multiple triggers on the same cell within a short time frame
+    [Networked] private TickTimer spaceTriggerCooldown { get; set; }
+
+    private void OnTriggerEnter(Collider collision)
     {
+        if (!Runner.IsServer) return; // Просчет шагов делает только сервер (Хост)
+
         if (collision.CompareTag("SpaceTrigger"))
         {
+            // Если таймер кулдауна еще тикает, игнорируем клетку, чтобы не резать шаги дважды
+            if (!spaceTriggerCooldown.ExpiredOrNotRunning(Runner)) return;
+
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing && currentDiceValue > 0)
             {
-                // Decrease dice value after being triggered
                 currentDiceValue--;
-                collision.enabled = false;
-                StartCoroutine(SpaceEnterDelay(collision));
+                Debug.Log($"Stepped on cell {collision.name}. Steps left: {currentDiceValue}");
+
+                // Init a 0.5 second cooldown to prevent multiple triggers on the same cell
+                spaceTriggerCooldown = TickTimer.CreateFromSeconds(Runner, 0.5f);
+
+                if (currentDiceValue <= 0)
+                {
+                    Debug.Log("[BOARD] Ход завершен, шаги закончились!");
+                    GameSession.Instance.RPC_RequestEndTurn();
+                }
             }
         }
     }
 
-    // Ensure the player doesn't hit the same trigger twice
-    // To not cut in half his movement
-    public IEnumerator SpaceEnterDelay(Collider2D collision)
-    {
-        yield return new WaitForSeconds(0.5f);
-        if (collision != null) collision.enabled = true;
-    }
-
     public void OnDiceRolled()
     {
-        // Only allow the owner of this piece to process the roll logic
         if (!HasStateAuthority) return;
-        if (DiceUI.Instance == null && GameManager.Instance == null && DiceRoller.Instance == null) return;
-        // Obtain rolled value
+
+        if (DiceUI.Instance == null || GameManager.Instance == null || DiceRoller.Instance == null)
+        {
+            Debug.LogError("Crucial managers not found on scene!");
+            return;
+        }
+
         currentDiceValue = DiceRoller.Instance.DiceRollResult;
         DiceUI.Instance.HandleDiceRolled(currentDiceValue);
-        // Invoke a C# event (fires an error)
-        DiceRoller.Instance.OnDiceRollCompleted?.Invoke(currentDiceValue); 
+
+        DiceRoller.Instance.OnDiceRollCompleted?.Invoke(currentDiceValue);
 
         if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
-            // Use dice to convert to movement steps 
-            // If is playing
             DiceRoller.Instance.ConvertDiceToMovement();
-            Debug.Log($"Player can move: remaining steps = {currentDiceValue}");
+            Debug.Log($"Exploration mode activated! Steps available: {currentDiceValue}");
         }
         else if (GameManager.Instance.CurrentState == GameManager.GameState.Combat)
         {
-            // Use dice to convert to combat damage
-            // If is in an encounter
             DiceRoller.Instance.ConvertDiceToCombat();
-            Debug.Log($"Player can attack.");
+            Debug.Log($"Combat mode activated!");
         }
     }
 
-    // Questionable to use both OnTriggerEnter2D and OnCollisionEnter2D, but for now we can use collision to detect enemies and trigger to detect space tiles
-    public void OnCollisionEnter2D(Collision2D other)
+    public void OnCollisionEnter(Collision other)
     {
-        // Duplicate logic for no valid reason
-        if (currentDiceValue <= 0) return;
+        if (!Runner.IsServer || currentDiceValue <= 0) return;
 
         if (other.gameObject.CompareTag("Enemy") && GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {
-            currentDiceValue--;
-            Debug.Log($"{other.gameObject.name} hit! Steps remaining: {currentDiceValue}");
+            Debug.Log($"Hit enemy {other.gameObject.name}!");
         }
     }
 }

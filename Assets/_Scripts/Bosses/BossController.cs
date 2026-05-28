@@ -1,124 +1,50 @@
 using UnityEngine;
-using Fusion;
-
-public class BossController : NetworkBehaviour
+public class BossController : EnemyBase
 {
-    // 1. STATE ENUM: Perfect for tracking what the boss is doing
-    public enum BossState { Idle, Chasing, Attacking, PhaseTransition }
-
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float attackRange = 2f;
-
-    [Header("References")]
-    [SerializeField] private Animator animator;
-
-    // 2. NETWORKED VARIABLES: Syncs the current behavior to all clients
-    [Networked] public BossState CurrentState { get; set; }
-    [Networked] public NetworkObject TargetPlayer { get; set; }
-
-    private ChangeDetector _changes;
-
     public override void Spawned()
     {
-        _changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
-
-        if (Object.HasStateAuthority)
+        base.Spawned();
+        if (GameSession.Instance != null)
         {
-            CurrentState = BossState.Idle;
+            GameSession.Instance.RegisterEnemy((int)(Object.Id.Raw));
+            Debug.LogWarning($"[BOSS INITIATIVE] Босс {gameObject.name} успешно занял слот в очереди ходов!");
+        }
+        if (GameSession.Instance == null) {
+            Debug.LogError("[BOSS INITIATIVE] Экземпляр GameSession не найден!");
         }
     }
 
     public override void FixedUpdateNetwork()
     {
-        // Only the Server/Host calculates AI behavior
-        if (!Object.HasStateAuthority) return;
+        if (!HasStateAuthority || IsDead) return;
 
-        FindNearestPlayer();
-
-        if (TargetPlayer != null)
+        int myBossID = (int)Object.Id.Raw;
+        if (GameSession.Instance != null && GameSession.Instance.CurrentTurnID != myBossID)
         {
-            float distance = Vector2.Distance(transform.position, TargetPlayer.transform.position);
-
-            if (distance > attackRange)
-            {
-                CurrentState = BossState.Chasing;
-
-                // Move towards player
-                Vector2 direction = (TargetPlayer.transform.position - transform.position).normalized;
-                transform.position += (Vector3)direction * moveSpeed * Runner.DeltaTime;
-            }
-            else
-            {
-                CurrentState = BossState.Attacking;
-                TriggerAttack();
-            }
+            if (CurrentState != EnemyState.Chase) CurrentState = EnemyState.Chase;
+            return;
         }
-        else
+
+        FindClosestPlayer();
+
+        base.FixedUpdateNetwork();
+
+        if (CurrentState == EnemyState.Attack)
         {
-            CurrentState = BossState.Idle;
+            FinishBossTurn();
         }
     }
 
-    public override void Render()
+    private void FinishBossTurn()
     {
-        // 3. LISTEN TO STATE CHANGES: Update animations/visuals on ALL clients
-        foreach (var change in _changes.DetectChanges(this))
+        // Возвращаем стейт босса в покой
+        CurrentState = EnemyState.Chase;
+
+        // Передаем ход обратно игрокам, вызывая метод GameSession
+        if (GameSession.Instance != null)
         {
-            if (change == nameof(CurrentState))
-            {
-                UpdateVisualsByState(CurrentState);
-            }
+            GameSession.Instance.RPC_RequestEndTurn();
+            Debug.LogWarning("[BOSS SYSTEM] Босс успешно атаковал игрока и вернул ход в GameSession!");
         }
-    }
-
-    private void UpdateVisualsByState(BossState state)
-    {
-        switch (state)
-        {
-            case BossState.Idle:
-                animator.SetBool("IsMoving", false);
-                break;
-            case BossState.Chasing:
-                animator.SetBool("IsMoving", true);
-                break;
-            case BossState.Attacking:
-                animator.SetBool("IsMoving", false);
-                break;
-        }
-    }
-
-    private void FindNearestPlayer()
-    {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        float closestDistance = float.MaxValue;
-        NetworkObject closestPlayer = null;
-
-        foreach (var player in players)
-        {
-            float dist = Vector2.Distance(transform.position, player.transform.position);
-            if (dist < closestDistance)
-            {
-                closestDistance = dist;
-                closestPlayer = player.GetComponent<NetworkObject>();
-            }
-        }
-        TargetPlayer = closestPlayer;
-    }
-
-    private void TriggerAttack()
-    {
-        animator.SetTrigger("Attack");
-
-        // 4. RPC CALL: Good for sudden, one-shot events everyone must witness
-        RPC_PlayBossRoar();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlayBossRoar()
-    {
-        // Play roar SFX on all machines!
-        // CameraShake.Instance.Shake();
-        Debug.Log("The Boss Roars!");
     }
 }

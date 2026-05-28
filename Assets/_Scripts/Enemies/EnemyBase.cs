@@ -4,7 +4,7 @@ using Fusion;
 
 public class EnemyBase : NetworkBehaviour, IDamageable
 {
-    private enum EnemyState { Chase, Attack, Dead }
+    protected enum EnemyState { Chase, Attack, Dead, Idle }
 
     [Header("Enemy Data")]
     [SerializeField] private EnemyData enemyData;
@@ -12,7 +12,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
 
     // 1. BANDWIDTH OPTIMIZATION: Networked state variables
     [Networked] public float CurrentHP { get; set; }
-    [Networked] private EnemyState CurrentState { get; set; }
+    [Networked] protected EnemyState CurrentState { get; set; }
     [Networked] private TickTimer AttackCooldown { get; set; }
 
     private Transform _target;
@@ -29,7 +29,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         if (HasStateAuthority)
         {
             CurrentHP = enemyData != null ? enemyData.maxHealth : 10f;
-            CurrentState = EnemyState.Chase;
+            CurrentState = EnemyState.Idle;
         }
     }
 
@@ -59,7 +59,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         }
         else
         {
-            CurrentState = EnemyState.Chase; // Default fallback
+            CurrentState = EnemyState.Idle; // Default fallback
         }
     }
 
@@ -108,10 +108,10 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         switch (CurrentState)
         {
             case EnemyState.Chase:
-                enemyAnim.SetTrigger("enemy_move_trig");
+                enemyAnim.SetTrigger("walk_trig");
                 break;
             case EnemyState.Attack:
-                enemyAnim.SetTrigger("enemy_attack_trig"); // Assuming you have an attack trigger
+                enemyAnim.SetTrigger("attack_trig");
                 break;
         }
     }
@@ -145,7 +145,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         }
     }
 
-    private void FindClosestPlayer()
+    public void FindClosestPlayer()
     {
         float closestDistance = float.MaxValue;
         PlayerController closestPlayer = null;

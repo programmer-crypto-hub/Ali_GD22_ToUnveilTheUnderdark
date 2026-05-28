@@ -32,7 +32,7 @@ public class ShopUIManager : NetworkBehaviour
     private void HandleTurnChanged()
     {
         // If the turn is no longer mine, force the shop to close
-        if (GameSession.Instance.CurrentTurnPlayer != Runner.LocalPlayer)
+        if (GameSession.Instance.CurrentTurnID != Runner.LocalPlayer.PlayerId)
         {
             ToggleShop(false);
         }
@@ -40,7 +40,7 @@ public class ShopUIManager : NetworkBehaviour
     public void ToggleShop(bool isOpen)
     {
         // Local check to prevent UI from opening out of turn
-        if (isOpen && Runner.LocalPlayer != GameSession.Instance.CurrentTurnPlayer)
+        if (isOpen && Runner.LocalPlayer.PlayerId != GameSession.Instance.CurrentTurnID)
         {
             Debug.Log("It's not your turn to shop!");
             return;

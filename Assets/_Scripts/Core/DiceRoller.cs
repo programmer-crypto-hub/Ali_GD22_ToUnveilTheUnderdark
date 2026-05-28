@@ -9,23 +9,27 @@ public class DiceRoller : NetworkBehaviour
     // 1. Network the result. Render() will catch when it changes!
     [Networked] public int DiceRollResult { get; set; } = -1;
 
-    public event Action<int> OnDiceRollCompleted;
+    public Action<int> OnDiceRollCompleted;
 
     public override void Spawned()
     {
         if (Instance == null) Instance = this;
     }
 
-    // Clients call this to tell the server "I am rolling!"
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestRollDice()
+    public void RequestRollDice()
     {
-        if (!HasStateAuthority) return;
+        // Защита: генерировать случайные числа для настольной игры имеет право только Сервер/Хост
+        // В режиме Хоста на одной машине это условие всегда будет выполняться успешно!
+        if (GetComponent<NetworkObject>().Runner.IsServer)
+        {
+            // Бросаем кубик d20 (от 1 до 20)
+            DiceRollResult = UnityEngine.Random.Range(1, 21);
 
-        // Server rolls the random number (1 to 20)
-        DiceRollResult = UnityEngine.Random.Range(1, 21);
-        OnDiceRollCompleted?.Invoke(DiceRollResult);
-        Debug.Log($"Server rolled: {DiceRollResult}");
+            // Запускаем C# ивенты для обновления ваших механик перемещения
+            OnDiceRollCompleted?.Invoke(DiceRollResult);
+
+            Debug.LogWarning($"[DICESUCCESS] Сервер выбросил на кубике: {DiceRollResult}");
+        }
     }
 
     public override void Render()

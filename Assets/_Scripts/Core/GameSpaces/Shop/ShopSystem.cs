@@ -11,7 +11,7 @@ public class ShopSystem : NetworkBehaviour
     {
         if (!HasStateAuthority) return;
         // 1. Turn Check
-        if (Object.InputAuthority != GameSession.Instance.CurrentTurnPlayer) return;
+        if (Object.InputAuthority.PlayerId != GameSession.Instance.CurrentTurnID) return;
 
         // 2. Lookup item data from the SO Database
         ShopItem item = masterDatabase.GetItemByID(itemID);

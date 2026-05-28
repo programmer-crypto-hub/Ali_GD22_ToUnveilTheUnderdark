@@ -1,16 +1,16 @@
 using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Collections.Unicode;
 
 public class RoomEncounterHandler : NetworkBehaviour
 {
     [Header("Encounter Settings")]
     [SerializeField] private NetworkObject enemyPrefab;
-    [SerializeField] private int enemyCount = 3;
+    [SerializeField] private int enemyCount = 1; 
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private EnemyData enemyData;
 
+    [Header("Presentation Visuals")]
     [SerializeField] private NetworkObject roomDoors;
     [SerializeField] private NetworkObject rewardChestPrefab;
     [SerializeField] private Transform chestSpawnPoint;
@@ -26,10 +26,11 @@ public class RoomEncounterHandler : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!HasStateAuthority || EncounterTriggered || EncounterCleared) return;
+        //if (!HasStateAuthority) return;
 
         if (other.CompareTag("Player"))
         {
+            Debug.Log("[SERVER] Player entered the boss room trigger. Starting encounter...");
             StartEncounter();
         }
     }
@@ -43,24 +44,39 @@ public class RoomEncounterHandler : NetworkBehaviour
         }
 
         EncounterTriggered = true;
-        Debug.Log("Boss Encounter Started!");
+        Debug.Log("[SERVER] Boss Encounter Started! Монстры призываются на поле.");
 
-        var enemy = new PlayerRef();
+        spawnedEnemies.Clear();
+
         for (int i = 0; i < enemyCount; i++)
         {
             Transform targetPoint = spawnPoints[i % spawnPoints.Length];
 
-            Runner.Spawn(enemyPrefab, targetPoint.position, transform.rotation, enemy);
+            Vector3 transRot = new Vector3(-90, 0, 0);
+            NetworkObject instance = Runner.Spawn(enemyPrefab, targetPoint.position, Quaternion.Euler(transRot), Runner.LocalPlayer);
+
+            if (instance != null)
+            {
+                spawnedEnemies.Add(instance);
+
+                if (instance.TryGetComponent<EnemyBase>(out var baseEnemy))
+                {
+                    // Если у вашего EnemyBase есть метод инициализации, раскомментируйте:
+                    baseEnemy.CurrentHP = enemyData != null ? enemyData.maxHealth : 100f;
+                }
+            }
         }
     }
 
     public override void FixedUpdateNetwork()
     {
+        // Проверку живых врагов делает только Сервер (Хост)
         if (!HasStateAuthority || !EncounterTriggered || EncounterCleared) return;
 
+        // Удаляем из списка тех, кто умер и деспавнился (стал null или потерял валидность)
         spawnedEnemies.RemoveAll(e => e == null || !e.IsValid);
 
-        // Если все враги мертвы — комната зачищена!
+        // Комната зачищена ТОЛЬКО тогда, когда реально все заспавненные враги исчезли!
         if (spawnedEnemies.Count == 0)
         {
             EncounterCleared = true;
@@ -70,7 +86,7 @@ public class RoomEncounterHandler : NetworkBehaviour
 
     private void OnEncounterFinished()
     {
-        Debug.Log("Boss Room Cleared! Rewarding players, opening passage.");
+        Debug.Log("[SERVER] Boss Room Cleared! Награда создана.");
 
         if (rewardChestPrefab != null && chestSpawnPoint != null)
         {
@@ -81,11 +97,13 @@ public class RoomEncounterHandler : NetworkBehaviour
     private void OnEncounterStateChanged()
     {
         if (roomDoors == null) return;
+
         if (EncounterTriggered && !EncounterCleared)
         {
             roomDoors.gameObject.SetActive(true);
             Debug.Log($"Gates {roomDoors.name} closed shut!");
         }
+
         if (EncounterCleared)
         {
             roomDoors.gameObject.SetActive(false);

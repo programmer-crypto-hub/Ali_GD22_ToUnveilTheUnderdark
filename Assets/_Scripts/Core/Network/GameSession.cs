@@ -7,91 +7,103 @@ public class GameSession : NetworkBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private Button endTurnBTN;
-    [SerializeField] private GameObject movementPanel;
 
     public static GameSession Instance;
-
     public event Action OnTurnChangedEvent;
-    // This networked variable tells everyone which PlayerRef currently has authority to act
+
     [Networked, OnChangedRender(nameof(OnTurnChanged))]
-    public PlayerRef CurrentTurnPlayer { get; set; }
-    [Networked, Capacity(4)]
-    public NetworkArray<PlayerRef> PlayerOrder => default;
-    [Networked] public int PlayerCount { get; set; }
+    public int CurrentTurnID { get; set; } = -1;
+
+    [Networked, Capacity(12)]
+    public NetworkArray<int> TurnOrder => default;
+
+    [Networked] public int TotalParticipants { get; set; }
+
+    public override void Spawned() => Instance = this;
 
     public void RegisterPlayer(PlayerRef player)
     {
         if (!HasStateAuthority) return;
 
-        // 1. Check if the player is already in the list (prevents duplicates)
-        for (int i = 0; i < PlayerCount; i++)
+        int playerID = player.RawEncoded;
+        RegisterParticipant(playerID);
+    }
+
+    /// <summary>
+    /// A method to register enemies (Boss and Minions) using their unique network IDs.
+    /// </summary>
+    /// <param name="enemyNetworkID">Unique network ID of the enemy (Object.Id.Raw)</param>
+    public void RegisterEnemy(int enemyNetworkID)
+    {
+        RegisterParticipant(enemyNetworkID + 1000);
+    }
+
+    private void RegisterParticipant(int id)
+    {
+        for (int i = 0; i < TotalParticipants; i++)
         {
-            if (PlayerOrder[i] == player) return;
+            if (TurnOrder[i] == id) return;
         }
 
-        // 2. Add them if there is space
-        if (PlayerCount < PlayerOrder.Length)
+        if (TotalParticipants < TurnOrder.Length)
         {
-            PlayerOrder.Set(PlayerCount, player);
-            PlayerCount++;
+            TurnOrder.Set(TotalParticipants, id);
+            TotalParticipants++;
 
-            // 3. Auto-start the first turn if nobody is playing yet
-            if (CurrentTurnPlayer == PlayerRef.None)
+            if (CurrentTurnID == -1)
             {
-                CurrentTurnPlayer = player;
+                CurrentTurnID = id;
             }
 
-            Debug.Log($"Player {player.PlayerId} registered. Total: {PlayerCount}");
+            Debug.Log($"Player with ID {id} registered in turn order. Total: {TotalParticipants}");
         }
     }
 
-    public override void Spawned() => Instance = this;
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestEndTurn()
     {
-        // Find current player's index in the array
+        if (!HasStateAuthority || TotalParticipants == 0) return;
+
         int currentIndex = -1;
-        for (int i = 0; i < PlayerCount; i++)
+        for (int i = 0; i < TotalParticipants; i++)
         {
-            if (PlayerOrder[i] == CurrentTurnPlayer)
+            if (TurnOrder[i] == CurrentTurnID)
             {
                 currentIndex = i;
                 break;
             }
         }
 
-        // Move to next index (loop back to 0 if at the end)
-        int nextIndex = (currentIndex + 1) % PlayerCount;
-        CurrentTurnPlayer = PlayerOrder[nextIndex];
+        if (currentIndex == -1) currentIndex = 0;
+
+        int nextIndex = (currentIndex + 1) % TotalParticipants;
+        CurrentTurnID = TurnOrder[nextIndex];
+
+        Debug.Log($"Turn switched to ID: {CurrentTurnID}");
+
+        OnTurnChanged();
     }
-    // This runs on everyone's machine whenever the turn changes
+
+    // Внутри вашего GameSession.cs
+
+    private int _lastProcessedTurnID = -2; // Кэш для отслеживания предыдущего хода
+
     public void OnTurnChanged()
     {
-        if (CurrentTurnPlayer == PlayerRef.None) return;
+        if (CurrentTurnID == -1) return;
 
-        bool isMyTurn = (Runner.LocalPlayer == CurrentTurnPlayer);
+        // СЕТЕВОЙ ЗАМОК: Если этот ход мы УЖЕ обработали в прошлых кадрах, 
+        // мгновенно выходим! Это полностью остановит ежекадровое мигание панели!
+        if (CurrentTurnID == _lastProcessedTurnID) return;
 
-        // Toggle UI based on turn authority
-        if (endTurnBTN != null) endTurnBTN.gameObject.SetActive(isMyTurn);
-        movementPanel.SetActive(isMyTurn);
+        // Запоминаем текущий ход, чтобы запереть замок на следующие тики
+        _lastProcessedTurnID = CurrentTurnID;
 
-        if (isMyTurn)
-        {
-            InputManager.Instance.playerActionMap.Enable(); // Enable the Action Map
-            movementPanel.SetActive(true);
-        }
-        else
-        {
-            InputManager.Instance.playerActionMap.Disable(); // Disable the Action Map
-            movementPanel.SetActive(false);
-            ShopUIManager.Instance.ToggleShop(false); // Close shop if left open
-        }
+        if (endTurnBTN != null) endTurnBTN.gameObject.SetActive(true);
+
+        Debug.LogWarning($"[TURN SYSTEM UI] Ход официально переключен на ID {CurrentTurnID}. Панели стабилизированы.");
+
+        OnTurnChangedEvent?.Invoke();
     }
 
-    // Only the Host should call this to move to the next player
-    public void CycleTurn(PlayerRef nextPlayer)
-    {
-        if (HasStateAuthority) CurrentTurnPlayer = nextPlayer;
-    }
 }

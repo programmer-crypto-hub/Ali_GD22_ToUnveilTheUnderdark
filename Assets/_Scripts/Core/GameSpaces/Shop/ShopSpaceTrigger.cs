@@ -49,7 +49,7 @@ public class ShopSpaceTrigger : MonoBehaviour
         var Runner = FindFirstObjectByType<NetworkRunner>();
         if (GameSession.Instance == null) Debug.LogError("GameSession instance not found! Make sure it is in the scene and properly initialized.");
         // Fusion 2 uses Runner.LocalPlayer to identify 'you'
-        if (GameSession.Instance.CurrentTurnPlayer != Runner.LocalPlayer)
+        if (GameSession.Instance.CurrentTurnID != Runner.LocalPlayer.PlayerId)
         {
             Debug.Log("It is not your turn to trade!");
             // Optional: Trigger a "Wait for your turn" UI message here
