@@ -34,7 +34,7 @@ public class PlayerMovement : NetworkBehaviour
                 // Init a 0.5 second cooldown to prevent multiple triggers on the same cell
                 spaceTriggerCooldown = TickTimer.CreateFromSeconds(Runner, 0.5f);
 
-                if (currentDiceValue <= 0)
+                if (currentDiceValue <= 0 && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
                 {
                     Debug.Log("[BOARD] Ход завершен, шаги закончились!");
                     GameSession.Instance.RPC_RequestEndTurn();
@@ -42,7 +42,6 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
     }
-
     public void OnDiceRolled()
     {
         if (!HasStateAuthority) return;

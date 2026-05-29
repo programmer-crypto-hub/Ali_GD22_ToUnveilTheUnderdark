@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Newtonsoft.Json.Bson;
 
 public class GameplayHUDController : MonoBehaviour
 {
+    public static GameplayHUDController Instance { get; private set; }
     [Header("Data Sources")]
     [SerializeField] private PlayerStats playerStats;
     [SerializeField] private PlayerProgression playerProgression;
@@ -12,6 +14,7 @@ public class GameplayHUDController : MonoBehaviour
     [Header("HP UI Components")]
     [Tooltip("Иконка сердца. Должна иметь Image Type = Filled, Fill Method = Vertical, Fill Origin = Bottom")]
     [SerializeField] private Image hpFillImage;
+    [SerializeField] public Image enemyHealthFillImage;
 
     [Header("Gold UI Components")]
     [SerializeField] private TextMeshProUGUI goldValueText;
@@ -149,6 +152,13 @@ public class GameplayHUDController : MonoBehaviour
         // Заполняем картинку-сердце вертикально (значение от 0f до 1f)
         hpFillImage.fillAmount = max > 0.01f ? Mathf.Clamp01(current / max) : 0f;
     }
+
+    public void UpdateEnemyHealthUI(float current, float max)
+    {
+        if (enemyHealthFillImage == null) return;
+        // Заполняем картинку-сердце вертикально (значение от 0f до 1f)
+        enemyHealthFillImage.fillAmount = max > 0.01f ? Mathf.Clamp01(current / max) : 0f;
+    }   
 
     private void UpdateExperienceUI(float current, float required)
     {

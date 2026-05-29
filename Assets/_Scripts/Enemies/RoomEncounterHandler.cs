@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class RoomEncounterHandler : NetworkBehaviour
 {
+    public static RoomEncounterHandler Instance { get; private set; }
     [Header("Encounter Settings")]
     [SerializeField] private NetworkObject enemyPrefab;
     [SerializeField] private int enemyCount = 1; 
-    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] public Transform[] spawnPoints;
     [SerializeField] private EnemyData enemyData;
 
     [Header("Presentation Visuals")]

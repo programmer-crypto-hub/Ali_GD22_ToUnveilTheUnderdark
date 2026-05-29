@@ -15,9 +15,9 @@ MonoBehaviour:
   enemyName: Boss
   enemyType: 2
   maxHealth: 200
-  moveSpeed: 15
+  moveSpeed: 400
   damage: 25
-  attackRange: 10
-  detectionRange: 10
-  experienceReward: 10
+  attackRange: 50
+  detectionRange: 1000
+  experienceReward: 100
   prefab: {fileID: 3914635985323752830, guid: ddfd5421d1e36cd418581b582f300f9d, type: 3}

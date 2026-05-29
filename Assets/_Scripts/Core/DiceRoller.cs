@@ -47,10 +47,10 @@ public class DiceRoller : NetworkBehaviour
         int spaces = Mathf.RoundToInt(DiceRollResult / 3.0f);
         return spaces == 0 ? 1 : spaces; // Ensure at least 1 space
     }
-    public int ConvertDiceToCombat()
+    public float ConvertDiceToCombat()
     {
         int diceToCombatApprox = 100 / 5;
-        int damage = (DiceRollResult / diceToCombatApprox);
+        float damage = (DiceRollResult / diceToCombatApprox);
         return damage;
     }
 

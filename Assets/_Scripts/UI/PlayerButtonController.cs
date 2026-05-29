@@ -63,8 +63,6 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
             {
                 DiceRoller.Instance.RequestRollDice();
                 DiceUI.Instance.HandleDiceRolled(DiceRoller.Instance.DiceRollResult);
-                _isInitialized = false;
-                DiceRoller.Instance.ResetDice();
             }
         }
 

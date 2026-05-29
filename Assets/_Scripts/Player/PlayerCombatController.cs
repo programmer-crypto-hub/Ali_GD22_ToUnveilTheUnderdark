@@ -46,6 +46,10 @@ public class PlayerCombatController : NetworkBehaviour
 
     private void Update()
     {
+        if (GameSession.Instance.CurrentTurnID != (int)Object.Id.Raw)
+        {
+            return;
+        }
         // ХОТКЕЙ ДЛЯ ПРЕЗЕНТАЦИИ: Нажимаем клавишу "A" для атаки!
         // Так как игра на одном устройстве (Хост), HasInputAuthority отработает идеально.
         if (Object.HasInputAuthority && Input.GetKeyDown(KeyCode.A))
@@ -56,6 +60,14 @@ public class PlayerCombatController : NetworkBehaviour
                 Debug.Log("Starting attack.");
                 // Запускаем процесс атаки
                 TryStartAttack();
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (GameSession.Instance != null)
+            {
+                Debug.LogWarning("[TURN SYSTEM] Игрок вручную нажал ENTER. Передаем ход следующему участнику!");
+                GameSession.Instance.RPC_RequestEndTurn();
             }
         }
     }
@@ -115,9 +127,9 @@ public class PlayerCombatController : NetworkBehaviour
         Vector3 targetPos = bossGo.transform.position;
         targetPos.y = transform.position.y;
 
-        Vector3 directionToBoss = (targetPos - transform.position).normalized;
+        Vector3 directionToBoss = Vector3.left;
         directionToBoss.y = 0f;
-        Vector3 dashDestination = targetPos - (directionToBoss * meleeAttackRange);
+        Vector3 dashDestination = targetPos + (directionToBoss * 15f);
         dashDestination.y = transform.position.y;
 
         if (blindingScreenGroup != null)
@@ -127,7 +139,7 @@ public class PlayerCombatController : NetworkBehaviour
         }
 
         // Играем звук телепорта / вжух
-        if (audioSource != null && whooshSFX != null)
+        if (whooshSFX != null)
         {
             Vector3 earPosition = Camera.main != null ? Camera.main.transform.position : transform.position;
             AudioSource.PlayClipAtPoint(whooshSFX, earPosition, 1.0f); // 1.0f — максимальная громкость
@@ -160,6 +172,10 @@ public class PlayerCombatController : NetworkBehaviour
             Vector3 earPosition = Camera.main != null ? Camera.main.transform.position : transform.position;
             AudioSource.PlayClipAtPoint(bladeHitSFX, earPosition, 1.0f);
         }
+
+        if (bossGo.TryGetComponent<EnemyBase>(out var enemyBase))
+            enemyBase.TakeDamage(0f);
+
         // Ждем еще 0.15 секунд, чтобы звук удара совпал со вспышкой VFX эффектов
         yield return new WaitForSeconds(0.15f);
 
@@ -170,10 +186,10 @@ public class PlayerCombatController : NetworkBehaviour
         TriggerVisualAttack();
         yield return new WaitForSeconds(2f);
 
-        StartCoroutine(ReturnToOriginRoutine());
+        ReturnToOriginRoutine();
     }
 
-    private IEnumerator ReturnToOriginRoutine()
+    private void ReturnToOriginRoutine()
     {
         Debug.Log("[COMBAT] Начинаем путь назад на исходную позицию.");
 
@@ -206,11 +222,8 @@ public class PlayerCombatController : NetworkBehaviour
 
         if (GameSession.Instance != null && Object.HasStateAuthority)
         {
-            GameSession.Instance.RPC_RequestEndTurn();
             Debug.LogWarning("[COMBAT SUCCESS] Рыцарь вернулся на базу, ход передан боссу!");
         }
-
-        yield return null;
     }
 
 
@@ -281,13 +294,6 @@ public class PlayerCombatController : NetworkBehaviour
     public void HandleAttackFinishedAnimationEvent()
     {
         _isAttackInProgress = false;
-
-        // Босс получил урон, анимация закончилась — автоматически передаем ход боссу!
-        if (GameSession.Instance != null && Object.HasStateAuthority)
-        {
-            GameSession.Instance.RPC_RequestEndTurn();
-            Debug.Log("[COMBAT] Атака завершена, ход автоматически передан Боссу.");
-        }
     }
     private bool CanStartAttack()
     {

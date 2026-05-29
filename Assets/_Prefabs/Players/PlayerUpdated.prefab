@@ -148,8 +148,8 @@ MonoBehaviour:
   _UnlockedWeaponMask: 0
   _CurrentWeaponIndex: 0
   weaponPrefabs:
-  - {fileID: 3593621991975276900}
   - {fileID: 7067741570792967680}
+  - {fileID: 3593621991975276900}
 --- !u!95 &4078633969993388044
 Animator:
   serializedVersion: 7
@@ -636,6 +636,10 @@ PrefabInstance:
     - target: {fileID: 6943905652683798794, guid: bcd62336d635fd846af5c775d769de07, type: 3}
       propertyPath: m_Name
       value: Staff (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6943905652683798794, guid: bcd62336d635fd846af5c775d769de07, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

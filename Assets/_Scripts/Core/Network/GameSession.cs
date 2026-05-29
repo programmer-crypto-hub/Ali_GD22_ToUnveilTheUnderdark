@@ -19,26 +19,15 @@ public class GameSession : NetworkBehaviour
 
     [Networked] public int TotalParticipants { get; set; }
 
-    public override void Spawned() => Instance = this;
+    public bool isNetworkReady = false;
 
-    public void RegisterPlayer(PlayerRef player)
+    public override void Spawned()
     {
-        if (!HasStateAuthority) return;
-
-        int playerID = player.RawEncoded;
-        RegisterParticipant(playerID);
+        Instance = this;
+        isNetworkReady = true;
     }
 
-    /// <summary>
-    /// A method to register enemies (Boss and Minions) using their unique network IDs.
-    /// </summary>
-    /// <param name="enemyNetworkID">Unique network ID of the enemy (Object.Id.Raw)</param>
-    public void RegisterEnemy(int enemyNetworkID)
-    {
-        RegisterParticipant(enemyNetworkID + 1000);
-    }
-
-    private void RegisterParticipant(int id)
+    public void RegisterParticipant(int id, string participantType)
     {
         for (int i = 0; i < TotalParticipants; i++)
         {
@@ -55,7 +44,7 @@ public class GameSession : NetworkBehaviour
                 CurrentTurnID = id;
             }
 
-            Debug.Log($"Player with ID {id} registered in turn order. Total: {TotalParticipants}");
+            Debug.Log($"Participant with ID {id} registered in turn order. Total: {TotalParticipants}");
         }
     }
 

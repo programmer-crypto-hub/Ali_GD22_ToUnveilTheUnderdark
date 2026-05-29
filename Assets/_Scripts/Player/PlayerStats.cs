@@ -97,6 +97,7 @@ public class PlayerStats : NetworkBehaviour
             };
         }
         isNetworkReady = true;
+        if (GameSession.Instance != null && GameSession.Instance.isNetworkReady) GameSession.Instance.RegisterParticipant((int)Object.Id.Raw, "Player");
     }
 
     public void ApplyLevelUpBonuses(int healthBonus, float caveCoinsBonus)

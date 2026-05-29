@@ -9,7 +9,7 @@ public class GameManager : NetworkBehaviour
     {
         MainMenu = 0,
         Playing = 1,
-        Combat = 2, // Useful for when a player lands on an encounter
+        Combat = 2, 
         Paused = 3,
         Lost = 4,
         Won = 5,
@@ -26,7 +26,7 @@ public class GameManager : NetworkBehaviour
     }
     public override void Spawned()
     {
-        if (HasStateAuthority) CurrentState = GameState.MainMenu;
+        if (HasStateAuthority) CurrentState = GameState.Combat;
     }
 
     // This is the Brain
