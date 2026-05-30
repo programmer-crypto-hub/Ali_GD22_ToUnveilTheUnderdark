@@ -187,15 +187,16 @@ public class EnemyBase : NetworkBehaviour, IDamageable
         if (Runner == null || !Runner.IsServer || IsDead) return;
 
         float finalDamage = 0f;
-        if (DiceRoller.Instance != null && DiceRoller.Instance.DiceRollResult > 0)
+        if (DiceRoller.Instance != null && DiceRoller.Instance.GetDiceResult() > 0)
         {
             damage = DiceRoller.Instance.ConvertDiceToCombat();
             finalDamage = damage * (enemyData != null ? enemyData.damage : 10f);
+            Debug.Log($"Boss is taking damage from dice! Dice result: {DiceRoller.Instance.GetDiceResult()}, converted damage: {damage}, final damage after multiplier: {finalDamage}");
         }
         // Вычитаем динамический урон из здоровья босса
         CurrentHP -= finalDamage;
         Debug.LogWarning($"[SERVER COMBAT] Босс получил урон с КУБИКА: {finalDamage}. Осталось HP: {CurrentHP}");
-        Debug.LogWarning($"Check? Did the enemy take damage? If not, why? Damage is: {finalDamage}; DiceRoller is null? {DiceRoller.Instance == null}, or diceRollResult isn't more than 0? {DiceRoller.Instance.DiceRollResult > 0}");
+        Debug.LogWarning($"Check? Did the enemy take damage? If not, why? Damage is: {finalDamage}; DiceRoller is null? {DiceRoller.Instance == null}, or diceRollResult isn't more than 0? {DiceRoller.Instance.GetDiceResult() > 0}");
         // ДИНАМИЧЕСКИЙ ОБНОВИТЕЛЬ ИНТЕРФЕЙСА:
         // Находим менеджер UI на сцене прямо в секунду удара, обходя пустые поля инспектора префаба!
         var hud = FindFirstObjectByType<GameplayHUDController>();

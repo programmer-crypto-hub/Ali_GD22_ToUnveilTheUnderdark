@@ -15,7 +15,7 @@ public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public GameObject lockOverlay;
     public TextMeshProUGUI lockLevelText;
 
-    private ShopItem itemData;
+    [SerializeField] private ShopItem itemData;
 
     public void Setup(ShopItem item, bool canAfford, bool correctRole)
     {

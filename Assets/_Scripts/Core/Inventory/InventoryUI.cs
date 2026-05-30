@@ -8,15 +8,14 @@ public class InventoryUI : MonoBehaviour
     public ItemDatabase database;
 
     [Header("UI Panels")]
-    public GameObject upperGridPanel;  // Your 30-slot background
-    public GameObject lowerBarPanel;   // Your 10-slot hotbar at the bottom
+    public GameObject upperGridPanel;  // 30-slot background
+    public GameObject lowerBarPanel;   // 10-slot hotbar at the bottom
 
     [Header("Prefabs & Parents")]
     public GameObject slotPrefab; // A simple blank UI image prefab
     public Transform gridContainer; // The GameObject with the Grid Layout Group
 
     [Header("Static References")]
-    [Tooltip("Keep manually dragging your 10 lower hotbar images here!")]
     public Image[] lowerBarSlots;
 
     // This array will hold the 30 spawned upper images automatically
@@ -40,7 +39,20 @@ public class InventoryUI : MonoBehaviour
     {
         if (_hasGeneratedGrid) return;
 
-        for (int i = 0; i < 30; i++)
+        int startIndex = 0;
+
+        if (gridContainer.childCount > 0)
+        {
+            Transform firstChild = gridContainer.GetChild(0);
+            firstChild.gameObject.name = "Slot_0";
+            _upperGridSlots[0] = firstChild.GetComponent<Image>();
+
+            // Мы уже получили 1 слот, значит динамически нужно создать только 29!
+            startIndex = 1;
+            Debug.LogWarning("[INVENTORY UI] Перехвачен шаблонный слот сцены и назначен как Slot_0");
+        }
+
+        for (int i = startIndex; i < 30; i++)
         {
             // 1. Instantiate the blank icon
             GameObject newSlot = Instantiate(slotPrefab, gridContainer);
@@ -55,6 +67,15 @@ public class InventoryUI : MonoBehaviour
         _hasGeneratedGrid = true;
     }
 
+    private void Update()
+    {
+        // KEYBOARD HOTKEY FOR PRESENTATION: Press "I" to open/close the full inventory grid!
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            ToggleInventoryExpansion();
+            Debug.LogWarning($"[INVENTORY UI] Manual toggle triggered via 'I' key. Current state: {currentState}");
+        }
+    }
     public void ToggleInventoryExpansion()
     {
         // Simple toggle switch
@@ -62,10 +83,15 @@ public class InventoryUI : MonoBehaviour
             ? InventoryVisualState.Expanded
             : InventoryVisualState.DefaultLower;
 
+        if (upperGridPanel != null && lowerBarPanel != null)
+        {
+            upperGridPanel.SetActive(currentState == InventoryVisualState.Expanded);
+            lowerBarPanel.SetActive(currentState == InventoryVisualState.DefaultLower);
+        }
         RefreshUI();
     }
 
-    private void RefreshUI()
+    public void RefreshUI()
     {
         var runner = FindFirstObjectByType<NetworkRunner>();
         if (runner == null) return;

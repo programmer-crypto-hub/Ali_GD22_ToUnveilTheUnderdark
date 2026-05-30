@@ -119,6 +119,56 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &24925030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 24925032}
+  - component: {fileID: 24925031}
+  m_Layer: 0
+  m_Name: PlayerButtonController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &24925031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24925030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfb36f652a2824e409ee90f0bb528191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerButtonController
+  playerNetworkObject: {fileID: 1005809161424700482, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
+  rollDiceButton: {fileID: 0}
+  shopButton: {fileID: 0}
+  endTurnButton: {fileID: 0}
+  nextWeapon: {fileID: 0}
+  prevButton: {fileID: 0}
+--- !u!4 &24925032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24925030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 960.1402, y: 230.78003, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &405234678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -930,11 +980,6 @@ MonoBehaviour:
   winMenuButton: {fileID: 1041321131}
   exitActivationObjectOverride: {fileID: 0}
   showDebugLogs: 1
---- !u!1 &1413596746 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 986900483720658952, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
-  m_PrefabInstance: {fileID: 2236350162780674749}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1430321064
 GameObject:
   m_ObjectHideFlags: 0
@@ -1298,6 +1343,8 @@ MonoBehaviour:
   roomDoors: {fileID: 0}
   rewardChestPrefab: {fileID: 0}
   chestSpawnPoint: {fileID: 0}
+  staticChestAnimator: {fileID: 0}
+  enemyPanel: {fileID: 0}
   _EncounterTriggered:
     _value: 0
   _EncounterCleared:
@@ -1367,9 +1414,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameSession
   endTurnBTN: {fileID: 886835846}
-  movementPanel: {fileID: 1413596746}
-  _PlayerOrder: []
-  _PlayerCount: 0
+  _CurrentTurnID: -1
+  _TurnOrder: 
+  _TotalParticipants: 0
+  isNetworkReady: 0
 --- !u!4 &1965876082
 Transform:
   m_ObjectHideFlags: 0
@@ -1638,6 +1686,10 @@ PrefabInstance:
     - target: {fileID: 4303404619736525646, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
       propertyPath: SortKey
       value: 3037382652
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385407520926880255, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6012751727633366646, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
       propertyPath: m_Name
@@ -1942,3 +1994,4 @@ SceneRoots:
   - {fileID: 8340647990612029323}
   - {fileID: 405234678}
   - {fileID: 8653149336491498437}
+  - {fileID: 24925032}

@@ -331,21 +331,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0272357983462c4c8381a7383f3064b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuntimeStateController
-  settingsBinder: {fileID: 0}
-  inputManager: {fileID: 1651381226}
-  playerSpawner: {fileID: 0}
-  playerController: {fileID: 0}
-  playerStats: {fileID: 0}
-  gameplayHUDController: {fileID: 0}
-  weaponManager: {fileID: 0}
-  gameManager: {fileID: 0}
-  roomEncounterHandler: {fileID: 0}
-  cameraTarget: {fileID: 0}
-  eventBus: {fileID: 253959655}
-  gameSession: {fileID: 0}
-  shopUIManager: {fileID: 0}
-  playerProgression: {fileID: 0}
-  playerData: {fileID: 0}
 --- !u!4 &2118463149
 Transform:
   m_ObjectHideFlags: 0

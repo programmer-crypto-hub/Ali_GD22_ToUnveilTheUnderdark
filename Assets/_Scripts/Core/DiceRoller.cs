@@ -18,20 +18,22 @@ public class DiceRoller : NetworkBehaviour
 
     public void RequestRollDice()
     {
-        // Защита: генерировать случайные числа для настольной игры имеет право только Сервер/Хост
-        // В режиме Хоста на одной машине это условие всегда будет выполняться успешно!
         if (GetComponent<NetworkObject>().Runner.IsServer)
         {
             // Бросаем кубик d20 (от 1 до 20)
             DiceRollResult = UnityEngine.Random.Range(1, 21);
 
-            // Запускаем C# ивенты для обновления ваших механик перемещения
             OnDiceRollCompleted?.Invoke(DiceRollResult);
 
             Debug.LogWarning($"[DICESUCCESS] Сервер выбросил на кубике: {DiceRollResult}");
+
+            if (DiceUI.Instance != null) DiceUI.Instance.HandleDiceRolled(DiceRollResult);
         }
     }
-
+    public int GetDiceResult()
+    {
+        return DiceRollResult;
+    }
     public override void Render()
     {
         // 2. State Sync: Detect when the roll arrives
@@ -50,7 +52,8 @@ public class DiceRoller : NetworkBehaviour
     public float ConvertDiceToCombat()
     {
         int diceToCombatApprox = 100 / 5;
-        float damage = (DiceRollResult / diceToCombatApprox);
+        float damage = ((float)DiceRollResult / diceToCombatApprox);
+        Debug.Log($"Calculating damage, via formula {DiceRollResult} / {diceToCombatApprox}, which results in {damage}");
         return damage;
     }
 

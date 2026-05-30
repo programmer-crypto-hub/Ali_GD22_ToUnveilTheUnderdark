@@ -1,12 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // ОБЯЗАТЕЛЬНО: Подключаем систему ивентов Unity
+using UnityEngine.EventSystems; 
 using Fusion;
 
-/*
- * Emergency Multi-Bypass Script for MVP Presentation.
- * Uses direct Pointer Clicks to ignore completely any empty OnClick() or RemoveAllListeners() bugs.
- */
 public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
 {
     [Header("Player Tracking")]
@@ -23,10 +19,8 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
 
     private void Update()
     {
-        // ==================== ФАЗА 1: СЕТЕВОЕ ОЖИДАНИЕ ====================
         if (!_isInitialized)
         {
-            // 1. Ленивый поиск игрока
             if (playerNetworkObject == null)
             {
                 foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
@@ -39,11 +33,8 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
                 }
                 if (playerNetworkObject == null) return;
             }
-
-            // 2. Сетевой барьер
             if (DiceRoller.Instance == null || DiceUI.Instance == null || GameSession.Instance == null) return;
 
-            // 3. Точка активации (срабатывает 1 раз на 201-м кадре)
             _isInitialized = true;
 
             var weaponManager = playerNetworkObject.GetComponentInChildren<WeaponManager>();
@@ -53,16 +44,26 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
                 if (prevButton != null) { prevButton.onClick.RemoveAllListeners(); prevButton.onClick.AddListener(() => weaponManager.SwitchToPrevWeapon()); }
             }
 
-            Debug.LogWarning("[UI SYSTEM] Сетевой барьер успешно пройден на 201-м кадре!");
+            Debug.LogWarning("[UI SYSTEM] Сетевой барьер успешно пройден!");
         }
 
-        // 1. ПРИНУДИТЕЛЬНЫЙ БРОСОК КУБИКА (Кнопка R)
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (DiceRoller.Instance != null && DiceUI.Instance != null && _isInitialized == true)
+            if (DiceRoller.Instance != null && _isInitialized == true)
             {
                 DiceRoller.Instance.RequestRollDice();
-                DiceUI.Instance.HandleDiceRolled(DiceRoller.Instance.DiceRollResult);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            var shopUI = FindFirstObjectByType<ShopUIManager>();
+            if (shopUI != null)
+            {
+                // Simply reverse the current active state of the panel or force toggle open!
+                bool isCurrentlyOpen = shopUI.shopPanel.activeSelf;
+                shopUI.ToggleShop(!isCurrentlyOpen);
+                Debug.LogWarning($"[HOTKEY] Pressed S to toggle shop display plane. New state: {!isCurrentlyOpen}");
             }
         }
 

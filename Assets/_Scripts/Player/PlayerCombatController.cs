@@ -20,7 +20,7 @@ public class PlayerCombatController : NetworkBehaviour
     [SerializeField] private AudioClip whooshSFX;
     [SerializeField] private AudioClip bladeHitSFX;
 
-    [SerializeField] private float meleeAttackRange = 15f;
+    [SerializeField] private float meleeAttackRange = 50f;
 
     private Vector3 _returnPosition;
     private bool _hasCollidedWithBoss;
@@ -129,7 +129,7 @@ public class PlayerCombatController : NetworkBehaviour
 
         Vector3 directionToBoss = Vector3.left;
         directionToBoss.y = 0f;
-        Vector3 dashDestination = targetPos + (directionToBoss * 15f);
+        Vector3 dashDestination = targetPos + (directionToBoss * 10f);
         dashDestination.y = transform.position.y;
 
         if (blindingScreenGroup != null)

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   itemID: 31
   itemName: Damage Potion
-  description: A Potion in a bottle with magic of enpowerment.
+  description: A Potion in a bottle with magic of empower.
   cost: 10
   icon: {fileID: 1018383391595562092, guid: de267c089aab8e04f9973b37351fe6eb, type: 3}
   requiredRole: 1

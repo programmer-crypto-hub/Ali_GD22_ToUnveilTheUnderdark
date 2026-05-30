@@ -10,22 +10,21 @@ public class ShopSystem : NetworkBehaviour
     public void RPC_RequestPurchase(int itemID)
     {
         if (!HasStateAuthority) return;
-        // 1. Turn Check
-        if (Object.InputAuthority.PlayerId != GameSession.Instance.CurrentTurnID) return;
 
-        // 2. Lookup item data from the SO Database
+        var player = Runner.GetPlayerObject(Object.InputAuthority).GetComponent<PlayerStats>();
+        if (player == null || GameSession.Instance == null) return;
+
+        // FIX: Verify current session turn using the verified integer Network ID match!
+        if (GameSession.Instance.CurrentTurnID != (int)player.Object.Id.Raw) return;
+
         ShopItem item = masterDatabase.GetItemByID(itemID);
         if (item == null) return;
 
-        // 3. Get the Player's Networked component
-        var player = Runner.GetPlayerObject(Object.InputAuthority).GetComponent<PlayerStats>();
-
-        // 4. Validate Funds & Space
         bool hasMoney = player.Gold >= item.cost;
         bool hasSpace = false;
         int emptySlotIndex = -1;
 
-        // Find first empty slot (assuming 0 is 'empty' or use -1)
+        // Process free slot lookup across the 30 NetworkArray spaces
         for (int i = 0; i < player.InventoryItemIDs.Length; i++)
         {
             if (player.InventoryItemIDs[i] == 0)
@@ -39,9 +38,14 @@ public class ShopSystem : NetworkBehaviour
         if (hasMoney && hasSpace)
         {
             player.Gold -= item.cost;
-            player.InventoryItemIDs.Set(emptySlotIndex, itemID); // NetworkArray requires .Set()
+            player.InventoryItemIDs.Set(emptySlotIndex, itemID);
 
-            Debug.Log($"Server: {player.PlayerName} bought {item.itemName}");
+            Debug.LogWarning($"[SERVER TRANSACTION SUCCESS] {player.gameObject.name} successfully purchased {item.itemName}!");
+
+            // Force the Inventory layout UI on the player's screen to instantly re-render with the new item icon!
+            var invUI = FindFirstObjectByType<InventoryUI>();
+            if (invUI != null) invUI.RefreshUI();
         }
     }
+
 }
