@@ -1,25 +1,9 @@
 using Fusion;
 using UnityEngine;
-using static Unity.Collections.Unicode;
 
-public class ShopSpaceTrigger : MonoBehaviour
+public class ShopSpaceTrigger : NetworkBehaviour
 {
     private bool _isPlayerInZone = false;
-
-    private void OnEnable()
-    {
-        if (InputManager.Instance == null) Debug.LogError("InputManager instance not found! Make sure it is in the scene and properly initialized.");
-        // Subscribe to the event
-        if (InputManager.Instance != null)
-            InputManager.Instance.OnInteractPressed += TryOpenShop;
-    }
-
-    private void OnDisable()
-    {
-        // Unsubscribe to avoid memory leaks
-        if (InputManager.Instance != null)
-            InputManager.Instance.OnInteractPressed -= TryOpenShop;
-    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {

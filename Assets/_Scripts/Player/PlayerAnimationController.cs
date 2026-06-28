@@ -52,8 +52,7 @@ public class PlayerAnimationController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (animator == null || InputManager.Instance == null) return;
-        float moveSpeed = InputManager.Instance.MoveInput.magnitude;
+        float moveSpeed = playerStats != null ? playerStats.playerData.moveSpeed : 0f;
         animator.SetFloat(moveSpeedParameter, moveSpeed);
     }
 

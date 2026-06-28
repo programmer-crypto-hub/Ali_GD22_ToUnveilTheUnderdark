@@ -40,6 +40,46 @@ public class PlayerStats : NetworkBehaviour
     public float XP { get; set; }
     [Networked] public string PlayerName { get; set; }
 
+    public override void FixedUpdateNetwork()
+    {
+        // Handle input for toggling the shop UI
+        if (GetInput(out NetworkInputData data))
+        {
+            Debug.Log("Input received in PlayerStats: " + data);
+            if (data.toggleShopPressed)
+            {
+                Debug.Log("Shop Button was pressed.");
+
+                // Find via singleton
+                if (ShopUIManager.Instance != null)
+                {
+                    ShopUIManager.Instance.HandleShopToggleInput();
+                }
+                else
+                {
+                    // Alternatively, find the ShopUIManager in the scene if the singleton is not set
+                    var shopUI = FindFirstObjectByType<ShopUIManager>();
+                    shopUI?.HandleShopToggleInput();
+                }
+            }
+            // Handle input for toggling the inventory UI
+            if (data.toggleInventoryPressed)
+            {
+                Debug.Log("Inventory Button was pressed.");
+                // Find via singleton
+                if (InventoryUI.Instance != null)
+                {
+                    InventoryUI.Instance.HandleInventoryToggleInput();
+                }
+                else
+                {
+                    // Alternatively, find the InventoryUIManager in the scene if the singleton is not set
+                    var inventoryUI = FindFirstObjectByType<InventoryUI>();
+                    inventoryUI?.HandleInventoryToggleInput();
+                }
+            }
+        }
+    }
     public void OnStatsChanged()
 {
     OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);

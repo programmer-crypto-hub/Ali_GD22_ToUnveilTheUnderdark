@@ -33,12 +33,12 @@ public class PlayerMovement : NetworkBehaviour
 
                 // Init a 0.5 second cooldown to prevent multiple triggers on the same cell
                 spaceTriggerCooldown = TickTimer.CreateFromSeconds(Runner, 0.5f);
-
-                if (currentDiceValue <= 0 && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
-                {
-                    Debug.Log("[BOARD] Ход завершен, шаги закончились!");
-                    GameSession.Instance.RPC_RequestEndTurn();
-                }
+                if (GetInput(out NetworkInputData data))
+                    if (currentDiceValue <= 0 && data.endTurnPressed)
+                    {
+                        Debug.Log("Turn ended.");
+                        GameSession.Instance.RPC_RequestEndTurn();
+                    }
             }
         }
     }

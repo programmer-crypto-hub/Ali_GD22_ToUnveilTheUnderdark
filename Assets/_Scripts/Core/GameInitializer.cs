@@ -7,7 +7,6 @@ public static class GameInitializer
     {
         // Check if they exist, if not, create them and set DontDestroyOnLoad
         EnsureServiceExists<EventBus>("EventBus");
-        EnsureServiceExists<InputManager>("InputManager");
     }
 
     private static void EnsureServiceExists<T>(string name) where T : Component

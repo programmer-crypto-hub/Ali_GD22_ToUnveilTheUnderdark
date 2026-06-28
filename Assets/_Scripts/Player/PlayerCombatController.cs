@@ -44,33 +44,41 @@ public class PlayerCombatController : NetworkBehaviour
         blindingScreenGroup = GameObject.Find("BlindingScreen").GetComponent<CanvasGroup>();
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
-        if (GameSession.Instance.CurrentTurnID != (int)Object.Id.Raw)
+        if (GetInput(out NetworkInputData data))
         {
-            return;
-        }
-        // ХОТКЕЙ ДЛЯ ПРЕЗЕНТАЦИИ: Нажимаем клавишу "A" для атаки!
-        // Так как игра на одном устройстве (Хост), HasInputAuthority отработает идеально.
-        if (Object.HasInputAuthority && Input.GetKeyDown(KeyCode.A))
-        {
-            Debug.Log("Attack hotkey pressed.");
-            if (CanStartAttack())
+            // Attack input (Space key)
+            if (data.attackPressed && Object.HasInputAuthority)
             {
-                Debug.Log("Starting attack.");
-                // Запускаем процесс атаки
-                TryStartAttack();
+                Debug.Log("[SERVER] Получен сетевой инпут атаки.");
+                if (CanStartAttack())
+                {
+                    Debug.Log("Starting attack.");
+                    TryStartAttack();
+                }
             }
-        }
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            if (GameSession.Instance != null)
+
+            // Dice Roll (R key)
+            if (data.diceRollPressed)
             {
-                Debug.LogWarning("[TURN SYSTEM] Игрок вручную нажал ENTER. Передаем ход следующему участнику!");
-                GameSession.Instance.RPC_RequestEndTurn();
+                if (DiceRoller.Instance != null)
+                {
+                    DiceRoller.Instance.RequestRollDice();
+                }
+            }
+
+            // Turn end (Enter key)
+            if (data.endTurnPressed)
+            {
+                if (GameSession.Instance != null)
+                {
+                    GameSession.Instance.RPC_RequestEndTurn();
+                }
             }
         }
     }
+
 
     public override void Render()
     {

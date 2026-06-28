@@ -2,8 +2,10 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryUI : MonoBehaviour
+public class InventoryUI : NetworkBehaviour
 {
+    public static InventoryUI Instance;
+
     [Header("Data References")]
     public ItemDatabase database;
 
@@ -29,10 +31,15 @@ public class InventoryUI : MonoBehaviour
     }
     public InventoryVisualState currentState = InventoryVisualState.DefaultLower;
 
-    private bool _isExpanded = false;
     private void Start()
     {
         GenerateUpperGrid();
+    }
+
+    public void HandleInventoryToggleInput()
+    {
+        ToggleInventoryExpansion();
+        Debug.Log("Handling inventory Ui expansion");
     }
 
     private void GenerateUpperGrid()
@@ -47,9 +54,7 @@ public class InventoryUI : MonoBehaviour
             firstChild.gameObject.name = "Slot_0";
             _upperGridSlots[0] = firstChild.GetComponent<Image>();
 
-            // Мы уже получили 1 слот, значит динамически нужно создать только 29!
             startIndex = 1;
-            Debug.LogWarning("[INVENTORY UI] Перехвачен шаблонный слот сцены и назначен как Slot_0");
         }
 
         for (int i = startIndex; i < 30; i++)
@@ -67,15 +72,6 @@ public class InventoryUI : MonoBehaviour
         _hasGeneratedGrid = true;
     }
 
-    private void Update()
-    {
-        // KEYBOARD HOTKEY FOR PRESENTATION: Press "I" to open/close the full inventory grid!
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            ToggleInventoryExpansion();
-            Debug.LogWarning($"[INVENTORY UI] Manual toggle triggered via 'I' key. Current state: {currentState}");
-        }
-    }
     public void ToggleInventoryExpansion()
     {
         // Simple toggle switch

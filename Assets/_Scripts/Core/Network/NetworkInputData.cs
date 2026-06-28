@@ -3,10 +3,16 @@ using UnityEngine;
 
 public struct NetworkInputData : INetworkInput
 {
-    public const byte MOUSEBUTTON0 = 1;
-    public const byte MOUSEBUTTON1 = 2;
+    public NetworkBool mouseLeftClick;
+    public NetworkBool mouseRightClick;
 
-    public NetworkButtons buttons;
+    public NetworkBool jumpPressed;
+    public NetworkBool attackPressed;
+    public NetworkBool diceRollPressed;
+    public NetworkBool endTurnPressed;
+    public NetworkBool interactPressed;
+    public NetworkBool toggleShopPressed;
+    public NetworkBool toggleInventoryPressed;
+
     public Vector3 direction;
-    public Vector2 movement;
 }

@@ -1160,6 +1160,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -339
       objectReference: {fileID: 0}
+    - target: {fileID: 9040521597695900878, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9077581712048969572, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 3.6862793
@@ -1171,8 +1175,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5712466588047481017, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1636107620}
   m_SourcePrefab: {fileID: 100100000, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+--- !u!1 &847985468 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5712466588047481017, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+  m_PrefabInstance: {fileID: 847985467}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &847985469 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9040521597695900878, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
@@ -1794,6 +1806,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1636107619 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7076801903900337803, guid: cbeba2f842f62474f98fa4655873633d, type: 3}
+  m_PrefabInstance: {fileID: 847985467}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847985468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f39d49ba8f55f1b4d9a81732f053e1b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
+--- !u!114 &1636107620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847985468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 103604812
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1636107619}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &1795005588
 GameObject:
   m_ObjectHideFlags: 0

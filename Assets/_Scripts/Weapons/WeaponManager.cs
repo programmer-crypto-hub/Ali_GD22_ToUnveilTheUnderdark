@@ -106,13 +106,14 @@ public class WeaponManager : NetworkBehaviour
             }
         }
     }
-    public void CheckAttackInput()
+    public override void FixedUpdateNetwork()
     {
-        if (!Object.HasInputAuthority) return;
-        if (InputManager.Instance.AttackPressed == true && InputManager.Instance != null)
+        if (GetInput(out NetworkInputData data))
         {
-            InputManager.Instance.OnAttackPressed?.Invoke();
-            PerformCurrentWeaponAttack();
+            if (data.attackPressed)
+            {
+                PerformCurrentWeaponAttack();
+            }
         }
     }
     public void PerformCurrentWeaponAttack()

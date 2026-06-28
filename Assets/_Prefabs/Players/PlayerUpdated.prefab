@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 7662427363872413756}
   - component: {fileID: -6294055781264973135}
   - component: {fileID: -5128743119337386372}
+  - component: {fileID: 7041761551252235902}
   m_Layer: 6
   m_Name: PlayerUpdated
   m_TagString: Player
@@ -333,6 +334,18 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &7041761551252235902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322352118448638456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cfaed8fd9dce324bb40e3553c27e60f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
 --- !u!1 &5259460894316011579
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,9 +1,9 @@
+using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; 
-using Fusion;
+using UnityEngine.EventSystems;
 
-public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
+public class PlayerButtonController : NetworkBehaviour, IPointerClickHandler
 {
     [Header("Player Tracking")]
     public NetworkObject playerNetworkObject;
@@ -15,65 +15,77 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
     [SerializeField] public Button nextWeapon;
     [SerializeField] public Button prevButton;
 
+    private NetworkObject _localPlayerNetworkObject;
     private bool _isInitialized = false;
 
-    private void Update()
+    public override void Spawned()
     {
-        if (!_isInitialized)
+        base.Spawned();
+
+        // Asynchronously wait for the local player to exist before binding UI elements
+        StartCoroutine(InitializeUIWhenPlayerSpawns());
+    }
+
+    private System.Collections.IEnumerator InitializeUIWhenPlayerSpawns()
+    {
+        // Wait frame-by-frame until the runner spawns the local player prefab
+        while (_localPlayerNetworkObject == null)
         {
-            if (playerNetworkObject == null)
+            if (Runner != null)
             {
-                foreach (var player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
+                var localPlayerRef = Runner.GetPlayerObject(Runner.LocalPlayer);
+                if (localPlayerRef != null)
                 {
-                    if (player.Object != null && player.Object.HasInputAuthority)
-                    {
-                        playerNetworkObject = player.GetComponent<NetworkObject>();
-                        break;
-                    }
+                    _localPlayerNetworkObject = localPlayerRef.GetComponent<NetworkObject>();
                 }
-                if (playerNetworkObject == null) return;
             }
-            if (DiceRoller.Instance == null || DiceUI.Instance == null || GameSession.Instance == null) return;
+            yield return null;
+        }
 
-            _isInitialized = true;
-
-            var weaponManager = playerNetworkObject.GetComponentInChildren<WeaponManager>();
+        // Runs exactly once on boot
+        if (_localPlayerNetworkObject != null)
+        {
+            var weaponManager = _localPlayerNetworkObject.GetComponentInChildren<WeaponManager>();
             if (weaponManager != null)
             {
-                if (nextWeapon != null) { nextWeapon.onClick.RemoveAllListeners(); nextWeapon.onClick.AddListener(() => weaponManager.SwitchToNextWeapon()); }
-                if (prevButton != null) { prevButton.onClick.RemoveAllListeners(); prevButton.onClick.AddListener(() => weaponManager.SwitchToPrevWeapon()); }
+                if (nextWeapon != null)
+                {
+                    nextWeapon.onClick.RemoveAllListeners();
+                    nextWeapon.onClick.AddListener(() => weaponManager.SwitchToNextWeapon());
+                }
+                if (prevButton != null)
+                {
+                    prevButton.onClick.RemoveAllListeners();
+                    prevButton.onClick.AddListener(() => weaponManager.SwitchToPrevWeapon());
+                }
+                Debug.Log("Successfully bound weapon navigation buttons to local player data slots.");
             }
-
-            Debug.LogWarning("[UI SYSTEM] Сетевой барьер успешно пройден!");
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        _isInitialized = true;
+    }
+
+    // Executes cleanly on network ticks with zero performance overhead!
+    public override void FixedUpdateNetwork()
+    {
+        // Exit early if the player or dependencies aren't fully awake yet
+        if (!_isInitialized) return;
+        if (DiceRoller.Instance == null || GameSession.Instance == null) return;
+
+        // Extract the authoritative, safe inputs passed through the runner
+        if (GetInput(out NetworkInputData data))
         {
-            if (DiceRoller.Instance != null && _isInitialized == true)
+            if (data.diceRollPressed)
             {
+                // Trigger the synchronized server-authoritative roll execution
                 DiceRoller.Instance.RequestRollDice();
+                Debug.Log("[NETWORK COMBAT] Authoritative server request to roll dice received.");
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            var shopUI = FindFirstObjectByType<ShopUIManager>();
-            if (shopUI != null)
+            if (data.endTurnPressed)
             {
-                // Simply reverse the current active state of the panel or force toggle open!
-                bool isCurrentlyOpen = shopUI.shopPanel.activeSelf;
-                shopUI.ToggleShop(!isCurrentlyOpen);
-                Debug.LogWarning($"[HOTKEY] Pressed S to toggle shop display plane. New state: {!isCurrentlyOpen}");
-            }
-        }
-
-        // 2. ПРИНУДИТЕЛЬНЫЙ КОНЕЦ ХОДА (Кнопка E)
-        if (Input.GetKeyDown(KeyCode.E) && _isInitialized == true)
-        {
-            if (GameSession.Instance != null)
-            {
+                // Safely fire the turn engine cleanup RPC
                 GameSession.Instance.RPC_RequestEndTurn();
-                _isInitialized = false;
+                Debug.Log("[NETWORK COMBAT] Authoritative server request to close active turn state.");
             }
         }
     }
@@ -81,7 +93,6 @@ public class PlayerButtonController : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Проверяем, на какой конкретно объект нажал игрок пальцем/тачпадом
         GameObject clickedObject = eventData.pointerPressRaycast.gameObject;
         if (clickedObject == null) return;
 

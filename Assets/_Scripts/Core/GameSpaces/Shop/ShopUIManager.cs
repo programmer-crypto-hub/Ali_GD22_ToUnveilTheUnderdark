@@ -15,27 +15,35 @@ public class ShopUIManager : NetworkBehaviour
 
     public List<ShopItem> allItems; // Drag all shop items here in Inspector
 
+    private bool _isCurrentlySubscribed = false;
     private void Awake() => Instance = this;
 
-    private void OnEnable()
+    public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        if (GameSession.Instance != null)
-            GameSession.Instance.OnTurnChangedEvent += HandleTurnChanged;
-    }
-    private void OnDisable()
-    {
-        // Always unsubscribe to prevent memory leaks!
-        if (GameSession.Instance != null)
+        base.Despawned(runner, hasState);
+
+        // Clean up using the corrected boolean tracker
+        if (GameSession.Instance != null && _isCurrentlySubscribed)
+        {
             GameSession.Instance.OnTurnChangedEvent -= HandleTurnChanged;
+            _isCurrentlySubscribed = false;
+        }
     }
 
     private void HandleTurnChanged()
     {
-        // If the turn is no longer mine, force the shop to close
         if (GameSession.Instance.CurrentTurnID != Runner.LocalPlayer.PlayerId)
         {
             ToggleShop(false);
         }
+    }
+    public void HandleShopToggleInput()
+    {
+        Debug.Log($"HandleShopToggleInput called! Did the shop open?" + (shopPanel.activeSelf ? "Yes" : "No"));
+        if (shopPanel == null) return;
+
+        bool targetState = !shopPanel.activeSelf;
+        ToggleShop(targetState);
     }
     public void ToggleShop(bool isOpen)
     {
@@ -163,9 +171,6 @@ public class ShopUIManager : NetworkBehaviour
         // Turn security check
         if (GameSession.Instance.CurrentTurnID != (int)player.Object.Id.Raw) return;
 
-        // ==================== DATABASE AUTO-LOOKUP FIX ====================
-        // If the masterDatabase field is empty due to network spawning constraints,
-        // we search the active scene or fall back to your inspector list to find the asset info!
         ShopItem item = null;
 
         if (masterDatabase != null)
@@ -183,7 +188,6 @@ public class ShopUIManager : NetworkBehaviour
             Debug.LogError($"[SHOP ERROR] Item ID {itemID} could not be found anywhere in the databases!");
             return;
         }
-        // ==================================================================
 
         // Validate Funds & Inventory Grid Space
         bool hasMoney = player.Gold >= item.cost;

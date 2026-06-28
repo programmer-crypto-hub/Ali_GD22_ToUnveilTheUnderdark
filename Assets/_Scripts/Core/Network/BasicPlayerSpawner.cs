@@ -12,17 +12,7 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     private NetworkRunner _runner;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
-    private bool _mouseButton0;
-    private bool _mouseButton1;
-
-    private void Update()
-    {
-        // Gathers quick click states inside standard Unity frames
-        if (Input.GetMouseButtonDown(0)) _mouseButton0 = true;
-        if (Input.GetMouseButtonDown(1)) _mouseButton1 = true;
-    }
-
-    // Kicked off by your UI Button
+    // Kicked off by a UI Button
     public void StartHostFromButton()
     {
         if (_runner != null) return; // Already running, ignore extra clicks
@@ -66,22 +56,16 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new NetworkInputData();
+        var localPlayerObj = runner.GetPlayerObject(runner.LocalPlayer);
+        if (localPlayerObj == null) return;
 
-        // Standard frame-by-frame queries (No subscriptions needed)
-        if (Input.GetKey(KeyCode.W)) data.direction += Vector3.forward;
-        if (Input.GetKey(KeyCode.S)) data.direction += Vector3.back;
-        if (Input.GetKey(KeyCode.A)) data.direction += Vector3.left;
-        if (Input.GetKey(KeyCode.D)) data.direction += Vector3.right;
+        var inputHandler = localPlayerObj.GetComponent<PlayerInputHandler>();
+        if (inputHandler != null)
+        {
+            inputHandler.PopulatedNetworkInput(out var data);
 
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0 || Input.GetMouseButton(0));
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON1, _mouseButton1 || Input.GetMouseButton(1));
-
-        // Flush tracking variables immediately after processing
-        _mouseButton0 = false;
-        _mouseButton1 = false;
-
-        input.Set(data);
+            input.Set(data);
+        }
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)

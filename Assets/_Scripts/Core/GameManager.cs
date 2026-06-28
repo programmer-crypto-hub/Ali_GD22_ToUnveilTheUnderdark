@@ -57,7 +57,7 @@ public class GameManager : NetworkBehaviour
     {
         if (HasStateAuthority) CurrentState = GameState.Playing;
         Time.timeScale = 1f;
-        InputManager.Instance?.EnablePlayerInput();
+        PlayerInputHandler.IsMyTurn = true;
         // Close Shop/Inventory if they were open from another state
         ShopUIManager.Instance?.ToggleShop(false);
         Debug.Log("Switched to Exploration Mode.");
@@ -67,26 +67,23 @@ public class GameManager : NetworkBehaviour
     {
         if (HasStateAuthority) CurrentState = GameState.Combat;
         // Disable movement but keep UI active for attacks
-        if (InputManager.Instance.playerActionMap.enabled == false)
-        {
-            InputManager.Instance.EnablePlayerInput();
-            InputManager.Instance.EnableUIInput();
-        }
+        PlayerInputHandler.IsMyTurn = false;
+        PlayerInputHandler.IsUIActive = true;
         Debug.Log("Combat Initialized. Board movement frozen.");
     }
 
     public void HandleGameOver(GameState state)
     {
         Time.timeScale = 0f;
-        InputManager.Instance?.EnableUIInput();
+        PlayerInputHandler.IsUIActive = true;
         // Trigger Win/Loss UI screens here
-        if (InputManager.Instance != null && state == GameState.Won)
+        if (state == GameState.Won)
         {
             Debug.Log("Congratulations! You've won the game!");
             // Show win screen
-            InputManager.Instance.DisablePlayerInput(); // Prevent further actions after winning
+            PlayerInputHandler.IsUIActive = false; // Prevent further actions after winning
         }
-        else if (InputManager.Instance != null && state == GameState.Lost)
+        else if (state == GameState.Lost)
         {
             Debug.Log("Game Over! Better luck next time.");
             // Show loss screen
@@ -96,10 +93,8 @@ public class GameManager : NetworkBehaviour
     public void HandleMainMenu()
     {
         Time.timeScale = 1f;
-        InputManager.Instance?.EnableUIInput();
+        PlayerInputHandler.IsUIActive = true;
     }
-
-    // --- State Change Requests (Server Only) ---
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestStateChange(GameState newState)
