@@ -8,9 +8,9 @@ public class EnemyData : ScriptableObject
 {
     public enum EnemyTypeByWeapons
     {
-        Melee,   // Ближний бой (гоблины, орки)
-        Ranged,  // Дальний бой (лучники, маги)
-        Boss     // Боссы (особые враги)
+        Melee = 1,
+        Ranged = 2,
+        Boss = 3
     }
 
     public enum EnemyTypeByHealth
@@ -20,42 +20,22 @@ public class EnemyData : ScriptableObject
         Boss = 3
     }
 
-
-    [Header("Общее")]
-    [Tooltip("Читаемое название врага (для UI и логирования).")]
     public string enemyName = "New Enemy";
 
-    [Tooltip("Тип врага (ближний, дальний, босс).")]
     public EnemyTypeByWeapons enemyType;
 
-    [Header("Характеристики")]
     [Min(1f)]
-    [Tooltip("Максимальное здоровье врага.")]
     public float maxHealth = 200f;
-
     [Min(0f)]
-    [Tooltip("Скорость движения врага (единиц в секунду).")]
     public float moveSpeed = 400f;
-
     [Min(0f)]
-    [Tooltip("Урон, который враг наносит за одну атаку.")]
     public float damage = 25f;
-
-    [Header("Бой")]
     [Min(0f)]
-    [Tooltip("Дальность атаки врага (радиус ближнего боя или дальность выстрела).")]
     public float attackRange = 50f;
-
     [Min(0f)]
-    [Tooltip("Дальность обнаружения игрока (на каком расстоянии враг начинает преследовать).")]
     public float detectionRange = 1000f;
-
-    [Header("Награды")]
     [Min(0f)]
-    [Tooltip("Опыт, который получает игрок за убийство этого врага.")]
     public float experienceReward = 500f;
 
-    [Header("Префаб")]
-    [Tooltip("Префаб врага, который будет использоваться для создания экземпляров.")]
     public GameObject prefab;
 }

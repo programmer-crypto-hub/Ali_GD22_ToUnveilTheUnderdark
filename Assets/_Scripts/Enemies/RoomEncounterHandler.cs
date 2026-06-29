@@ -49,10 +49,12 @@ public class RoomEncounterHandler : NetworkBehaviour
         }
 
         EncounterTriggered = true;
-        Debug.Log("[SERVER] Boss Encounter Started! Монстры призываются на поле.");
-
+        Debug.Log("Boss Encounter Started!");
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RequestStateChange(GameManager.GameState.Combat);
+        }
         spawnedEnemies.Clear();
-
         for (int i = 0; i < enemyCount; i++)
         {
             Transform targetPoint = spawnPoints[i % spawnPoints.Length];
@@ -66,7 +68,6 @@ public class RoomEncounterHandler : NetworkBehaviour
 
                 if (instance.TryGetComponent<EnemyBase>(out var baseEnemy))
                 {
-                    // Если у вашего EnemyBase есть метод инициализации, раскомментируйте:
                     baseEnemy.CurrentHP = enemyData != null ? enemyData.maxHealth : 100f;
                 }
             }
@@ -75,13 +76,10 @@ public class RoomEncounterHandler : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        // Проверку живых врагов делает только Сервер (Хост)
         if (!HasStateAuthority || !EncounterTriggered || EncounterCleared) return;
 
-        // Удаляем из списка тех, кто умер и деспавнился (стал null или потерял валидность)
         spawnedEnemies.RemoveAll(e => e == null || !e.IsValid);
 
-        // Комната зачищена ТОЛЬКО тогда, когда реально все заспавненные враги исчезли!
         if (spawnedEnemies.Count == 0)
         {
             EncounterCleared = true;
@@ -93,9 +91,8 @@ public class RoomEncounterHandler : NetworkBehaviour
 
     private void OnEncounterFinished()
     {
-        Debug.LogWarning($"[CRITICAL DIAGNOSTIC] OnEncounterFinished called! Time: {Time.time}s | EncounterTriggered: {EncounterTriggered} | EncounterCleared: {EncounterCleared}");
+        Debug.LogWarning($"OnEncounterFinished called! Time: {Time.time}s | EncounterTriggered: {EncounterTriggered} | EncounterCleared: {EncounterCleared}");
 
-        // 1. ЗАПУСК АНИМАЦИИ ОТКРЫТИЯ СУНДУКА
         if (staticChestAnimator != null)
         {
             staticChestAnimator.SetTrigger("open_trig");
@@ -103,56 +100,46 @@ public class RoomEncounterHandler : NetworkBehaviour
         }
 
         enemyPanel.SetActive(false);
-        // Изменение сетевых данных инвентаря Fusion считает строго Хост/Сервер
         if (Runner == null || !Runner.IsServer) return;
 
-        // 2. ДИНАМИЧЕСКИЙ ПЕРЕХВАТ МАГАЗИНА И ИГРОКА
         var shopManager = FindFirstObjectByType<ShopUIManager>();
         var playerNetObj = FindFirstObjectByType<PlayerStats>();
 
         if (shopManager == null || shopManager.allItems == null || shopManager.allItems.Count == 0)
         {
-            Debug.LogError("[CHEST BRIDGE ERROR] Не удалось динамически найти ShopUIManager или массив All Items на сцене пуст!");
+            Debug.LogError("Couldn't find any shop items!");
             return;
         }
 
         if (playerNetObj == null || playerNetObj.InventoryItemIDs.Length == 0)
         {
-            Debug.LogError("[CHEST BRIDGE ERROR] Не удалось найти PlayerStats на сцене для начисления награды!");
+            Debug.LogError("Couldn't find PlayerStats on the scene for award distribution!");
             return;
         }
 
-        // Берем случайный Scriptable Object напрямую из вашего массива All Items на экране инспектора!
         ShopItem luckyDrop = shopManager.allItems[UnityEngine.Random.Range(0, shopManager.allItems.Count)];
-        int itemID = luckyDrop.itemID; // Вытаскиваем его уникальный ID (например, 17 для Экскалибура или 22 для Бомбы)
+        int itemID = luckyDrop.itemID; 
 
-        int dropQuantity = 1; // По умолчанию выпадает 1 предмет
+        int dropQuantity = 1; 
 
-        // Если это финальный боссфайт и выпала бомба (ID 22) — выдаем сразу 5 штук!
         if (itemID == 22)
         {
             dropQuantity = 5;
-            Debug.LogWarning($"[CHEST LOOT] ДЬЯВОЛЬСКИЙ ДРОП! Выпало супер-количество: {dropQuantity} Бомб!");
         }
-        // Если выпало редкое зелье (3x ID) или крутое оружие — можно настроить выдачу 2-3 штук для эпичности
         else if (itemID >= 31 && itemID <= 34)
         {
-            dropQuantity = 2; // Сразу 2 зелья лечения за победу над боссом
+            dropQuantity = 2;
         }
 
-        // 5. ПООЧЕРЕДНОЕ ЗАПОЛНЕНИЕ СЕТЕВЫХ ЯЧЕЕК ХОТБАРА И ИНВЕНТАРЯ
-        // Запускаем цикл, который пропишет ID предмета в свободные слоты столько раз, сколько штук выпало!
         for (int q = 0; q < dropQuantity; q++)
         {
             int targetSlotIndex = -1;
 
-            // Сначала ищем место в нижнем хотбаре (индексы 20-29), чтобы иконки сразу вспыхнули внизу экрана на видео!
             for (int i = 20; i < 30; i++)
             {
                 if (playerNetObj.InventoryItemIDs[i] == 0) { targetSlotIndex = i; break; }
             }
 
-            // Если хотбар забит, пишем в верхний инвентарь (индексы 0-19)
             if (targetSlotIndex == -1)
             {
                 for (int i = 0; i < 20; i++)
@@ -161,20 +148,18 @@ public class RoomEncounterHandler : NetworkBehaviour
                 }
             }
 
-            // Если нашли свободную ячейку — записываем ID в сеть Photon Fusion!
             if (targetSlotIndex != -1)
             {
                 playerNetObj.InventoryItemIDs.Set(targetSlotIndex, itemID);
-                Debug.LogWarning($"[CHEST] Штука №{q + 1} предмета {luckyDrop.itemName} (ID: {itemID}) записана в сетевой слот {targetSlotIndex}!");
+                Debug.Log($"Item {q + 1} of name {luckyDrop.itemName} with ID: {itemID} was assigned to slot {targetSlotIndex}!");
             }
             else
             {
-                Debug.LogError($"[CHEST] Слот не найден! Инвентарь переполнен на штуке №{q + 1}.");
-                break; // Останавливаем цикл, если сумки трещат по швам
+                Debug.LogError($"Slot wasn't found for item {q + 1}.");
+                break; 
             }
         }
 
-        // 6. МГНОВЕННО ОБНОВЛЯЕМ ЭКРАН ИНТЕРФЕЙСА CANVAS
         RPC_RefreshLocalInventoryUI();
     }
 
@@ -184,11 +169,7 @@ public class RoomEncounterHandler : NetworkBehaviour
         var inventoryUI = FindFirstObjectByType<InventoryUI>();
         if (inventoryUI != null)
         {
-            // Вызываем двойной триггер смены визуального состояния, 
-            // чтобы ваш метод RefreshUI() внутри заставил новые иконки вспыхнуть в хотбаре на записи видео!
             inventoryUI.ToggleInventoryExpansion();
-            inventoryUI.ToggleInventoryExpansion();
-            Debug.LogWarning("[UI SYNCHRONIZED] Интерфейс инвентаря принудительно перерисован из сетевого массива!");
         }
     }
 

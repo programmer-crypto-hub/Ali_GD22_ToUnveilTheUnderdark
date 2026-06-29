@@ -108,19 +108,19 @@ public class GameplayHUDController : MonoBehaviour
 
         if (playerStats != null)
         {
-            playerStats.OnHealthChanged += UpdateHealthUI;
-            playerStats.OnGoldChanged += UpdateGoldUI;
+            GameManager.Events.OnHealthChanged += UpdateHealthUI;
+            GameManager.Events.OnGoldChanged += UpdateGoldUI;
             _isBound = true;
         }
 
         if (playerProgression != null)
         {
-            playerProgression.OnXPChanged += UpdateExperienceUI;
-            playerProgression.OnLevelUp += UpdateLevelUI;
+            GameManager.Events.OnXPChanged += UpdateExperienceUI;
+            GameManager.Events.OnLevelUp += UpdateLevelUI;
         }
 
         if (weaponManager != null)
-            weaponManager.OnWeaponChanged += UpdateWeaponUI;
+            GameManager.Events.OnWeaponChanged += UpdateWeaponUI;
     }
 
     private void UnbindEvents()
@@ -129,18 +129,18 @@ public class GameplayHUDController : MonoBehaviour
 
         if (playerStats != null)
         {
-            playerStats.OnHealthChanged -= UpdateHealthUI;
-            playerStats.OnGoldChanged -= UpdateGoldUI;
+            GameManager.Events.OnHealthChanged -= UpdateHealthUI;
+            GameManager.Events.OnGoldChanged -= UpdateGoldUI;
         }
 
         if (playerProgression != null)
         {
-            playerProgression.OnXPChanged -= UpdateExperienceUI;
-            playerProgression.OnLevelUp -= UpdateLevelUI;
+            GameManager.Events.OnXPChanged -= UpdateExperienceUI;
+            GameManager.Events.OnLevelUp -= UpdateLevelUI;
         }
 
         if (weaponManager != null)
-            weaponManager.OnWeaponChanged -= UpdateWeaponUI;
+            GameManager.Events.OnWeaponChanged -= UpdateWeaponUI;
 
         _isBound = false;
     }

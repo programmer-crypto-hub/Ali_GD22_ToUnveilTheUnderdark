@@ -9,24 +9,12 @@ public class PlayerAnimationController : NetworkBehaviour
         Ranged = 1
     }
 
-    [Header("Связи")]
-    [Tooltip("Animator на визуальной модели игрока.")]
     [SerializeField] private Animator animator;
 
-    [Tooltip("Статы игрока. Нужны, чтобы корректно реагировать на смерть и не обновлять лишние параметры после неё.")]
     [SerializeField] private PlayerStats playerStats;
-
-    [Header("Параметры Animator")]
-    [Tooltip("Имя float-параметра скорости движения в Animator Controller.")]
     [SerializeField] private string moveSpeedParameter = "MoveSpeed";
-
-    [Tooltip("Имя trigger-параметра атаки в Animator Controller.")]
     [SerializeField] private string attackTriggerParameter = "Attack";
-
-    [Tooltip("Имя int-параметра типа атаки в Animator Controller. Через него Animator решает, какой attack-state запускать: melee или ranged.")]
     [SerializeField] private string attackTypeParameter = "AttackType"; 
-
-    [Tooltip("Имя bool-параметра смерти в Animator Controller.")]
     [SerializeField] private string isDeadParameter = "IsDead";
 
     public override void Spawned()
@@ -40,14 +28,14 @@ public class PlayerAnimationController : NetworkBehaviour
 
     private void OnEnable()
     {
-        if (playerStats != null)
-            playerStats.OnDeath += HandleDeath;
+        if (GameManager.Events != null)
+            GameManager.Events.OnDeath += HandleDeath;
     }
 
     private void OnDisable()
     {
-        if (playerStats != null)
-            playerStats.OnDeath -= HandleDeath;
+        if (GameManager.Events != null)
+            GameManager.Events.OnDeath -= HandleDeath;
     }
 
     public override void FixedUpdateNetwork()

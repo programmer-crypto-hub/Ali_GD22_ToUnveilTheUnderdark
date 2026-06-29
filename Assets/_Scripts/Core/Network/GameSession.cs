@@ -9,7 +9,6 @@ public class GameSession : NetworkBehaviour
     [SerializeField] private Button endTurnBTN;
 
     public static GameSession Instance;
-    public event Action OnTurnChangedEvent;
 
     [Networked, OnChangedRender(nameof(OnTurnChanged))]
     public int CurrentTurnID { get; set; } = -1;
@@ -92,7 +91,7 @@ public class GameSession : NetworkBehaviour
 
         Debug.LogWarning($"[TURN SYSTEM UI] Ход официально переключен на ID {CurrentTurnID}. Панели стабилизированы.");
 
-        OnTurnChangedEvent?.Invoke();
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnTurnChanged, CurrentTurnID);
     }
 
 }

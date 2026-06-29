@@ -54,8 +54,8 @@ public class PlayerMovement : NetworkBehaviour
 
         currentDiceValue = DiceRoller.Instance.DiceRollResult;
         DiceUI.Instance.HandleDiceRolled(currentDiceValue);
-
-        DiceRoller.Instance.OnDiceRollCompleted?.Invoke(currentDiceValue);
+        
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnDiceRolled, currentDiceValue);
 
         if (GameManager.Instance.CurrentState == GameManager.GameState.Playing)
         {

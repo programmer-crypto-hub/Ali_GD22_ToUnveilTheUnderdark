@@ -82,10 +82,10 @@ public class PlayerStats : NetworkBehaviour
     }
     public void OnStatsChanged()
 {
-    OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
-    OnGoldChanged?.Invoke(Gold, 9999); // Max gold
-    OnDiceRolled?.Invoke(CurrentDiceValue, 20f); // D20
-    
+    GameManager.Instance.RaiseEvent(GameManager.Events.OnHealthChanged, CurrentHealth, MaxHealth);
+    GameManager.Instance.RaiseEvent(GameManager.Events.OnGoldChanged, Gold, 9999); // Max gold
+    GameManager.Instance.RaiseEvent(GameManager.Events.OnDiceRolled, CurrentDiceValue); // D20
+
     UpdateUI();
 }
 
@@ -110,13 +110,6 @@ public class PlayerStats : NetworkBehaviour
     public int CurrentRoleId => currentRoleId;
     public string CurrentRole => currentRole;
 
-    public event Action<float, float> OnHealthChanged;
-    public event Action<int, int> OnGoldChanged;
-    public event Action<float, float> OnDiceRolled;
-    public event Action<string, int> OnRoleApplied;
-
-    public event Action OnDeath;
-
     public override void Spawned()
     {
         if (HasStateAuthority) // Only the Server/Host sets initial values
@@ -129,12 +122,7 @@ public class PlayerStats : NetworkBehaviour
         // Subscribe to Role changes
         if (PlayerRolesController.Instance != null)
         {
-            PlayerRolesController.Instance.OnRoleGiven += () =>
-            {
-                currentRole = PlayerRolesController.Instance.roleName.ToString();
-                currentRoleId = PlayerRolesController.Instance.RoleId;
-                OnRoleApplied?.Invoke(currentRole, currentRoleId);
-            };
+            GameManager.Instance.RaiseEvent(GameManager.Events.OnRoleGiven);
         }
         isNetworkReady = true;
         if (GameSession.Instance != null && GameSession.Instance.isNetworkReady) GameSession.Instance.RegisterParticipant((int)Object.Id.Raw, "Player");
@@ -161,7 +149,7 @@ public class PlayerStats : NetworkBehaviour
 
         if (CurrentHealth <= 0f)
         {
-            OnDeath?.Invoke();
+            GameManager.Instance.RaiseEvent(GameManager.Events.OnDeath);
             // Since Animator isn't networked by default, use an RPC for the animation
             playerAnim.SetInteger("health", -1);
         }
@@ -214,6 +202,6 @@ public class PlayerStats : NetworkBehaviour
             return;
         CurrentDiceValue = Mathf.RoundToInt(CurrentDiceValue * multiplier);
         CurrentDiceValue = Mathf.Clamp(CurrentDiceValue, 1, playerData.maxDiceValue);
-        OnDiceRolled?.Invoke(CurrentDiceValue, playerData.maxDiceValue);
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnDiceRolled, CurrentDiceValue);
     }
 }

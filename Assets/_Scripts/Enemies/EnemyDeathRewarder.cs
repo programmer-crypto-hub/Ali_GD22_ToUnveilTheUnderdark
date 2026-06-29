@@ -6,21 +6,18 @@ public class EnemyDeathRewarder : MonoBehaviour
     [Tooltip("Компонент прогрессии игрока, куда будем добавлять опыт.")]
     public PlayerProgression playerProgression;
 
-    public void RegisterEnemy(EnemyStats stats)
+    public void RegisterEnemy()
     {
-        if (stats == null)
-            return;
-
-        // Подписываемся на событие смерти конкретного врага.
-        stats.OnDied += HandleEnemyDied;
+        if (GameManager.Events == null) return;
+        GameManager.Events.OnEnemyDied += HandleEnemyDied;
     }
 
-    private void HandleEnemyDied(EnemyStats stats)
+    private void HandleEnemyDied()
     {
-        if (stats == null)
+        if (GameManager.Events == null)
             return;
 
-        stats.OnDied -= HandleEnemyDied;
+        GameManager.Events.OnEnemyDied -= HandleEnemyDied;
 
         if (playerProgression == null)
         {
@@ -28,6 +25,7 @@ public class EnemyDeathRewarder : MonoBehaviour
             return;
         }
 
+        var stats = GetComponent<EnemyStats>();
         float reward = stats.ExperienceReward;
         if (reward > 0f)
         {

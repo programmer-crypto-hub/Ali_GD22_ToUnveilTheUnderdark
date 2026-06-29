@@ -19,10 +19,7 @@ public class PlayerRoles : ScriptableObject
         Random = 5
     }
 
-    [Header("Role Settings")]
     public RoleType roleType;
 
-    [Header("Role Sprites")]
-    [Tooltip("Sprites")]
     public Sprite roleSprite;
 }

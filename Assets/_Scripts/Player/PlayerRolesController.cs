@@ -1,3 +1,4 @@
+// TODO: Fix this script, find usage or delete.
 using System;
 using Fusion;
 using UnityEngine;
@@ -6,17 +7,11 @@ using System.Collections;
 
 public class PlayerRolesController : NetworkBehaviour
 {
-    [Header("Roles Stats")]
-    [Tooltip("ScriptableObject с базовыми параметрами ролей игрока (PlayerRolesData).")]
     [SerializeField]
     public PlayerRoles playerRoles;
 
     public static PlayerRolesController Instance { get; private set; }
 
-    public Action OnRoleGiven;
-
-    [Header("UI Elements")]
-    [Tooltip("—сылка на UI элемент дл€ отображени€ текущей роли игрока.")]
     public GameObject rolePanel;
     public Image roleImage;
     [Networked]
@@ -28,7 +23,6 @@ public class PlayerRolesController : NetworkBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("PlayerRolesController: уже существует другой экземпл€р. Ётот экземпл€р будет отключен.", this);
             enabled = false;
             return;
         }

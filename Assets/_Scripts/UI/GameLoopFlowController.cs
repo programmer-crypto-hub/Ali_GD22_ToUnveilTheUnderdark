@@ -135,16 +135,16 @@ public class GameLoopFlowController : NetworkBehaviour
         if (playerStats == null)
             return;
 
-        playerStats.OnDeath += HandlePlayerDeath;
+        GameManager.Events.OnDeath += HandlePlayerDeath;
         isSubscribedToDeath = true;
     }
 
     private void UnsubscribeFromPlayerDeath()
     {
-        if (!isSubscribedToDeath || playerStats == null)
+        if (!isSubscribedToDeath || GameManager.Events == null)
             return;
 
-        playerStats.OnDeath -= HandlePlayerDeath;
+        GameManager.Events.OnDeath -= HandlePlayerDeath;
         isSubscribedToDeath = false;
     }
 

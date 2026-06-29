@@ -30,8 +30,6 @@ public class EnemyEncounter : NetworkBehaviour
     public int enemyIndex = 0; // Index to select enemy type from EnemyData array
     public int Index; // Index for EnemyHierarchy, to define if an enemy can spawn here (via CanEnemySpawnHere())
 
-    public Action OnEnemySpawnTriggered;
-
     public override void Spawned()
     {
         if (HasStateAuthority)
@@ -112,7 +110,7 @@ public class EnemyEncounter : NetworkBehaviour
                 Runner.Spawn(enemyPrefab, spawnPlatforms[spawnIndex].transform.position, Quaternion.identity);
                 isEnemySpawned = true;
                 Debug.Log($"EnemyEncounter: Spawned {EnemyData.enemyName} at {spawnPlatforms[spawnIndex].name}");
-                OnEnemySpawnTriggered?.Invoke();
+                GameManager.Instance.RaiseEvent(GameManager.Events.OnEnemySpawnTriggered);
             }
             else
             {

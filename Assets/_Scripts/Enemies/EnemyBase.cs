@@ -9,7 +9,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     protected enum EnemyState { Chase, Attack, Dead, Idle }
 
     [Header("Enemy Data")]
-    [SerializeField] private EnemyData enemyData;
+    [SerializeField] public EnemyData enemyData;
     [SerializeField] public Animator enemyAnim;
 
     [Networked, OnChangedRender(nameof(OnBossHPChanged))] 
@@ -25,7 +25,6 @@ public class EnemyBase : NetworkBehaviour, IDamageable
 
     public Image HealthBar;
     public bool IsDead => CurrentState == EnemyState.Dead;
-    public event Action OnDied;
 
     public override void Spawned()
     {
@@ -226,7 +225,7 @@ public class EnemyBase : NetworkBehaviour, IDamageable
     private void Die()
     {
         CurrentState = EnemyState.Dead;
-        OnDied?.Invoke();
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnEnemyDied);
         Invoke(nameof(DespawnBoss), 2f);
     }
     private void DespawnBoss()

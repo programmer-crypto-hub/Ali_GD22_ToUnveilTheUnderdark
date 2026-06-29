@@ -1,3 +1,4 @@
+// TODO: Apply to usage.
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;

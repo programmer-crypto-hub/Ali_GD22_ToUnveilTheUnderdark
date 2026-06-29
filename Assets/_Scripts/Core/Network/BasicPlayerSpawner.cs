@@ -8,6 +8,7 @@ using UnityEngine;
 public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private NetworkObject _playerPrefab;
+    [SerializeField] private GameObject gameManagerNetworkPrefab;
 
     private NetworkRunner _runner;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
@@ -83,10 +84,18 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
             _spawnedCharacters.Add(player, networkPlayer);
             runner.SetPlayerObject(player, networkPlayer);
 
-            if (GameManager.Instance != null) GameManager.Instance.HandleExploration();
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.HandleExploration();
+                GameManager.Instance.RequestStateChange(GameManager.GameState.Playing);
+            }
         }
     }
 
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        if (runner.IsServer) runner.Spawn(gameManagerNetworkPrefab, Vector3.zero, Quaternion.identity);
+    }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
@@ -116,7 +125,6 @@ public class BasicPlayerSpawner : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    public void OnSceneLoadDone(NetworkRunner runner) { }
     public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }

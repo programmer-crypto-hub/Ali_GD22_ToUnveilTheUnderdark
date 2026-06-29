@@ -4142,6 +4142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasicPlayerSpawner
   _playerPrefab: {fileID: 1005809161424700482, guid: 021b3d65021c2de46895ad27659d29f9, type: 3}
+  gameManagerNetworkPrefab: {fileID: 7991054817448021072, guid: 8db6d4b551bc5d943ab21b5c02c1a1ed, type: 3}
 --- !u!114 &1585282490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4776,7 +4777,8 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 1905918530}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1905918530
 MonoBehaviour:

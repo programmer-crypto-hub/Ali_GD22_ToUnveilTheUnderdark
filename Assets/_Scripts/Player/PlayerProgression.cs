@@ -42,12 +42,6 @@ public class PlayerProgression : NetworkBehaviour
     [Tooltip("Множитель роста требуемого опыта на каждый следующий уровень.")]
     public float xpGrowthFactor = 1.5f;
 
-    // Событие, вызываемое при повышении уровня
-    public event Action<int> OnLevelUp;
-
-    // Событие для обновления UI опыта: (текущий опыт, опыт до следующего уровня)
-    public event Action<float, float> OnXPChanged;
-
     public override void Spawned()
     {
         if (playerStats == null)
@@ -55,7 +49,7 @@ public class PlayerProgression : NetworkBehaviour
 
         // Инициализируем подписчиков начальными значениями
         float required = GetRequiredXPForNextLevel();
-        OnXPChanged?.Invoke(currentXP, required);
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnXPChanged, currentXP, required);
     }
 
     public float GetRequiredXPForNextLevel()
@@ -93,7 +87,7 @@ public class PlayerProgression : NetworkBehaviour
         }
 
         float nextRequired = GetRequiredXPForNextLevel();
-        OnXPChanged?.Invoke(currentXP, nextRequired);
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnXPChanged, currentXP, nextRequired);
 
         if (leveledUpAtLeastOnce)
         {
@@ -107,7 +101,7 @@ public class PlayerProgression : NetworkBehaviour
         caveCoinIncreasePerLevel += 5f; // Увеличиваем прибавку монет на каждом уровне (пример динамической прогрессии)
 
         // Уведомляем подписчиков
-        OnLevelUp?.Invoke(currentLevel);
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnLevelUp, currentLevel);
 
         // Пример: усиливаем характеристики игрока при каждом уровне
         if (playerStats != null)

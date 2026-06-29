@@ -21,7 +21,6 @@ public class WeaponManager : NetworkBehaviour
 
     private ChangeDetector _changes;
 
-    public Action<WeaponBase> OnWeaponChanged;
     public WeaponBase CurrentWeapon
     {
         get

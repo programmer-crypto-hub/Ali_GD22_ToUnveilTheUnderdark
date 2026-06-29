@@ -1,3 +1,4 @@
+// TODO: Find usage for this script (for example, level progression system).
 using System;
 using UnityEngine;
 

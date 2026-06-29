@@ -1,21 +1,22 @@
-using UnityEngine;
+// TODO: Find usage for this script, or delete it
+//using UnityEngine;
 
-public static class GameInitializer
-{
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    public static void InitializeServices()
-    {
-        // Check if they exist, if not, create them and set DontDestroyOnLoad
-        EnsureServiceExists<EventBus>("EventBus");
-    }
+//public static class GameInitializer
+//{
+//    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+//    public static void InitializeServices()
+//    {
+//        // Check if they exist, if not, create them and set DontDestroyOnLoad
+//        EnsureServiceExists<EventBus>("EventBus");
+//    }
 
-    private static void EnsureServiceExists<T>(string name) where T : Component
-    {
-        if (Object.FindFirstObjectByType<T>() == null)
-        {
-            GameObject go = new GameObject(name);
-            go.AddComponent<T>();
-            Object.DontDestroyOnLoad(go);
-        }
-    }
-}
+//    private static void EnsureServiceExists<T>(string name) where T : Component
+//    {
+//        if (Object.FindFirstObjectByType<T>() == null)
+//        {
+//            GameObject go = new GameObject(name);
+//            go.AddComponent<T>();
+//            Object.DontDestroyOnLoad(go);
+//        }
+//    }
+//}

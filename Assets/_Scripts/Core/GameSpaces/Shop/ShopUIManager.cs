@@ -25,14 +25,14 @@ public class ShopUIManager : NetworkBehaviour
         // Clean up using the corrected boolean tracker
         if (GameSession.Instance != null && _isCurrentlySubscribed)
         {
-            GameSession.Instance.OnTurnChangedEvent -= HandleTurnChanged;
+            GameManager.Events.OnTurnChanged -= HandleTurnChanged;
             _isCurrentlySubscribed = false;
         }
     }
 
-    private void HandleTurnChanged()
+    private void HandleTurnChanged(int currentTurnId)
     {
-        if (GameSession.Instance.CurrentTurnID != Runner.LocalPlayer.PlayerId)
+        if (currentTurnId != Runner.LocalPlayer.PlayerId)
         {
             ToggleShop(false);
         }
@@ -151,7 +151,7 @@ public class ShopUIManager : NetworkBehaviour
                 if (shopSystem != null)
                 {
                     shopSystem.RPC_RequestPurchase(item.itemID);
-                    Debug.LogWarning($"[SHOP TRANSACTION] Requested item ID purchase: {item.itemID}");
+                    Debug.LogWarning($"Requested item ID purchase: {item.itemID}");
                 }
                 ToggleShop(false); // Close shop canvas pane seamlessly after clicking
             });

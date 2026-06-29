@@ -1,3 +1,4 @@
+// TODO: Use for ranged enemies, such as archers or mages, that attack from a distance.
 using UnityEngine;
 
 public class RangedEnemies : MonoBehaviour

@@ -1,3 +1,4 @@
+// TODO: Find usage for this script (for example, combat), or delete.
 using UnityEngine;
 using Fusion;
 

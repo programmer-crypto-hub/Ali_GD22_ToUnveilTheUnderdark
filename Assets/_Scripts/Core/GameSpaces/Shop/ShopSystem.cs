@@ -40,7 +40,7 @@ public class ShopSystem : NetworkBehaviour
             player.Gold -= item.cost;
             player.InventoryItemIDs.Set(emptySlotIndex, itemID);
 
-            Debug.LogWarning($"[SERVER TRANSACTION SUCCESS] {player.gameObject.name} successfully purchased {item.itemName}!");
+            Debug.LogWarning($"{player.gameObject.name} successfully purchased {item.itemName}!");
 
             // Force the Inventory layout UI on the player's screen to instantly re-render with the new item icon!
             var invUI = FindFirstObjectByType<InventoryUI>();

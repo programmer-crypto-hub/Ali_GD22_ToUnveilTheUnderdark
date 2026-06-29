@@ -166,13 +166,10 @@ public class PlayerCombatController : NetworkBehaviour
         transform.position = dashDestination;
         Debug.LogWarning($"[WARP TEST] Игрок прыгнул к боссу! Новая позиция в кадре: {transform.position}");
 
-
-        // 2. ЖЕСТКОЕ НАНЕСЕНИЕ УРОНА: Вызываем расчет урона прямо из кода, 
-        // в обход капризных Animation Events! Босс ГАРАНТИРОВАННО потеряет HP.
         if (Object.HasStateAuthority && weaponManager != null)
         {
             weaponManager.PerformCurrentWeaponAttack();
-            RPC_PlayActionEffects(); // Спавним искры удара
+            RPC_PlayActionEffects();
         }
 
         if (bladeHitSFX != null)
@@ -270,10 +267,8 @@ public class PlayerCombatController : NetworkBehaviour
         }
     }
 
-    // ВЫЗЫВАЕТСЯ ВАШИМ UNITY ANIMATION EVENT (В момент самого удара на кадре анимации!)
     public void HandleAttackActionAnimationEvent()
     {
-        // Урон рассчитывает СТРОГО Хост/Сервер
         if (!Object.HasStateAuthority) return;
 
         if (weaponManager != null)
@@ -295,7 +290,7 @@ public class PlayerCombatController : NetworkBehaviour
         {
             Instantiate(attackActionEffectPrefab, attackEffectPoint.position, attackEffectPoint.rotation);
         }
-        Debug.Log("[COMBAT] Эффекты попадания меча по боссу отрисованы!");
+        Debug.Log("Sword Hit VFX played.");
     }
 
     // ВЫЗЫВАЕТСЯ ВАШИМ ВТОРЫМ UNITY ANIMATION EVENT (В самом конце анимации взмаха)

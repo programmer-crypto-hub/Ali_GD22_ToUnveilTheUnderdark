@@ -1,3 +1,4 @@
+// TODO: Find usage to this script or merge with SceneLoader.
 using UnityEngine;
 
 public class NetworkLauncher : MonoBehaviour

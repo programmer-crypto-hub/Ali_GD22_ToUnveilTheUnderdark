@@ -19,10 +19,7 @@ public class EnemyStats : NetworkBehaviour, IDamageable
     public float MoveSpeed => enemyData != null ? enemyData.moveSpeed : 3f;
     public float AttackRange => enemyData != null ? enemyData.attackRange : 1.5f;
 
-    // 3. IDAMAGEABLE IMPLEMENTATION
     public bool IsDead => CurrentHP <= 0;
-
-    public event Action<EnemyStats> OnDied;
 
     public override void Spawned()
     {
@@ -66,7 +63,7 @@ public class EnemyStats : NetworkBehaviour, IDamageable
         Debug.Log($"{name} has died.");
 
         // Notify any local systems (like a UI stats panel)
-        OnDied?.Invoke(this);
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnEnemyDied);
 
         // Despawn deletes the object across the network for everyone
         Runner.Despawn(Object);

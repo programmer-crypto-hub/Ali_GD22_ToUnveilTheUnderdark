@@ -1,3 +1,4 @@
+using System;
 using Fusion;
 using UnityEngine;
 
@@ -8,86 +9,139 @@ public class GameManager : NetworkBehaviour
     public enum GameState
     {
         MainMenu = 0,
-        Playing = 1,
-        Combat = 2, 
-        Paused = 3,
-        Lost = 4,
-        Won = 5,
+        Playing = 1,  // Exploration Mode
+        Combat = 2,   // Turn-Based Combat Loop
+        Lost = 3,
+        Won = 4,
     }
+
+    [SerializeField] private GameEventRegistry events;
+    public static GameEventRegistry Events => Instance != null ? Instance.events : null;
 
     [Networked, OnChangedRender(nameof(OnStateChanged))]
     public GameState CurrentState { get; private set; }
 
+    private GameState _lastLocalState;
+    private bool _isNetworkInitialized = false;
+    // Local state fallback queue if a script requests a state change too early on boot
+    private GameState? _pendingStateRequest = null;
+
     public void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        _lastLocalState = GameState.MainMenu;
     }
+
     public override void Spawned()
     {
-        if (HasStateAuthority) CurrentState = GameState.Combat;
+        _isNetworkInitialized = true;
+        // Establish the initial runtime baseline state securely on the Host
+        if (HasStateAuthority && CurrentState == GameState.MainMenu)
+        {
+            CurrentState = GameState.Playing;
+        }
+
+        Instance = this;
+
+        // Match the initial local frame track cache
+        _lastLocalState = CurrentState;
+
+        if (_pendingStateRequest.HasValue && HasStateAuthority)
+        {
+            CurrentState = _pendingStateRequest.Value;
+            _pendingStateRequest = null;
+        }
+        else if (HasStateAuthority && CurrentState == GameState.MainMenu)
+        {
+            CurrentState = GameState.Combat;
+        }
     }
 
-    // This is the Brain
-    void OnStateChanged()
+    public void RaiseMapGenerated()
     {
-        switch (CurrentState)
+        Debug.Log("Event Fired: OnMapGenerated.");
+        events.OnMapGenerated?.Invoke();
+    }
+
+    public void RequestStateChange(GameState newState)
+    {
+        // Safety Barrier: If Fusion isn't ready yet, queue the request safely in local C# memory
+        if (!_isNetworkInitialized)
         {
-            case GameState.MainMenu:
-                HandleMainMenu();
-                break;
+            Debug.LogWarning($"[GAME MANAGER] Network not ready. Queuing state request to: {newState}");
+            _pendingStateRequest = newState;
+            return;
+        }
 
-            case GameState.Playing:
-                HandleExploration();
-                break;
+        // If we are ready, route it cleanly down to the network authority layer
+        RPC_RequestStateChange(newState);
+    }
 
-            case GameState.Combat:
-                HandleCombat();
-                break;
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_RequestStateChange(GameState newState)
+    {
+        // FIXED: Enforce state authority and assign variable.
+        // DO NOT call OnStateChanged manually here! Fusion's OnChangedRender attribute handles it automatically.
+        if (HasStateAuthority)
+        {
+            CurrentState = newState;
+            Debug.Log($"[SERVER STATE CHANGER] Authority verified. State updated to: {newState}");
+        }
+    }
 
+    // Fired automatically by Photon Fusion 2 on EVERY client when CurrentState replicates!
+    private void OnStateChanged()
+    {
+        GameState oldState = _lastLocalState;
+        GameState newState = CurrentState;
+        _lastLocalState = newState;
+
+        Debug.LogWarning($"[STATE TRANSITION] Replicated switch from {oldState} ➡️ {newState}");
+
+        switch (newState)
+        {
+            case GameState.MainMenu: HandleMainMenu(); break;
+            case GameState.Playing: HandleExploration(); break;
+            case GameState.Combat: HandleCombat(); break;
             case GameState.Lost:
-            case GameState.Won:
-                HandleGameOver(CurrentState);
-                break;
+            case GameState.Won: HandleGameOver(newState); break;
+        }
+
+        if (Events != null)
+        {
+            RaiseEvent(Events.OnGameStateTransition, oldState, newState);
         }
     }
 
     public void HandleExploration()
     {
-        if (HasStateAuthority) CurrentState = GameState.Playing;
         Time.timeScale = 1f;
+
+        // Allow local movement, unlock player input states natively
         PlayerInputHandler.IsMyTurn = true;
-        // Close Shop/Inventory if they were open from another state
+        PlayerInputHandler.IsUIActive = true;
+
         ShopUIManager.Instance?.ToggleShop(false);
-        Debug.Log("Switched to Exploration Mode.");
     }
 
-    public void HandleCombat()
+    private void HandleCombat()
     {
-        if (HasStateAuthority) CurrentState = GameState.Combat;
-        // Disable movement but keep UI active for attacks
+        Time.timeScale = 1f;
+
         PlayerInputHandler.IsMyTurn = false;
         PlayerInputHandler.IsUIActive = true;
-        Debug.Log("Combat Initialized. Board movement frozen.");
     }
 
     public void HandleGameOver(GameState state)
     {
         Time.timeScale = 0f;
         PlayerInputHandler.IsUIActive = true;
-        // Trigger Win/Loss UI screens here
-        if (state == GameState.Won)
-        {
-            Debug.Log("Congratulations! You've won the game!");
-            // Show win screen
-            PlayerInputHandler.IsUIActive = false; // Prevent further actions after winning
-        }
-        else if (state == GameState.Lost)
-        {
-            Debug.Log("Game Over! Better luck next time.");
-            // Show loss screen
-        }
     }
 
     public void HandleMainMenu()
@@ -95,13 +149,7 @@ public class GameManager : NetworkBehaviour
         Time.timeScale = 1f;
         PlayerInputHandler.IsUIActive = true;
     }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RequestStateChange(GameState newState)
-    {
-        if (HasStateAuthority)
-        {
-            CurrentState = newState;
-        }
-    }
+    public void RaiseEvent(Action action) => action?.Invoke();
+    public void RaiseEvent<T>(Action<T> action, T arg) => action?.Invoke(arg);
+    public void RaiseEvent<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2) => action?.Invoke(arg1, arg2);
 }

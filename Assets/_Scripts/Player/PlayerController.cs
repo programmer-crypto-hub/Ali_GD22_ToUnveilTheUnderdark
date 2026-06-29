@@ -14,7 +14,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (playerStats == null) playerStats = GetComponent<PlayerStats>();
         if (!HasInputAuthority || PlayerMovement.Instance == null) return;
-        DiceRoller.Instance.OnDiceRollCompleted += MovePlayer; // Subscribe to dice rolls
+        GameManager.Events.OnDiceRollCompleted += MovePlayer; // Subscribe to dice rolls
         // Привязываем камеру ТОЛЬКО на том компьютере, который управляет этим персонажем
         if (HasInputAuthority)
         {

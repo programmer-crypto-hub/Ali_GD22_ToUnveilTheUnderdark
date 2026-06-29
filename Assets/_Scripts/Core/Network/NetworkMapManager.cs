@@ -33,19 +33,11 @@ public class NetworkMapManager : NetworkBehaviour
     {
         Debug.Log($"Generating Edgar Map with Seed: {seed}");
 
-        // 1. Tell Edgar to use our specific networked seed
-        //Grid2DGenerator.GeneratorConfig.Seed = seed;
-        if (EventBus.Instance == null)
-        {
-            Debug.LogError("EventBus is missing! Check if it's in the current scene or was destroyed.");
-            return;
-        }
         UnityEngine.Random.InitState(seed);
-        // 2. Trigger the generation
-        // Note: Use 'Generate()' for runtime generation
-        EventBus.Instance.RaiseMapGenerated();
+        // Trigger the generation
+        GameManager.Instance.RaiseMapGenerated();
         generator = GetComponent<DungeonGeneratorGrid2D>();
-        generator.Generate(); // Everyone builds the same Lego set!
+        generator.Generate(); 
     }
 
 }

@@ -9,28 +9,16 @@ public class SettingsPanelController : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject mainMenuPanel;
 
-    [Header("UI-controls")]
-    [Tooltip("Player Name input field.")]
     [SerializeField] private TMP_InputField playerName;
-
-    [Tooltip("Game Code input field.")]
     [SerializeField] private TMP_InputField gameCode;
 
     [Networked] private Toggle fullscreenToggle { get; set; }
 
-    [Tooltip(" нопка \"Ќазад\" дл€ закрыти€ панели.")]
     [SerializeField] private Button backButton;
-
-    [Header("јудио-источники (опционально)")]
-    [Tooltip("явные источники дл€ канала sound. –екомендуетс€ назначать вручную; иначе используетс€ резервный путь по loop=false.")]
     [SerializeField] private AudioSource[] soundSources;
-
-    [Tooltip("явные источники дл€ канала music. –екомендуетс€ назначать вручную; иначе используетс€ резервный путь по loop=true.")]
     [SerializeField] private AudioSource[] musicSources;
 
     private bool suppressCallbacks;
-
-    public event Action OnSettingsClosed;
 
     public bool IsOpen => settingsPanel != null && settingsPanel.activeSelf;
 
@@ -39,7 +27,7 @@ public class SettingsPanelController : MonoBehaviour
         if (settingsPanel == null)
         {
             settingsPanel = gameObject;
-            Debug.LogWarning($"{name}: settingsPanel не назначен. »спользую текущий объект как резервный путь.", this);
+            Debug.LogWarning($"{name}: settingsPanel isn't assigned.", this);
         }
 
         ResolveReferencesIfMissing();
@@ -67,11 +55,11 @@ public class SettingsPanelController : MonoBehaviour
 
     public void ClosePanel()
     {
-        if (settingsPanel == null)
+        if (settingsPanel == null || GameManager.Events == null)
             return;
 
         settingsPanel.SetActive(false);
-        OnSettingsClosed?.Invoke();
+        GameManager.Instance.RaiseEvent(GameManager.Events.OnSettingsClosed);
         mainMenuPanel.SetActive(false);
     }
 

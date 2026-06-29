@@ -1,5 +1,5 @@
+// TODO: Add to usage for ranged weapons.
 using UnityEngine;
-
 
 public class RangedWeapon : WeaponBase
 {

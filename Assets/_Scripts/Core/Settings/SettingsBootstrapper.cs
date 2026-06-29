@@ -1,3 +1,4 @@
+// TODO: Use for settings init.
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

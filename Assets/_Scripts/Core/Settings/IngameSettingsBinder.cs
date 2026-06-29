@@ -18,7 +18,6 @@ public class IngameSettingsBinder : NetworkBehaviour
     [Networked] private float networkedMusic { get; set; }
     [Networked] private bool networkedFullscreen { get; set; }
 
-    [Header("Аудио-источники (опционально)")]
     [SerializeField] private AudioSource[] soundSources;
     [SerializeField] private AudioSource[] musicSources;
 
@@ -29,7 +28,7 @@ public class IngameSettingsBinder : NetworkBehaviour
     {
         if (soundSlider == null || musicSlider == null || fullscreenToggle == null)
         {
-            Debug.LogWarning($"{name}: Some Pause settings are not assigned. Using fallback references.", this);
+            Debug.LogWarning($"{name}: Some settings are not assigned. Using fallback references.", this);
             soundSlider = FindFirstObjectByType<Slider>();
             musicSlider = FindFirstObjectByType<Slider>();
             fullscreenToggle = FindFirstObjectByType<Toggle>();
@@ -127,7 +126,7 @@ public class IngameSettingsBinder : NetworkBehaviour
         if (soundSlider != null && musicSlider != null && fullscreenToggle != null)
             return;
 
-        Debug.LogWarning($"{name}: ссылки настроек Pause не полностью назначены. Выполняю резервный автопоиск.", this);
+        Debug.LogWarning($"{name}: Some settings are not assigned. Using fallback references.", this);
 
         if (soundSlider == null || musicSlider == null)
         {
@@ -142,7 +141,7 @@ public class IngameSettingsBinder : NetworkBehaviour
             fullscreenToggle = GetComponentInChildren<Toggle>(true);
 
         if (soundSlider == null || musicSlider == null || fullscreenToggle == null)
-            Debug.LogError($"{name}: PauseSettingsBinder не смог восстановить все ссылки. Назначьте sound/music/fullscreen в Inspector.", this);
+            Debug.LogError($"{name}: IngameSettingsBinder couldn't resolve all references. Please assign sound/music/fullscreen in the Inspector.", this);
     }
 
     private void WarnIfDuplicateBinders()
@@ -154,7 +153,7 @@ public class IngameSettingsBinder : NetworkBehaviour
         if (binders.Length > 1)
         {
             duplicateWarningLogged = true;
-            Debug.LogWarning($"{name}: найдено несколько PauseSettingsBinder ({binders.Length}). Проверьте, что в сцене/префабе остался один активный биндер.", this);
+            Debug.LogWarning($"{name}: Some settings are not assigned. Using fallback references.{binders.Length}: Some settings are not assigned. Using fallback references.", this);
         }
     }
 }

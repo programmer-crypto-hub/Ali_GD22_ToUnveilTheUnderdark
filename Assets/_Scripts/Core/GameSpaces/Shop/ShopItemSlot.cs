@@ -46,7 +46,6 @@ public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             Debug.LogError("TooltipSystem is missing! Check if it's in the current scene or was destroyed.");
             return;
         }
-        // itemData is the ScriptableObject assigned in Setup()
         TooltipSystem.Instance.Show(itemData.description, itemData.itemName);
     }
 
